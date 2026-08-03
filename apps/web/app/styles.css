@@ -2184,6 +2184,22 @@ select:focus-visible {
 }
 
 @media (max-width: 420px) {
+  .mobile-product-nav {
+    justify-content: space-between;
+    gap: 2px;
+    overflow: hidden;
+    padding-inline: 8px;
+  }
+
+  .mobile-product-nav a {
+    min-width: 0;
+    flex: 1 1 0;
+    justify-content: center;
+    padding-inline: 4px;
+    font-size: 0.62rem;
+    white-space: nowrap;
+  }
+
   .password-toggle {
     display: grid;
     width: 44px;
