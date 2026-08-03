@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Phase 1 context gathered
-last_updated: "2026-08-03T17:36:39.258Z"
-last_activity: 2026-08-03 — Roadmap created with all 36 v1 requirements mapped.
+status: executing
+stopped_at: Completed 01-01-PLAN.md
+last_updated: '2026-08-03T18:42:59.317Z'
+last_activity: 2026-08-03
 progress:
   total_phases: 6
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 7
+  completed_plans: 1
+  percent: 14
 ---
 
 # Project State
@@ -21,35 +21,35 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-03)
 
 **Core value:** Cada igreja consegue registrar e acompanhar suas contribuições com segurança, clareza e isolamento total dos dados de outras congregações.
-**Current focus:** Phase 1 — Tenant and Production-Safety Foundation
+**Current focus:** Phase 01 — tenant-and-production-safety-foundation
 
 ## Current Position
 
-Phase: 1 of 6 (Tenant and Production-Safety Foundation)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-08-03 — Roadmap created with all 36 v1 requirements mapped.
+Phase: 01 (tenant-and-production-safety-foundation) — EXECUTING
+Plan: 2 of 7
+Status: Ready to execute
+Last activity: 2026-08-03
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 14%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0
-- Average duration: —
-- Total execution time: 0.0 hours
+- Total plans completed: 1
+- Average duration: 11 min
+- Total execution time: 0.2 hours
 
 **By Phase:**
 
-| Phase | Plans | Total | Avg/Plan |
-| ----- | ----- | ----- | -------- |
-| -     | -     | -     | -        |
+| Phase | Plans | Total  | Avg/Plan |
+| ----- | ----- | ------ | -------- |
+| 01    | 1     | 11 min | 11 min   |
 
 **Recent Trend:**
 
-- Last 5 plans: —
-- Trend: —
+- Last 5 plans: 01-01 (11 min)
+- Trend: Baseline established
 
 _Updated after each plan completion_
 
@@ -62,6 +62,9 @@ Decisions are logged in PROJECT.md Key Decisions table. Recent decisions affecti
 - [Roadmap]: Preserve the dependency order tenant safety → audit/finance → members → donations → reporting → operations.
 - [Roadmap]: Treat visual quality and PT-BR/EN/ES behavior as acceptance gates in every user-facing phase.
 - [Phase 3]: Members remain separate from administrative accounts and precede donation entry.
+- [Phase 01]: Use a stable NOLOGIN uckg_runtime authorization role with separately generated LOGIN members.
+- [Phase 01]: Set tenant, actor, and correlation context transaction-locally and verify pool reuse with max one connection.
+- [Phase 01]: Use migration credentials only for schema and E2E fixture setup while the API runs with the generated runtime URL.
 
 ### Pending Todos
 
@@ -76,6 +79,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-03T17:36:39.251Z
-Stopped at: Phase 1 context gathered
-Resume file: .planning/phases/01-tenant-and-production-safety-foundation/01-CONTEXT.md
+Last session: 2026-08-03T18:42:41.687Z
+Stopped at: Completed 01-01-PLAN.md
+Resume file: None
