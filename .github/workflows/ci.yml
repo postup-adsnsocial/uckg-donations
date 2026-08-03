@@ -23,7 +23,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     env:
-      DATABASE_URL: postgresql://uckg:uckg@localhost:5432/uckg_donations
+      MIGRATION_DATABASE_URL: postgresql://uckg:uckg@localhost:5432/uckg_donations
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -37,6 +37,7 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm test:migrations
+      - run: pnpm --filter @uckg/database test:tenancy
       - run: pnpm build
 
   e2e:
@@ -56,7 +57,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     env:
-      DATABASE_URL: postgresql://uckg:uckg@localhost:5432/uckg_donations
+      MIGRATION_DATABASE_URL: postgresql://uckg:uckg@localhost:5432/uckg_donations
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -67,6 +68,26 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build:packages
       - run: pnpm db:migrate
+      - name: Provision generated runtime LOGIN
+        shell: bash
+        run: |
+          runtime_login="uckg_ci_runtime_${GITHUB_RUN_ID}_${GITHUB_RUN_ATTEMPT}"
+          runtime_password="$(openssl rand -hex 24)"
+          echo "::add-mask::${runtime_password}"
+          RUNTIME_LOGIN="${runtime_login}" RUNTIME_PASSWORD="${runtime_password}" \
+            pnpm --filter @uckg/database exec node --input-type=module --eval '
+              import { Pool } from "pg";
+              const quoteIdentifier = (value) => `"${value.replaceAll(`"`, `""`)}"`;
+              const quoteLiteral = (value) => `\u0027${value.replaceAll(`\u0027`, `\u0027\u0027`)}\u0027`;
+              const pool = new Pool({ connectionString: process.env.MIGRATION_DATABASE_URL });
+              try {
+                await pool.query(`CREATE ROLE ${quoteIdentifier(process.env.RUNTIME_LOGIN)} LOGIN PASSWORD ${quoteLiteral(process.env.RUNTIME_PASSWORD)} NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT NOREPLICATION NOBYPASSRLS`);
+                await pool.query(`GRANT uckg_runtime TO ${quoteIdentifier(process.env.RUNTIME_LOGIN)}`);
+              } finally {
+                await pool.end();
+              }
+            '
+          echo "DATABASE_URL=postgresql://${runtime_login}:${runtime_password}@localhost:5432/uckg_donations" >> "${GITHUB_ENV}"
       - run: pnpm exec playwright install --with-deps chromium firefox
       - run: pnpm test:e2e
       - run: pnpm test:visual

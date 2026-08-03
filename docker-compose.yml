@@ -1,3 +1,7 @@
+x-app-database-environment: &app-database-environment
+  MIGRATION_DATABASE_URL: ${MIGRATION_DATABASE_URL:-postgresql://uckg:uckg@localhost:5432/uckg_donations}
+  DATABASE_URL: ${DATABASE_URL:-postgresql://uckg_runtime_local:uckg_runtime_local@localhost:5432/uckg_donations}
+
 services:
   postgres:
     image: postgres:16-alpine
@@ -14,6 +18,25 @@ services:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  runtime-role:
+    image: postgres:16-alpine
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      <<: *app-database-environment
+    command:
+      - sh
+      - -ec
+      - |
+        until psql "$${MIGRATION_DATABASE_URL}" -tAc "select 1 from pg_roles where rolname = 'uckg_runtime'" | grep -q 1; do
+          sleep 1
+        done
+        if ! psql "$${MIGRATION_DATABASE_URL}" -tAc "select 1 from pg_roles where rolname = 'uckg_runtime_local'" | grep -q 1; then
+          psql "$${MIGRATION_DATABASE_URL}" -v ON_ERROR_STOP=1 -c "CREATE ROLE uckg_runtime_local LOGIN PASSWORD 'uckg_runtime_local' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT NOREPLICATION NOBYPASSRLS"
+        fi
+        psql "$${MIGRATION_DATABASE_URL}" -v ON_ERROR_STOP=1 -c "GRANT uckg_runtime TO uckg_runtime_local"
 
 volumes:
   postgres_data:

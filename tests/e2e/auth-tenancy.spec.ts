@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto';
 import { expect, test } from '@playwright/test';
 
 const databaseUrl =
+  process.env.MIGRATION_DATABASE_URL ??
   process.env.DATABASE_URL ??
   'postgresql://uckg:uckg@localhost:5432/uckg_donations';
 const connection = createDatabase(databaseUrl);
