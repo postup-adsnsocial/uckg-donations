@@ -26,4 +26,31 @@ describe('tenant permissions', () => {
       ),
     ).toBe(true);
   });
+
+  it('limits member data using least privilege', () => {
+    expect(
+      hasPermission(
+        { isPlatformAdmin: false, role: 'church_admin' },
+        'members:write',
+      ),
+    ).toBe(true);
+    expect(
+      hasPermission(
+        { isPlatformAdmin: false, role: 'financial_operator' },
+        'members:read',
+      ),
+    ).toBe(true);
+    expect(
+      hasPermission(
+        { isPlatformAdmin: false, role: 'financial_operator' },
+        'members:write',
+      ),
+    ).toBe(false);
+    expect(
+      hasPermission(
+        { isPlatformAdmin: false, role: 'auditor' },
+        'members:read',
+      ),
+    ).toBe(false);
+  });
 });

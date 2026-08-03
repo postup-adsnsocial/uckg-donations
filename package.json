@@ -24,6 +24,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:migrations": "pnpm --filter @uckg/database test:migrations",
+    "test:mvp": "node tests/e2e/mvp-browser-check.mjs",
+    "test:mvp:firefox": "MVP_BROWSER=firefox node tests/e2e/mvp-browser-check.mjs",
     "test:tenancy": "pnpm --filter @uckg/database test:tenancy",
     "test:visual": "playwright test --config=playwright.visual.config.ts",
     "test:visual:update": "playwright test --config=playwright.visual.config.ts --update-snapshots",

@@ -66,6 +66,32 @@ export interface Dictionary {
     supportPrefix: string;
     title: string;
   };
+  workspace: {
+    anonymous: string;
+    amount: string;
+    date: string;
+    emptyDonations: string;
+    emptyMembers: string;
+    envelopeImage: string;
+    envelopeTitle: string;
+    genericError: string;
+    historyTitle: string;
+    memberEmail: string;
+    memberName: string;
+    memberPhone: string;
+    memberTitle: string;
+    notes: string;
+    optional: string;
+    recentMembers: string;
+    saveEnvelope: string;
+    saveMember: string;
+    saving: string;
+    selectMember: string;
+    successEnvelope: string;
+    successMember: string;
+    total: string;
+    viewImage: string;
+  };
 }
 
 export const dictionaries: Record<Locale, Dictionary> = {
@@ -157,6 +183,33 @@ export const dictionaries: Record<Locale, Dictionary> = {
       supportPrefix: 'Problemas para acessar?',
       title: 'Bem-vindo de volta',
     },
+    workspace: {
+      anonymous: 'Anônimo',
+      amount: 'Valor do envelope',
+      date: 'Data de recebimento',
+      emptyDonations: 'Nenhum envelope lançado ainda.',
+      emptyMembers: 'Nenhum membro cadastrado ainda.',
+      envelopeImage: 'Foto do envelope (JPG ou PNG, até 8 MB)',
+      envelopeTitle: 'Lançar envelope',
+      genericError:
+        'Não foi possível concluir. Confira os dados e tente novamente.',
+      historyTitle: 'Envelopes recentes',
+      memberEmail: 'E-mail',
+      memberName: 'Nome completo',
+      memberPhone: 'Telefone com código do país',
+      memberTitle: 'Cadastrar membro',
+      notes: 'Observação',
+      optional: 'Opcional',
+      recentMembers: 'Membros cadastrados',
+      saveEnvelope: 'Salvar envelope',
+      saveMember: 'Cadastrar membro',
+      saving: 'Salvando…',
+      selectMember: 'Membro relacionado',
+      successEnvelope: 'Envelope lançado com sucesso.',
+      successMember: 'Membro cadastrado com sucesso.',
+      total: 'Total lançado',
+      viewImage: 'Ver imagem',
+    },
   },
   en: {
     brand: {
@@ -240,6 +293,33 @@ export const dictionaries: Record<Locale, Dictionary> = {
       supportAction: 'Contact the system administrator.',
       supportPrefix: 'Having trouble signing in?',
       title: 'Welcome back',
+    },
+    workspace: {
+      anonymous: 'Anonymous',
+      amount: 'Envelope amount',
+      date: 'Date received',
+      emptyDonations: 'No envelopes have been recorded yet.',
+      emptyMembers: 'No members have been registered yet.',
+      envelopeImage: 'Envelope photo (JPG or PNG, up to 8 MB)',
+      envelopeTitle: 'Record envelope',
+      genericError:
+        'Unable to complete the action. Check the details and try again.',
+      historyTitle: 'Recent envelopes',
+      memberEmail: 'Email',
+      memberName: 'Full name',
+      memberPhone: 'Phone with country code',
+      memberTitle: 'Register member',
+      notes: 'Note',
+      optional: 'Optional',
+      recentMembers: 'Registered members',
+      saveEnvelope: 'Save envelope',
+      saveMember: 'Register member',
+      saving: 'Saving…',
+      selectMember: 'Related member',
+      successEnvelope: 'Envelope recorded successfully.',
+      successMember: 'Member registered successfully.',
+      total: 'Recorded total',
+      viewImage: 'View image',
     },
   },
   es: {
@@ -328,6 +408,33 @@ export const dictionaries: Record<Locale, Dictionary> = {
       supportAction: 'Contacta al administrador del sistema.',
       supportPrefix: '¿Problemas para acceder?',
       title: 'Bienvenido de nuevo',
+    },
+    workspace: {
+      anonymous: 'Anónimo',
+      amount: 'Valor del sobre',
+      date: 'Fecha de recepción',
+      emptyDonations: 'Todavía no se registraron sobres.',
+      emptyMembers: 'Todavía no se registraron miembros.',
+      envelopeImage: 'Foto del sobre (JPG o PNG, hasta 8 MB)',
+      envelopeTitle: 'Registrar sobre',
+      genericError:
+        'No fue posible completar la acción. Revisa los datos e inténtalo de nuevo.',
+      historyTitle: 'Sobres recientes',
+      memberEmail: 'Correo electrónico',
+      memberName: 'Nombre completo',
+      memberPhone: 'Teléfono con código de país',
+      memberTitle: 'Registrar miembro',
+      notes: 'Observación',
+      optional: 'Opcional',
+      recentMembers: 'Miembros registrados',
+      saveEnvelope: 'Guardar sobre',
+      saveMember: 'Registrar miembro',
+      saving: 'Guardando…',
+      selectMember: 'Miembro relacionado',
+      successEnvelope: 'Sobre registrado correctamente.',
+      successMember: 'Miembro registrado correctamente.',
+      total: 'Total registrado',
+      viewImage: 'Ver imagen',
     },
   },
 };

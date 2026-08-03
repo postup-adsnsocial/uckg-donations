@@ -8,6 +8,7 @@ import { LocaleSwitcher } from '../components/locale-switcher';
 import { localeFromRoute } from '../i18n/config';
 import { getDictionary } from '../i18n/dictionaries';
 import { apiRequest } from '../lib/api';
+import { MvpWorkspace } from './mvp-workspace';
 
 interface Membership {
   churchId: string;
@@ -180,16 +181,14 @@ export default function DashboardPage() {
             <span aria-hidden="true">◫</span>
             {copy.navigation.overview}
           </a>
-          <span className="sidebar-link sidebar-link--disabled">
+          <a className="sidebar-link" href="#members">
             <span aria-hidden="true">◇</span>
             {copy.navigation.members}
-            <small>{copy.navigation.soon}</small>
-          </span>
-          <span className="sidebar-link sidebar-link--disabled">
+          </a>
+          <a className="sidebar-link" href="#envelopes">
             <span aria-hidden="true">＋</span>
             {copy.navigation.donations}
-            <small>{copy.navigation.soon}</small>
-          </span>
+          </a>
           <span className="sidebar-link sidebar-link--disabled">
             <span aria-hidden="true">▥</span>
             {copy.navigation.reports}
@@ -287,6 +286,12 @@ export default function DashboardPage() {
               <span className="status-pill">{copy.plannedStatus}</span>
             </article>
           </section>
+
+          <MvpWorkspace
+            churchId={currentChurch.church.id}
+            copy={dictionary.workspace}
+            locale={locale}
+          />
 
           <section className="security-note">
             <span aria-hidden="true">✓</span>

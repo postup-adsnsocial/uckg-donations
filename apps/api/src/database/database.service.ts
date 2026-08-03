@@ -1,4 +1,4 @@
-import { Injectable, OnModuleDestroy } from '@nestjs/common';
+import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
 import { createDatabase, type Database } from '@uckg/database';
 import type { Pool } from 'pg';
 
@@ -9,7 +9,7 @@ export class DatabaseService implements OnModuleDestroy {
   readonly db: Database;
   readonly pool: Pool;
 
-  constructor(configService: ApiConfigService) {
+  constructor(@Inject(ApiConfigService) configService: ApiConfigService) {
     const config = configService.values;
     const connection = createDatabase(config.databaseUrl, {
       applicationName: 'uckg-api',

@@ -1,11 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import type { ApiConfig } from './api-config.js';
 
 @Injectable()
 export class ApiConfigService {
-  constructor(private readonly config: ConfigService<ApiConfig, true>) {}
+  constructor(
+    @Inject(ConfigService)
+    private readonly config: ConfigService<ApiConfig, true>,
+  ) {}
 
   get values(): ApiConfig {
     return {

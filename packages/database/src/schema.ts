@@ -2,7 +2,10 @@ import { sql } from 'drizzle-orm';
 import {
   boolean,
   check,
+  date,
+  foreignKey,
   index,
+  integer,
   pgEnum,
   pgTable,
   text,
@@ -172,8 +175,79 @@ export const members = pgTable(
   ],
 );
 
+export const donations = pgTable(
+  'donations',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    churchId: uuid('church_id')
+      .notNull()
+      .references(() => churches.id, { onDelete: 'cascade' }),
+    memberId: uuid('member_id'),
+    amountCents: integer('amount_cents').notNull(),
+    receivedOn: date('received_on').notNull(),
+    notes: text('notes'),
+    createdBy: uuid('created_by')
+      .notNull()
+      .references(() => adminUsers.id, { onDelete: 'restrict' }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    unique('donations_church_id_id_unique').on(table.churchId, table.id),
+    foreignKey({
+      columns: [table.churchId, table.memberId],
+      foreignColumns: [members.churchId, members.id],
+      name: 'donations_church_member_fk',
+    }).onDelete('restrict'),
+    index('donations_church_received_idx').on(table.churchId, table.receivedOn),
+    check('donations_amount_positive', sql`${table.amountCents} > 0`),
+    check(
+      'donations_notes_not_blank',
+      sql`${table.notes} is null or length(trim(${table.notes})) > 0`,
+    ),
+  ],
+);
+
+export const envelopeFiles = pgTable(
+  'envelope_files',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    churchId: uuid('church_id')
+      .notNull()
+      .references(() => churches.id, { onDelete: 'cascade' }),
+    donationId: uuid('donation_id').notNull(),
+    originalName: text('original_name').notNull(),
+    contentType: text('content_type').notNull(),
+    sizeBytes: integer('size_bytes').notNull(),
+    storageKey: text('storage_key').notNull(),
+    checksum: text('checksum').notNull(),
+    uploadedBy: uuid('uploaded_by')
+      .notNull()
+      .references(() => adminUsers.id, { onDelete: 'restrict' }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.churchId, table.donationId],
+      foreignColumns: [donations.churchId, donations.id],
+      name: 'envelope_files_church_donation_fk',
+    }).onDelete('cascade'),
+    uniqueIndex('envelope_files_donation_unique').on(
+      table.churchId,
+      table.donationId,
+    ),
+    uniqueIndex('envelope_files_storage_key_unique').on(table.storageKey),
+    check('envelope_files_size_positive', sql`${table.sizeBytes} > 0`),
+  ],
+);
+
 export type Church = typeof churches.$inferSelect;
 export type AdminUser = typeof adminUsers.$inferSelect;
 export type ChurchMembership = typeof churchMemberships.$inferSelect;
 export type AdminSession = typeof adminSessions.$inferSelect;
 export type Member = typeof members.$inferSelect;
+export type Donation = typeof donations.$inferSelect;
+export type EnvelopeFile = typeof envelopeFiles.$inferSelect;

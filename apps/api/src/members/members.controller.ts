@@ -5,6 +5,7 @@ import {
   Body,
   Controller,
   Get,
+  Inject,
   Post,
 } from '@nestjs/common';
 import { createMemberRequestSchema } from '@uckg/contracts';
@@ -21,7 +22,9 @@ import { MembersService } from './members.service.js';
 
 @Controller('members')
 export class MembersController {
-  constructor(private readonly members: MembersService) {}
+  constructor(
+    @Inject(MembersService) private readonly members: MembersService,
+  ) {}
 
   @Get()
   @DomainRoute('members:read')

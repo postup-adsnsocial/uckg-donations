@@ -958,6 +958,309 @@ select:focus-visible {
   line-height: 1.5;
 }
 
+.mvp-workspace {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.workspace-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #e1e6eb;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 42, 77, 0.04);
+}
+
+.workspace-card__header {
+  display: flex;
+  min-height: 92px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid #e8ecf0;
+  padding: 22px 24px;
+}
+
+.workspace-card__header .section-label {
+  margin-bottom: 5px;
+}
+
+.workspace-card__header h2 {
+  margin: 0;
+  color: var(--ink-950);
+  font-size: 1.25rem;
+  letter-spacing: -0.025em;
+}
+
+.workspace-count {
+  display: grid;
+  min-width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 11px;
+  background: var(--blue-50);
+  color: var(--blue-800);
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.workspace-total {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+  text-align: right;
+}
+
+.workspace-total small {
+  color: var(--ink-500);
+  font-size: 0.67rem;
+}
+
+.workspace-total strong {
+  color: var(--blue-800);
+  font-size: 1.1rem;
+  white-space: nowrap;
+}
+
+.workspace-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  padding: 24px;
+}
+
+.workspace-field {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+}
+
+.workspace-field--wide {
+  grid-column: 1 / -1;
+}
+
+.workspace-field > span {
+  color: var(--ink-700);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.workspace-field input,
+.workspace-field select,
+.workspace-field textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  outline: 0;
+  padding: 10px 12px;
+  background: #ffffff;
+  color: var(--ink-950);
+  font-size: 0.82rem;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.workspace-field input[type='file'] {
+  padding: 8px;
+  color: var(--ink-500);
+}
+
+.workspace-field input[type='file']::file-selector-button {
+  min-height: 30px;
+  margin-right: 10px;
+  border: 0;
+  border-radius: 6px;
+  padding: 0 10px;
+  background: var(--blue-50);
+  color: var(--blue-800);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.workspace-field textarea {
+  min-height: 82px;
+  resize: vertical;
+}
+
+.workspace-field input:focus,
+.workspace-field select:focus,
+.workspace-field textarea:focus {
+  border-color: var(--blue-700);
+  box-shadow: 0 0 0 4px rgba(0, 75, 135, 0.09);
+}
+
+.workspace-submit {
+  min-height: 48px;
+  grid-column: 1 / -1;
+  border: 0;
+  border-radius: 9px;
+  padding: 0 18px;
+  background: var(--blue-800);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 750;
+}
+
+.workspace-submit:hover:not(:disabled) {
+  background: var(--blue-900);
+}
+
+.workspace-submit:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.workspace-message {
+  margin: 0;
+  grid-column: 1 / -1;
+  color: var(--blue-800);
+  font-size: 0.74rem;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.workspace-list {
+  display: grid;
+  gap: 10px;
+  border-top: 1px solid #e8ecf0;
+  padding: 22px 24px 24px;
+}
+
+.workspace-list h3 {
+  margin: 0 0 4px;
+  color: var(--ink-700);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+
+.member-row,
+.donation-row {
+  display: flex;
+  min-width: 0;
+  min-height: 52px;
+  align-items: center;
+  gap: 11px;
+  border-radius: 9px;
+  padding: 8px 10px;
+  background: var(--canvas);
+}
+
+.member-row > span {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--blue-100);
+  color: var(--blue-800);
+  font-size: 0.7rem;
+  font-weight: 850;
+}
+
+.member-row > div,
+.donation-row > div {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.member-row strong,
+.donation-row strong {
+  overflow: hidden;
+  color: var(--ink-700);
+  font-size: 0.76rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.member-row small,
+.donation-row small {
+  overflow: hidden;
+  color: var(--ink-500);
+  font-size: 0.67rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.donation-row {
+  justify-content: space-between;
+}
+
+.donation-row button {
+  min-height: 44px;
+  flex: 0 0 auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 12px;
+  background: #ffffff;
+  color: var(--blue-800);
+  font-size: 0.7rem;
+  font-weight: 750;
+}
+
+.workspace-empty {
+  margin: 0;
+  border: 1px dashed var(--line);
+  border-radius: 9px;
+  padding: 18px;
+  color: var(--ink-500);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.image-preview {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(0, 24, 44, 0.78);
+}
+
+.image-preview > div {
+  position: relative;
+  width: min(900px, 100%);
+  max-height: calc(100dvh - 48px);
+  overflow: auto;
+  border-radius: 14px;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.image-preview button {
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  margin: 0 0 -44px auto;
+  place-items: center;
+  border: 0;
+  border-radius: 10px;
+  background: var(--blue-950);
+  color: #ffffff;
+  font-size: 1.4rem;
+}
+
+.image-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: calc(100dvh - 72px);
+  object-fit: contain;
+}
+
 @media (max-width: 980px) {
   .auth-shell {
     grid-template-columns: minmax(330px, 0.8fr) minmax(410px, 1.2fr);
@@ -1002,6 +1305,10 @@ select:focus-visible {
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
+
+  .mvp-workspace {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 720px) {
@@ -1036,11 +1343,14 @@ select:focus-visible {
   }
 
   .dashboard-topbar {
+    flex-direction: column;
     align-items: flex-start;
     padding: 22px;
   }
 
   .dashboard-topbar__actions {
+    width: 100%;
+    justify-content: flex-start;
     gap: 10px;
   }
 
@@ -1079,6 +1389,29 @@ select:focus-visible {
     width: fit-content;
     margin-left: 60px;
     grid-column: 1 / -1;
+  }
+
+  .workspace-form {
+    grid-template-columns: 1fr;
+  }
+
+  .workspace-field {
+    grid-column: 1 / -1;
+  }
+
+  .donation-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .donation-row small {
+    overflow: visible;
+    text-overflow: initial;
+    white-space: normal;
+  }
+
+  .donation-row button {
+    width: 100%;
   }
 }
 

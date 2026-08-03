@@ -5,7 +5,7 @@ await withPostgresTestHarness(async ({ migratorPool }) => {
     `select table_name
        from information_schema.tables
       where table_schema = 'public'
-        and table_name in ('churches', 'admin_users', 'church_memberships', 'admin_sessions', 'members')
+        and table_name in ('churches', 'admin_users', 'church_memberships', 'admin_sessions', 'members', 'donations', 'envelope_files')
       order by table_name`,
   );
 
@@ -15,6 +15,8 @@ await withPostgresTestHarness(async ({ migratorPool }) => {
     'admin_users',
     'church_memberships',
     'churches',
+    'donations',
+    'envelope_files',
     'members',
   ];
 

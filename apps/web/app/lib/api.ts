@@ -7,7 +7,11 @@ export async function apiRequest(
 ): Promise<Response> {
   const headers = new Headers(init.headers);
 
-  if (init.body && !headers.has('content-type')) {
+  if (
+    init.body &&
+    typeof init.body === 'string' &&
+    !headers.has('content-type')
+  ) {
     headers.set('content-type', 'application/json');
   }
 

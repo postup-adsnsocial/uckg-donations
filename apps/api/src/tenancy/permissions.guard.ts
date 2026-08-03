@@ -14,6 +14,8 @@ import { requiredPermissionsKey } from './permissions.decorator.js';
 export const churchPermissions: ReadonlySet<ChurchPermission> = new Set([
   'audit:read',
   'church:read',
+  'donations:read',
+  'donations:write',
   'finance:write',
   'members:read',
   'members:write',
