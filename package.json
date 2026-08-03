@@ -24,6 +24,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:migrations": "pnpm --filter @uckg/database test:migrations",
+    "test:tenancy": "pnpm --filter @uckg/database test:tenancy",
     "test:visual": "playwright test --config=playwright.visual.config.ts",
     "test:visual:update": "playwright test --config=playwright.visual.config.ts --update-snapshots",
     "typecheck": "pnpm -r --if-present typecheck",

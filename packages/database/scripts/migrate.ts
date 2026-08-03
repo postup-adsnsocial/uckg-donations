@@ -3,9 +3,11 @@ import { fileURLToPath } from 'node:url';
 
 import { createDatabase } from '../src/index.js';
 
-const databaseUrl =
-  process.env.DATABASE_URL ??
-  'postgresql://uckg:uckg@localhost:5432/uckg_donations';
+const databaseUrl = process.env.MIGRATION_DATABASE_URL?.trim();
+
+if (!databaseUrl) {
+  throw new Error('MIGRATION_DATABASE_URL is required to run migrations.');
+}
 const migrationsFolder = fileURLToPath(
   new URL('../migrations', import.meta.url),
 );
