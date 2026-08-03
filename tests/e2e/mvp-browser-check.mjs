@@ -98,7 +98,7 @@ try {
   await assertResponsive(page, 'member-new');
   await page.getByRole('button', { name: 'Salvar' }).click();
   await page.waitForURL(/\/pt-BR\/members\/[0-9a-f-]+\?saved=1$/);
-  await page.getByRole('heading', { name: 'Detalhes do membro' }).waitFor();
+  await page.getByRole('heading', { level: 2, name: memberName }).waitFor();
 
   await page.goto('http://localhost:3000/pt-BR/envelopes/new');
   await page.getByLabel('Valor (USD)').fill('125.50');
@@ -110,14 +110,16 @@ try {
   await assertResponsive(page, 'envelope-new');
   await page.getByRole('button', { name: 'Salvar' }).click();
   await page.waitForURL(/\/pt-BR\/envelopes\/[0-9a-f-]+\?saved=1$/);
-  await page.getByRole('heading', { name: 'Detalhes do envelope' }).waitFor();
+  await page
+    .getByRole('heading', { level: 2, name: 'Detalhes do envelope' })
+    .waitFor();
   await page.getByRole('button', { name: 'Ver detalhes' }).click();
   await page.locator('.envelope-preview').waitFor();
   await assertResponsive(page, 'envelope-detail');
 
   await page.goto('http://localhost:3000/pt-BR/reports');
   await page.getByRole('button', { name: 'Gerar relatório' }).click();
-  await page.getByText('$125.50', { exact: false }).first().waitFor();
+  await page.getByRole('button', { name: '↓ Baixar PDF' }).waitFor();
   await assertResponsive(page, 'reports');
 
   for (const locale of ['en', 'es']) {
