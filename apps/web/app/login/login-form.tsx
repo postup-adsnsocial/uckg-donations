@@ -93,7 +93,12 @@ export function LoginForm({ copy, locale }: LoginFormProps) {
             onClick={() => setShowPassword((visible) => !visible)}
             type="button"
           >
-            {showPassword ? copy.hidePassword : copy.showPassword}
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M2.5 12s3.5-5.5 9.5-5.5 9.5 5.5 9.5 5.5-3.5 5.5-9.5 5.5S2.5 12 2.5 12Z" />
+              <circle cx="12" cy="12" r="2.5" />
+              {showPassword ? <path d="m4 4 16 16" /> : null}
+            </svg>
+            <span>{showPassword ? copy.hidePassword : copy.showPassword}</span>
           </button>
         </div>
       </div>

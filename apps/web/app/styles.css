@@ -304,29 +304,37 @@ button {
 
 .locale-switcher {
   display: flex;
-  height: 38px;
+  width: min(11.25rem, 100%);
+  min-width: 0;
+  min-height: 2.75rem;
   align-items: center;
-  gap: 7px;
   border: 1px solid var(--line);
   border-radius: 9px;
-  padding: 0 9px;
+  padding: 0 0.75rem;
   background: rgba(255, 255, 255, 0.92);
   color: var(--ink-500);
 }
 
 .locale-switcher select {
-  max-width: 92px;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
   border: 0;
   outline: 0;
+  padding: 0 0.25rem;
   background: transparent;
   color: var(--ink-700);
-  font-size: 0.72rem;
+  font-size: 0.875rem;
   font-weight: 700;
+  text-align: center;
+  text-align-last: center;
+  white-space: nowrap;
   cursor: pointer;
 }
 
 .auth-form-panel__inner {
   width: min(100%, 430px);
+  min-width: 0;
   margin: auto;
 }
 
@@ -363,12 +371,15 @@ button {
 
 .login-form {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 22px;
   margin-top: 38px;
 }
 
 .field-group {
   display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
   gap: 9px;
 }
 
@@ -432,6 +443,10 @@ button {
   font-size: 0.72rem;
   font-weight: 750;
   white-space: nowrap;
+}
+
+.password-toggle svg {
+  display: none;
 }
 
 .form-error {
@@ -713,6 +728,8 @@ select:focus-visible {
 .dashboard-topbar__actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 22px;
 }
 
@@ -1028,6 +1045,7 @@ select:focus-visible {
   }
 
   .dashboard-topbar__actions .locale-switcher {
+    width: min(9.5rem, 100%);
     padding-inline: 7px;
   }
 
@@ -1061,6 +1079,37 @@ select:focus-visible {
     width: fit-content;
     margin-left: 60px;
     grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 360px) {
+  .password-toggle {
+    display: grid;
+    width: 44px;
+    flex: 0 0 44px;
+    place-items: center;
+    padding: 0;
+  }
+
+  .password-toggle span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    clip-path: inset(50%);
+  }
+
+  .password-toggle svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.7;
   }
 }
 
