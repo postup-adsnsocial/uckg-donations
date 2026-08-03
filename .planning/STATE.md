@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-08-03T18:51:37.729Z"
+stopped_at: Completed 01-04-PLAN.md
+last_updated: "2026-08-03T18:56:59.582Z"
 last_activity: 2026-08-03
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 7
-  completed_plans: 2
-  percent: 29
+  completed_plans: 3
+  percent: 43
 ---
 
 # Project State
@@ -26,29 +26,29 @@ See: .planning/PROJECT.md (updated 2026-08-03)
 ## Current Position
 
 Phase: 01 (tenant-and-production-safety-foundation) — EXECUTING
-Plan: 3 of 7
+Plan: 4 of 7
 Status: Ready to execute
 Last activity: 2026-08-03
 
-Progress: [███░░░░░░░] 29%
+Progress: [████░░░░░░] 43%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 2
+- Total plans completed: 3
 - Average duration: 9 min
-- Total execution time: 0.3 hours
+- Total execution time: 0.5 hours
 
 **By Phase:**
 
 | Phase | Plans | Total  | Avg/Plan |
 | ----- | ----- | ------ | -------- |
-| 01    | 2     | 17 min | 9 min    |
+| 01    | 3     | 27 min | 9 min    |
 
 **Recent Trend:**
 
-- Last 5 plans: 01-01 (11 min), 01-02 (6 min)
+- Last 5 plans: 01-01 (11 min), 01-02 (6 min), 01-04 (10 min)
 - Trend: Tenant foundation plans are completing within the focused feedback target
 
 _Updated after each plan completion_
@@ -67,6 +67,9 @@ Decisions are logged in PROJECT.md Key Decisions table. Recent decisions affecti
 - [Phase 01]: Use migration credentials only for schema and E2E fixture setup while the API runs with the generated runtime URL.
 - [Phase 01]: TenantContext requires readonly churchId, actorId, and correlationId strings and validates them before opening a transaction.
 - [Phase 01]: Member domain SQL runs through TenantUnitOfWork while retaining explicit church predicates and insert values.
+- [Phase 01]: Production requires explicit API, database, body, proxy, metrics, and login-limit settings; development and test retain conservative defaults.
+- [Phase 01]: The API pool applies the validated statement limit as both PostgreSQL statement_timeout and node-postgres query_timeout.
+- [Phase 01]: Migration credentials remain script-only while ApiConfigService exposes only the runtime DATABASE_URL.
 
 ### Pending Todos
 
@@ -81,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-03T18:51:37.727Z
-Stopped at: Completed 01-02-PLAN.md
+Last session: 2026-08-03T18:56:59.579Z
+Stopped at: Completed 01-04-PLAN.md
 Resume file: None
