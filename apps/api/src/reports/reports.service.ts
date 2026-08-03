@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { schema } from '@uckg/database';
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 
 import type { TenantContext } from '../database/tenant-unit-of-work.js';
 import { TenantUnitOfWork } from '../database/tenant-unit-of-work.js';
@@ -37,6 +37,38 @@ export class ReportsService {
         .orderBy(desc(schema.reportFiles.createdAt))
         .limit(20),
     );
+  }
+
+  async get(context: TenantContext, reportId: string) {
+    const report = await this.tenantUnitOfWork.run(
+      context,
+      async (transaction) => {
+        const [found] = await transaction
+          .select({
+            endDate: schema.reportFiles.endDate,
+            startDate: schema.reportFiles.startDate,
+            storageKey: schema.reportFiles.storageKey,
+          })
+          .from(schema.reportFiles)
+          .where(
+            and(
+              eq(schema.reportFiles.churchId, context.churchId),
+              eq(schema.reportFiles.id, reportId),
+            ),
+          )
+          .limit(1);
+        return found;
+      },
+    );
+
+    if (!report) throw new NotFoundException('Report not found.');
+    return {
+      buffer: await this.storage.download(
+        this.storageBucket,
+        report.storageKey,
+      ),
+      filename: `uckg-donations-${report.startDate}-${report.endDate}.pdf`,
+    };
   }
 
   async generate(

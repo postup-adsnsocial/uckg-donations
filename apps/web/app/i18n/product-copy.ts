@@ -38,6 +38,7 @@ export interface ProductCopy {
     error: string;
   };
   envelopes: {
+    allMembers: string;
     amount: string;
     count: string;
     date: string;
@@ -50,6 +51,7 @@ export interface ProductCopy {
     member: string;
     new: string;
     notes: string;
+    operator: string;
     saved: string;
     startDate: string;
     title: string;
@@ -67,6 +69,7 @@ export interface ProductCopy {
     total: string;
   };
   reports: {
+    archive: string;
     download: string;
     empty: string;
     generate: string;
@@ -115,6 +118,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       title: 'Membros',
     },
     envelopes: {
+      allMembers: 'Todos os membros',
       amount: 'Valor',
       count: 'Envelopes',
       date: 'Data de recebimento',
@@ -127,6 +131,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       member: 'Membro relacionado',
       new: 'Lançar envelope',
       notes: 'Observação',
+      operator: 'Operador',
       saved: 'Envelope lançado com sucesso.',
       startDate: 'Data inicial',
       title: 'Envelopes',
@@ -144,6 +149,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       total: 'Total no período',
     },
     reports: {
+      archive: 'Relatórios arquivados',
       download: 'Baixar PDF',
       empty: 'Escolha o período para gerar o relatório.',
       generate: 'Gerar relatório',
@@ -190,6 +196,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       title: 'Members',
     },
     envelopes: {
+      allMembers: 'All members',
       amount: 'Amount',
       count: 'Envelopes',
       date: 'Date received',
@@ -202,6 +209,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       member: 'Related member',
       new: 'Record envelope',
       notes: 'Note',
+      operator: 'Operator',
       saved: 'Envelope recorded successfully.',
       startDate: 'Start date',
       title: 'Envelopes',
@@ -219,6 +227,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       total: 'Period total',
     },
     reports: {
+      archive: 'Archived reports',
       download: 'Download PDF',
       empty: 'Select a period to generate the report.',
       generate: 'Generate report',
@@ -267,6 +276,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       title: 'Miembros',
     },
     envelopes: {
+      allMembers: 'Todos los miembros',
       amount: 'Valor',
       count: 'Sobres',
       date: 'Fecha de recepción',
@@ -279,6 +289,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       member: 'Miembro relacionado',
       new: 'Registrar sobre',
       notes: 'Observación',
+      operator: 'Operador',
       saved: 'Sobre registrado correctamente.',
       startDate: 'Fecha inicial',
       title: 'Sobres',
@@ -296,6 +307,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       total: 'Total del período',
     },
     reports: {
+      archive: 'Informes archivados',
       download: 'Descargar PDF',
       empty: 'Elige el período para generar el informe.',
       generate: 'Generar informe',

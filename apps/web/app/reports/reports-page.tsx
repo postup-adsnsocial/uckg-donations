@@ -75,6 +75,19 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
     setLoading(false);
   }
 
+  async function downloadArchived(report: ReportRecord) {
+    const response = await apiRequest(`/reports/${report.id}`, {
+      headers: { 'x-church-id': church.id },
+    });
+    if (!response.ok) return;
+    const url = URL.createObjectURL(await response.blob());
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `uckg-donations-${report.startDate}-${report.endDate}.pdf`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  }
+
   const total = items.reduce((sum, item) => sum + item.amountCents, 0);
   return (
     <>
@@ -166,7 +179,7 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
       {archive.length ? (
         <section className="product-panel report-archive">
           <div className="panel-heading">
-            <h3>Archive</h3>
+            <h3>{copy.reports.archive}</h3>
           </div>
           <div className="product-table-wrap">
             <table className="product-table">
@@ -175,6 +188,7 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
                   <th>{copy.envelopes.date}</th>
                   <th>{copy.envelopes.count}</th>
                   <th>{copy.envelopes.total}</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -185,6 +199,15 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
                     </td>
                     <td>{report.envelopeCount}</td>
                     <td>{formatMoney(report.totalCents, locale)}</td>
+                    <td>
+                      <button
+                        className="table-action table-action--button"
+                        type="button"
+                        onClick={() => void downloadArchived(report)}
+                      >
+                        ↓ PDF
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

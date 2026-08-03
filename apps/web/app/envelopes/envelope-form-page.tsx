@@ -32,7 +32,7 @@ function EnvelopeForm({
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    apiRequest('/members?page=1', {
+    apiRequest('/members?page=1&pageSize=200&status=active', {
       headers: { 'x-church-id': church.id },
     }).then(async (response) => {
       if (response.ok)

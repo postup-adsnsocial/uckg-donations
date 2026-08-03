@@ -98,7 +98,7 @@ function EnvelopeDetail({
               <dd>{item.receivedOn}</dd>
             </div>
             <div>
-              <dt>Operator</dt>
+              <dt>{copy.envelopes.operator}</dt>
               <dd>{item.operatorName}</dd>
             </div>
             <div>

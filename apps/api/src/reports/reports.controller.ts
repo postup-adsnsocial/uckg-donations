@@ -5,9 +5,11 @@ import {
   Controller,
   Get,
   Inject,
+  Param,
   Query,
   Res,
 } from '@nestjs/common';
+import { churchIdSchema } from '@uckg/contracts';
 import type { Response } from 'express';
 
 import { CurrentUser } from '../auth/current-user.decorator.js';
@@ -55,6 +57,29 @@ export class ReportsController {
       tenant.church.name,
       startDate,
       endDate,
+    );
+    response.setHeader('Content-Type', 'application/pdf');
+    response.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${report.filename}"`,
+    );
+    response.send(report.buffer);
+  }
+
+  @Get(':reportId')
+  @DomainRoute('donations:read')
+  async get(
+    @CurrentTenant() tenant: ResolvedTenantContext,
+    @CurrentUser() user: AuthenticatedAdmin,
+    @Param('reportId') reportId: string,
+    @Res() response: Response,
+  ) {
+    const parsedId = churchIdSchema.safeParse(reportId);
+    if (!parsedId.success)
+      throw new BadRequestException('Invalid report identifier.');
+    const report = await this.reports.get(
+      this.context(tenant, user),
+      parsedId.data,
     );
     response.setHeader('Content-Type', 'application/pdf');
     response.setHeader(

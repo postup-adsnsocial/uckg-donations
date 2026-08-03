@@ -1414,6 +1414,14 @@ select:focus-visible {
   white-space: nowrap;
 }
 
+.table-action--button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
 .record-status {
   display: inline-flex;
   border-radius: 999px;
@@ -1760,7 +1768,8 @@ select:focus-visible {
   font-weight: 750;
 }
 
-.filter-bar input {
+.filter-bar input,
+.filter-bar select {
   min-height: 46px;
   border: 1px solid var(--line);
   border-radius: 9px;
@@ -2091,6 +2100,7 @@ select:focus-visible {
   }
 
   .filter-bar input,
+  .filter-bar select,
   .filter-bar button {
     width: 100%;
   }

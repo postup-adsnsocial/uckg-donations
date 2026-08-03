@@ -153,6 +153,7 @@ describe('route policy inventory', () => {
       'MembersController.get',
       'MembersController.list',
       'MembersController.update',
+      'ReportsController.get',
       'ReportsController.list',
       'ReportsController.pdf',
     ]);

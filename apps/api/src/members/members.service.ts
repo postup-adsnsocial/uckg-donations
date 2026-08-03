@@ -42,8 +42,8 @@ export class MembersService {
     search = '',
     page = 1,
     status?: 'active' | 'inactive',
+    pageSize = 20,
   ) {
-    const pageSize = 20;
     const term = search.trim();
     const searchPredicate = term
       ? or(
