@@ -37,7 +37,7 @@ Plans:
 
 - [x] 01-01-PLAN.md — Enforce and prove tenant isolation with the real PostgreSQL runtime role.
 - [x] 01-02-PLAN.md — Require explicit transaction-local tenant context for domain work.
-- [ ] 01-03-PLAN.md — Classify every route and deny missing permissions by default.
+- [x] 01-03-PLAN.md — Classify every route and deny missing permissions by default.
 - [x] 01-04-PLAN.md — Validate production configuration and harden HTTP/database bootstrap.
 - [ ] 01-05-PLAN.md — Add exact source and failed-account login throttling semantics.
 - [ ] 01-06-PLAN.md — Add correlated safe logs, health, errors and bounded metrics.
@@ -127,7 +127,7 @@ Plans:
 
 | Phase                                      | Plans Complete | Status      | Completed |
 | ------------------------------------------ | -------------- | ----------- | --------- |
-| 1. Tenant and Production-Safety Foundation | 3/7            | In Progress | -         |
+| 1. Tenant and Production-Safety Foundation | 4/7            | In Progress | -         |
 | 2. Audit and Financial Primitives          | 0/TBD          | Not started | -         |
 | 3. Members End to End                      | 0/TBD          | Not started | -         |
 | 4. Immutable Donation Ledger and Batches   | 0/TBD          | Not started | -         |

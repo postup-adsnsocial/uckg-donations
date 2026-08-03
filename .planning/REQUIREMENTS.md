@@ -17,7 +17,7 @@ clareza e isolamento total dos dados de outras congregações.
 
 - [x] **TEN-01**: Toda operação de domínio exige uma igreja ativa explícita e falha quando o contexto está ausente.
 - [x] **TEN-02**: Leituras e escritas cross-tenant são bloqueadas pela API, constraints e políticas do banco executadas com a role real da aplicação.
-- [ ] **TEN-03**: Cada endpoint de domínio nega acesso por padrão e exige uma permissão específica declarada.
+- [x] **TEN-03**: Cada endpoint de domínio nega acesso por padrão e exige uma permissão específica declarada.
 - [x] **SEC-01**: A API valida configuração de produção no startup e não usa defaults locais fora de desenvolvimento.
 - [x] **SEC-02**: Login possui throttling por origem/conta, headers seguros e logs estruturados que não expõem credenciais, tokens ou PII.
 - [ ] **SEC-03**: Operadores responsáveis conseguem observar saúde, erros e métricas essenciais sem acessar dados sensíveis de outras igrejas.
@@ -114,7 +114,7 @@ clareza e isolamento total dos dados de outras congregações.
 | ----------- | ------- | -------- |
 | TEN-01      | Phase 1 | Complete |
 | TEN-02      | Phase 1 | Complete |
-| TEN-03      | Phase 1 | Pending  |
+| TEN-03      | Phase 1 | Complete |
 | SEC-01      | Phase 1 | Complete |
 | SEC-02      | Phase 1 | Complete |
 | SEC-03      | Phase 1 | Pending  |
