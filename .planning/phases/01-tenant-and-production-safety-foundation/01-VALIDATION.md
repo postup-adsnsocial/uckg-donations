@@ -18,7 +18,7 @@ created: 2026-08-03
 | Property | Value |
 |----------|-------|
 | **Framework** | Vitest 3.2.4, PostgreSQL 16 integration scripts, Playwright 1.54.1 |
-| **Config file** | `vitest.config.ts`, `playwright.config.ts`, `playwright.visual.config.ts` |
+| **Config file** | `vitest.config.ts`, `playwright.config.ts`, `playwright.production-safety.config.ts`, `playwright.visual.config.ts` |
 | **Quick run command** | `pnpm test` |
 | **Full suite command** | `pnpm check:full` |
 | **Estimated runtime** | Measure during Wave 0 and record in summaries |
@@ -40,7 +40,7 @@ created: 2026-08-03
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
 | 01-01-01 | 01 | 1 | TEN-01, TEN-02 | harness/red | `pnpm test:migrations && (pnpm --filter @uckg/database test:tenancy; test $? -ne 0)` | ❌ W0 | ⬜ pending |
 | 01-01-02 | 01 | 1 | TEN-02 | migration/catalog | `pnpm test:migrations` | ✅ extend | ⬜ pending |
-| 01-01-03 | 01 | 1 | TEN-01, TEN-02 | PostgreSQL integration | `pnpm --filter @uckg/database test:tenancy` | ❌ W0 | ⬜ pending |
+| 01-01-03 | 01 | 1 | TEN-01, TEN-02 | PostgreSQL integration | `pnpm --filter @uckg/database test:tenancy && pnpm test:migrations` | ❌ W0 | ⬜ pending |
 | 01-02-01 | 02 | 2 | TEN-01, TEN-02 | unit | `pnpm exec vitest run apps/api/src/database/tenant-unit-of-work.spec.ts` | ❌ W0 | ⬜ pending |
 | 01-02-02 | 02 | 2 | TEN-01 | unit/integration | `pnpm exec vitest run apps/api/src/database apps/api/src/tenancy` | ⚠️ extend | ⬜ pending |
 | 01-03-01 | 03 | 3 | TEN-03 | unit | `pnpm exec vitest run apps/api/src/tenancy/permissions.guard.spec.ts` | ✅ extend | ⬜ pending |
@@ -53,7 +53,7 @@ created: 2026-08-03
 | 01-06-02 | 06 | 4 | SEC-03 | unit | `pnpm exec vitest run apps/api/src/health apps/api/src/observability apps/api/src/tenancy/route-policy-inventory.spec.ts` | ❌ W0 | ⬜ pending |
 | 01-06-03 | 06 | 4 | SEC-02, SEC-03 | type/unit | `pnpm --filter @uckg/api typecheck && pnpm exec vitest run apps/api/src/observability apps/api/src/health` | ❌ W0 | ⬜ pending |
 | 01-07-01 | 07 | 5 | SEC-01, SEC-03 | fixture/list | `pnpm --filter @uckg/api build && pnpm test:production-safety -- --list` | ❌ W0 | ⬜ pending |
-| 01-07-02 | 07 | 5 | TEN-01, TEN-02, TEN-03, SEC-01, SEC-02, SEC-03 | E2E/full | `pnpm --filter @uckg/database test:tenancy && pnpm test:production-safety && pnpm check:full` | ❌ W0 | ⬜ pending |
+| 01-07-02 | 07 | 5 | TEN-01, TEN-02, TEN-03, SEC-01, SEC-02, SEC-03 | targeted production E2E | `pnpm test:production-safety` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -65,11 +65,11 @@ created: 2026-08-03
 - [ ] Shared isolated PostgreSQL database/role harness extracted without discarding the existing members migration assertions.
 - [ ] `apps/api/src/config/api-config.spec.ts` — production fail-fast matrix.
 - [ ] `apps/api/src/tenancy/route-policy-inventory.spec.ts` — all routes classified; all domain routes carry a known non-empty permission.
-- [ ] `apps/api/src/security/login-throttler.guard.spec.ts` — independent source/account keys, proxy behavior and generic throttling.
+- [ ] `apps/api/src/security/login-attempt-store.spec.ts` and `apps/api/src/security/login-source-throttler.guard.spec.ts` — failed-account TTL/reset flow, independent source keys, proxy behavior and generic throttling.
 - [ ] `apps/api/src/observability/logger.config.spec.ts` — JSON redaction canaries.
 - [ ] `apps/api/src/observability/metrics.service.spec.ts` — metric/label allowlist and sensitive canaries.
 - [ ] Extend health tests for independent liveness/readiness and generic database failure.
-- [ ] `tests/e2e/production-safety.spec.ts` — headers, CORS, body limit, throttling, correlation, health and protected metrics.
+- [ ] `playwright.production-safety.config.ts` and `tests/e2e/production-safety.spec.ts` — isolated production-runtime fixture plus headers, CORS, body limit, throttling, correlation, health and protected metrics.
 - [ ] CI/local PostgreSQL provisioning uses separate migrator and real runtime credentials.
 
 ---
