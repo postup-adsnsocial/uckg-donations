@@ -130,6 +130,7 @@ clareza e isolamento total dos dados de outras congregações.
 | MEM-05      | Phase 3 | Pending |
 | MEM-06      | Phase 3 | Pending |
 | DON-01      | Phase 4 | Pending |
+| DON-02      | Phase 4 | Pending |
 | DON-03      | Phase 4 | Pending |
 | DON-04      | Phase 4 | Pending |
 | DON-05      | Phase 4 | Pending |
