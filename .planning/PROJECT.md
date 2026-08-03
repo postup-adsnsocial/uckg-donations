@@ -50,6 +50,8 @@ total dos dados de outras congregações.
 - O usuário definiu que acabamento visual tem importância equivalente ao backend. Erros básicos de
   truncamento, overflow, responsividade e tamanho de controles devem bloquear a entrega.
 - A interface deve sempre ser mantida simultaneamente em `pt-BR`, `en` e `es`.
+- As 150 igrejas-alvo estão nos Estados Unidos; infraestrutura de produção deve priorizar região
+  norte-americana próxima da API, mantendo timezone e locale configuráveis por igreja.
 
 ## Constraints
 
@@ -71,6 +73,7 @@ total dos dados de outras congregações.
 | Senhas administrativas com mínimo de 6 caracteres          | Política solicitada explicitamente pelo responsável do produto          | — Pending |
 | Gate visual obrigatório após E2E                           | Impede regressões de acabamento e traduções truncadas                   | ✓ Good    |
 | Membros antes de doações                                   | Estabelece a identidade opcional do doador antes do registro financeiro | — Pending |
+| PostgreSQL gerenciado e portável em região dos EUA         | Atende as 150 igrejas americanas sem acoplamento a um provedor específico | — Pending |
 
 ## Evolution
 

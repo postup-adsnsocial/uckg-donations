@@ -56,27 +56,30 @@ não conclui membros, auditoria de domínio, doações, relatórios, jobs ou inf
   de cookie preservando `HttpOnly`, `SameSite=Strict` e `Secure` em produção.
 - **D-12:** A política de senha permanece entre 6 e 128 caracteres, conforme decisão explícita do
   produto. Esta fase não elevará o mínimo novamente.
+- **D-13:** As 150 igrejas atendidas estão nos Estados Unidos. O banco gerenciado principal e a API
+  devem operar na mesma região dos EUA; `us-east-1` (Northern Virginia) é o default provisório até
+  medições com a distribuição real dos operadores. A região não será hardcoded no domínio.
 
 ### Safe observability
 
-- **D-13:** Logs são estruturados em JSON e incluem correlação por requisição. Redação obrigatória
+- **D-14:** Logs são estruturados em JSON e incluem correlação por requisição. Redação obrigatória
   cobre senha, cookie, token, authorization headers, e-mail, nomes, telefones e corpos sensíveis;
   eventos de login registram somente resultado e metadados operacionais seguros.
-- **D-14:** `liveness` permanece mínimo e não revela dependências; `readiness` verifica PostgreSQL;
+- **D-15:** `liveness` permanece mínimo e não revela dependências; `readiness` verifica PostgreSQL;
   métricas internas cobrem tráfego, latência, erros, throttling e pool sem labels de alta cardinalidade
   nem conteúdo tenant/PII. Readiness e métricas não serão uma nova tela administrativa nesta fase.
-- **D-15:** Erros recebem um identificador de correlação seguro para investigação. Respostas públicas
+- **D-16:** Erros recebem um identificador de correlação seguro para investigação. Respostas públicas
   não expõem stack trace, SQL, configuração ou detalhes que confirmem a existência de usuários ou
   dados de outra igreja.
 
 ### Verification contract
 
-- **D-16:** Provas de isolamento usam PostgreSQL real e a mesma role sem bypass usada pela aplicação.
+- **D-17:** Provas de isolamento usam PostgreSQL real e a mesma role sem bypass usada pela aplicação.
   Devem cobrir leitura, escrita, associação cross-tenant, ausência de contexto e troca repetida de
   tenant no mesmo pool.
-- **D-17:** Testes cobrem a inicialização de produção inválida, metadata de permissão ausente,
+- **D-18:** Testes cobrem a inicialização de produção inválida, metadata de permissão ausente,
   throttling, headers, redação de logs, liveness/readiness e métricas sem dados sensíveis.
-- **D-18:** Esta fase não adiciona uma nova superfície visual. Se mensagens ou estados visíveis forem
+- **D-19:** Esta fase não adiciona uma nova superfície visual. Se mensagens ou estados visíveis forem
   alterados, entram simultaneamente em PT-BR, EN e ES e passam por E2E e revisão visual nos
   breakpoints definidos em `AGENTS.md`.
 
@@ -166,6 +169,8 @@ não conclui membros, auditoria de domínio, doações, relatórios, jobs ou inf
 - Trocar de igreja deve ser tratado como novo contexto por requisição/transação, nunca como mutação de
   estado global ou estado persistente de uma conexão do pool.
 - O acabamento visual continua sendo critério de correção, embora esta fase não planeje uma nova tela.
+- As 150 igrejas estão nos Estados Unidos; o plano inicial usa um único PostgreSQL multi-tenant em
+  região norte-americana, sem criar um projeto ou banco por igreja.
 
 </specifics>
 
