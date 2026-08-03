@@ -1082,7 +1082,7 @@ select:focus-visible {
   }
 }
 
-@media (max-width: 360px) {
+@media (max-width: 420px) {
   .password-toggle {
     display: grid;
     width: 44px;
