@@ -31,7 +31,13 @@ operacional e o gate completo de qualidade da experiência.
 3. Um endpoint de domínio sem permissão específica declarada é negado, e cada função acessa somente as capacidades que recebeu.
 4. Uma configuração de produção incompleta impede o startup; login abusivo é limitado e respostas incluem headers seguros.
 5. Operadores responsáveis conseguem verificar saúde, erros correlacionados e métricas essenciais sem encontrar credenciais, tokens ou PII nos registros.
-   **Plans**: TBD
+   **Plans**: 4 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Enforce and prove tenant isolation with the real PostgreSQL runtime role.
+- [ ] 01-02-PLAN.md — Require explicit tenant transactions and fail-closed route permissions.
+- [ ] 01-03-PLAN.md — Validate production configuration and harden login/request handling.
+- [ ] 01-04-PLAN.md — Add safe observability and execute the adversarial phase gate.
    **UI hint**: yes
 
 ### Phase 2: Audit and Financial Primitives
@@ -117,7 +123,7 @@ operacional e o gate completo de qualidade da experiência.
 
 | Phase                                      | Plans Complete | Status      | Completed |
 | ------------------------------------------ | -------------- | ----------- | --------- |
-| 1. Tenant and Production-Safety Foundation | 0/TBD          | Not started | -         |
+| 1. Tenant and Production-Safety Foundation | 0/4            | Not started | -         |
 | 2. Audit and Financial Primitives          | 0/TBD          | Not started | -         |
 | 3. Members End to End                      | 0/TBD          | Not started | -         |
 | 4. Immutable Donation Ledger and Batches   | 0/TBD          | Not started | -         |
