@@ -38,14 +38,22 @@ created: 2026-08-03
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 01-01-01 | 01 | 1 | TEN-01, TEN-02 | PostgreSQL integration | `pnpm --filter @uckg/database test:tenancy` | ❌ W0 | ⬜ pending |
+| 01-01-01 | 01 | 1 | TEN-01, TEN-02 | harness/red | `pnpm test:migrations && (pnpm --filter @uckg/database test:tenancy; test $? -ne 0)` | ❌ W0 | ⬜ pending |
 | 01-01-02 | 01 | 1 | TEN-02 | migration/catalog | `pnpm test:migrations` | ✅ extend | ⬜ pending |
-| 01-02-01 | 02 | 2 | TEN-01 | unit + PostgreSQL | `pnpm exec vitest run apps/api/src/database apps/api/src/tenancy` | ❌ W0 | ⬜ pending |
-| 01-02-02 | 02 | 2 | TEN-03 | unit/inventory | `pnpm exec vitest run apps/api/src/tenancy packages/authorization/src/policy.spec.ts` | ⚠️ extend | ⬜ pending |
-| 01-03-01 | 03 | 2 | SEC-01 | unit | `pnpm exec vitest run apps/api/src/config` | ❌ W0 | ⬜ pending |
-| 01-03-02 | 03 | 2 | SEC-02 | unit | `pnpm exec vitest run apps/api/src/security apps/api/src/auth` | ❌ W0 | ⬜ pending |
-| 01-04-01 | 04 | 3 | SEC-02, SEC-03 | unit | `pnpm exec vitest run apps/api/src/observability apps/api/src/health` | ❌ W0 | ⬜ pending |
-| 01-04-02 | 04 | 3 | TEN-01, TEN-02, TEN-03, SEC-01, SEC-02, SEC-03 | E2E/full | `pnpm exec playwright test tests/e2e/production-safety.spec.ts --project=chromium && pnpm check:full` | ❌ W0 | ⬜ pending |
+| 01-01-03 | 01 | 1 | TEN-01, TEN-02 | PostgreSQL integration | `pnpm --filter @uckg/database test:tenancy` | ❌ W0 | ⬜ pending |
+| 01-02-01 | 02 | 2 | TEN-01, TEN-02 | unit | `pnpm exec vitest run apps/api/src/database/tenant-unit-of-work.spec.ts` | ❌ W0 | ⬜ pending |
+| 01-02-02 | 02 | 2 | TEN-01 | unit/integration | `pnpm exec vitest run apps/api/src/database apps/api/src/tenancy` | ⚠️ extend | ⬜ pending |
+| 01-03-01 | 03 | 3 | TEN-03 | unit | `pnpm exec vitest run apps/api/src/tenancy/permissions.guard.spec.ts` | ✅ extend | ⬜ pending |
+| 01-03-02 | 03 | 3 | TEN-03 | inventory | `pnpm exec vitest run apps/api/src/tenancy/route-policy-inventory.spec.ts apps/api/src/tenancy/permissions.guard.spec.ts packages/authorization/src/policy.spec.ts` | ❌ W0 | ⬜ pending |
+| 01-04-01 | 04 | 2 | SEC-01 | unit | `pnpm exec vitest run apps/api/src/config/api-config.spec.ts` | ❌ W0 | ⬜ pending |
+| 01-04-02 | 04 | 2 | SEC-01, SEC-02 | unit/type | `pnpm exec vitest run apps/api/src/config apps/api/src/database && pnpm --filter @uckg/api typecheck` | ⚠️ extend | ⬜ pending |
+| 01-05-01 | 05 | 4 | SEC-02 | unit | `pnpm exec vitest run apps/api/src/security/login-attempt-store.spec.ts apps/api/src/security/login-source-throttler.guard.spec.ts` | ❌ W0 | ⬜ pending |
+| 01-05-02 | 05 | 4 | SEC-02 | unit | `pnpm exec vitest run apps/api/src/security apps/api/src/auth packages/authorization/src/password.spec.ts` | ⚠️ extend | ⬜ pending |
+| 01-06-01 | 06 | 4 | SEC-02, SEC-03 | unit | `pnpm exec vitest run apps/api/src/observability/logger.config.spec.ts` | ❌ W0 | ⬜ pending |
+| 01-06-02 | 06 | 4 | SEC-03 | unit | `pnpm exec vitest run apps/api/src/health apps/api/src/observability apps/api/src/tenancy/route-policy-inventory.spec.ts` | ❌ W0 | ⬜ pending |
+| 01-06-03 | 06 | 4 | SEC-02, SEC-03 | type/unit | `pnpm --filter @uckg/api typecheck && pnpm exec vitest run apps/api/src/observability apps/api/src/health` | ❌ W0 | ⬜ pending |
+| 01-07-01 | 07 | 5 | SEC-01, SEC-03 | fixture/list | `pnpm --filter @uckg/api build && pnpm test:production-safety -- --list` | ❌ W0 | ⬜ pending |
+| 01-07-02 | 07 | 5 | TEN-01, TEN-02, TEN-03, SEC-01, SEC-02, SEC-03 | E2E/full | `pnpm --filter @uckg/database test:tenancy && pnpm test:production-safety && pnpm check:full` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 

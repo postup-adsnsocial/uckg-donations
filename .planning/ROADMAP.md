@@ -31,13 +31,16 @@ operacional e o gate completo de qualidade da experiência.
 3. Um endpoint de domínio sem permissão específica declarada é negado, e cada função acessa somente as capacidades que recebeu.
 4. Uma configuração de produção incompleta impede o startup; login abusivo é limitado e respostas incluem headers seguros.
 5. Operadores responsáveis conseguem verificar saúde, erros correlacionados e métricas essenciais sem encontrar credenciais, tokens ou PII nos registros.
-   **Plans**: 4 plans
+   **Plans**: 7 plans
 
 Plans:
 - [ ] 01-01-PLAN.md — Enforce and prove tenant isolation with the real PostgreSQL runtime role.
-- [ ] 01-02-PLAN.md — Require explicit tenant transactions and fail-closed route permissions.
-- [ ] 01-03-PLAN.md — Validate production configuration and harden login/request handling.
-- [ ] 01-04-PLAN.md — Add safe observability and execute the adversarial phase gate.
+- [ ] 01-02-PLAN.md — Require explicit transaction-local tenant context for domain work.
+- [ ] 01-03-PLAN.md — Classify every route and deny missing permissions by default.
+- [ ] 01-04-PLAN.md — Validate production configuration and harden HTTP/database bootstrap.
+- [ ] 01-05-PLAN.md — Add exact source and failed-account login throttling semantics.
+- [ ] 01-06-PLAN.md — Add correlated safe logs, health, errors and bounded metrics.
+- [ ] 01-07-PLAN.md — Execute the production-role outage/recovery adversarial phase gate.
    **UI hint**: yes
 
 ### Phase 2: Audit and Financial Primitives
@@ -123,7 +126,7 @@ Plans:
 
 | Phase                                      | Plans Complete | Status      | Completed |
 | ------------------------------------------ | -------------- | ----------- | --------- |
-| 1. Tenant and Production-Safety Foundation | 0/4            | Not started | -         |
+| 1. Tenant and Production-Safety Foundation | 0/7            | Not started | -         |
 | 2. Audit and Financial Primitives          | 0/TBD          | Not started | -         |
 | 3. Members End to End                      | 0/TBD          | Not started | -         |
 | 4. Immutable Donation Ledger and Batches   | 0/TBD          | Not started | -         |
