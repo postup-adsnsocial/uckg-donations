@@ -102,18 +102,52 @@ clareza e isolamento total dos dados de outras congregações.
 
 ## Traceability
 
-Preenchida durante a criação do roadmap.
-
-| Requirement | Phase | Status |
-| ----------- | ----- | ------ |
+| Requirement | Phase   | Status  |
+| ----------- | ------- | ------- |
+| TEN-01      | Phase 1 | Pending |
+| TEN-02      | Phase 1 | Pending |
+| TEN-03      | Phase 1 | Pending |
+| SEC-01      | Phase 1 | Pending |
+| SEC-02      | Phase 1 | Pending |
+| SEC-03      | Phase 1 | Pending |
+| AUD-01      | Phase 2 | Pending |
+| AUD-02      | Phase 2 | Pending |
+| FIN-01      | Phase 2 | Pending |
+| FIN-02      | Phase 2 | Pending |
+| FIN-03      | Phase 2 | Pending |
+| MEM-01      | Phase 3 | Pending |
+| MEM-02      | Phase 3 | Pending |
+| MEM-03      | Phase 3 | Pending |
+| MEM-04      | Phase 3 | Pending |
+| MEM-05      | Phase 3 | Pending |
+| MEM-06      | Phase 3 | Pending |
+| DON-01      | Phase 4 | Pending |
+| DON-02      | Phase 4 | Pending |
+| DON-03      | Phase 4 | Pending |
+| DON-04      | Phase 4 | Pending |
+| DON-05      | Phase 4 | Pending |
+| DON-06      | Phase 4 | Pending |
+| DON-07      | Phase 4 | Pending |
+| REP-01      | Phase 5 | Pending |
+| REP-02      | Phase 5 | Pending |
+| REP-03      | Phase 5 | Pending |
+| REP-04      | Phase 5 | Pending |
+| REP-05      | Phase 5 | Pending |
+| OPS-01      | Phase 6 | Pending |
+| OPS-02      | Phase 6 | Pending |
+| OPS-03      | Phase 6 | Pending |
+| OPS-04      | Phase 6 | Pending |
+| UX-01       | Phase 6 | Pending |
+| UX-02       | Phase 6 | Pending |
+| UX-03       | Phase 6 | Pending |
 
 **Coverage:**
 
-- v1 requirements: 38 total
-- Mapped to phases: 0
-- Unmapped: 38 ⚠️
+- v1 requirements: 36 total
+- Mapped to phases: 36
+- Unmapped: 0 ✓
 
 ---
 
 _Requirements defined: 2026-08-03_
-_Last updated: 2026-08-03 after project research_
+_Last updated: 2026-08-03 after roadmap creation_
