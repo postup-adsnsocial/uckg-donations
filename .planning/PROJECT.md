@@ -22,16 +22,15 @@ total dos dados de outras congregações.
 - ✓ Login e dashboard localizados em PT-BR, EN e ES — interface existente
 - ✓ Gate de qualidade com lint, tipos, testes, build, E2E e regressão visual — infraestrutura existente
 - ✓ Política de senha administrativa entre 6 e 128 caracteres — decisão explícita do produto
+- ✓ Cadastro completo, consulta e edição de membros da igreja ativa — MVP implementado
+- ✓ Lançamento e consulta de envelopes com imagem privada e operador — MVP implementado
+- ✓ Dashboard real e relatório básico em PDF por período — MVP implementado
+- ✓ Armazenamento local no desenvolvimento e buckets privados do Supabase em produção — adaptador implementado
 
 ### Active
 
-- [ ] Operadores autorizados conseguem cadastrar, consultar e manter membros da igreja ativa
-- [ ] Dados de membros permanecem isolados por igreja e protegidos por privilégio mínimo
-- [ ] Operadores financeiros conseguem registrar doações vinculadas à igreja e, quando aplicável, ao membro
-- [ ] Operadores conseguem consultar histórico e totais financeiros confiáveis
-- [ ] Relatórios essenciais respeitam locale, timezone e moeda configurados para a igreja
-- [ ] Imagens privadas de envelopes ficam vinculadas ao registro financeiro da igreja ativa
-- [ ] Relatórios podem ser gerados e arquivados em PDF com os mesmos filtros e totais da interface
+- [ ] Conectar e validar o ambiente Supabase real do cliente
+- [ ] Publicar web e API e executar o aceite com uma igreja piloto
 - [ ] Toda nova interface mantém acabamento profissional nas três línguas e nos breakpoints suportados
 - [ ] Controles de segurança pendentes para produção são concluídos antes do lançamento
 
@@ -68,15 +67,15 @@ total dos dados de outras congregações.
 
 ## Key Decisions
 
-| Decision                                                   | Rationale                                                               | Outcome   |
-| ---------------------------------------------------------- | ----------------------------------------------------------------------- | --------- |
-| Monólito modular com processos web, API e worker separados | Preserva limites claros sem custo prematuro de microsserviços           | ✓ Good    |
-| Sessões opacas próprias com cookie seguro                  | Controle explícito de identidade administrativa e tenant                | ✓ Good    |
-| Contas administrativas separadas de membros                | Evita misturar operadores do sistema com pessoas da congregação         | ✓ Good    |
-| PT-BR, EN e ES desde a fundação da interface               | Internacionalização tardia geraria retrabalho estrutural                | ✓ Good    |
-| Senhas administrativas com mínimo de 6 caracteres          | Política solicitada explicitamente pelo responsável do produto          | — Pending |
-| Gate visual obrigatório após E2E                           | Impede regressões de acabamento e traduções truncadas                   | ✓ Good    |
-| Membros antes de doações                                   | Estabelece a identidade opcional do doador antes do registro financeiro | — Pending |
+| Decision                                                   | Rationale                                                                 | Outcome   |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------- | --------- |
+| Monólito modular com processos web, API e worker separados | Preserva limites claros sem custo prematuro de microsserviços             | ✓ Good    |
+| Sessões opacas próprias com cookie seguro                  | Controle explícito de identidade administrativa e tenant                  | ✓ Good    |
+| Contas administrativas separadas de membros                | Evita misturar operadores do sistema com pessoas da congregação           | ✓ Good    |
+| PT-BR, EN e ES desde a fundação da interface               | Internacionalização tardia geraria retrabalho estrutural                  | ✓ Good    |
+| Senhas administrativas com mínimo de 6 caracteres          | Política solicitada explicitamente pelo responsável do produto            | — Pending |
+| Gate visual obrigatório após E2E                           | Impede regressões de acabamento e traduções truncadas                     | ✓ Good    |
+| Membros antes de doações                                   | Estabelece a identidade opcional do doador antes do registro financeiro   | — Pending |
 | PostgreSQL gerenciado e portável em região dos EUA         | Atende as 150 igrejas americanas sem acoplamento a um provedor específico | — Pending |
 | Arquivos fora do banco relacional                          | Envelopes e PDFs crescem separadamente; o banco guarda metadata e vínculo | — Pending |
 

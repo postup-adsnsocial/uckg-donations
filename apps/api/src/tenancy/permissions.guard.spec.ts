@@ -132,7 +132,8 @@ describe('DomainRoute', () => {
   });
 
   it('requires a first permission at compile time', () => {
-    if (false) {
+    const compileOnly = process.env.NODE_ENV === 'compile-only';
+    if (compileOnly) {
       // @ts-expect-error Domain routes must always declare a permission.
       DomainRoute();
     }

@@ -36,20 +36,45 @@ const optionalPhoneSchema = z.preprocess(
 );
 
 export const createMemberRequestSchema = z.object({
+  addressLine1: z.string().trim().min(2).max(200),
+  addressLine2: z.preprocess(
+    (value) => (value === '' ? undefined : value),
+    z.string().trim().max(200).optional(),
+  ),
+  city: z.string().trim().min(2).max(120),
+  country: z.string().trim().length(2).default('US'),
   email: optionalEmailSchema,
   fullName: z.string().trim().min(2).max(160),
+  notes: z.preprocess(
+    (value) => (value === '' ? undefined : value),
+    z.string().trim().max(1000).optional(),
+  ),
   phone: optionalPhoneSchema,
+  postalCode: z
+    .string()
+    .trim()
+    .regex(/^\d{5}(?:-\d{4})?$/),
+  region: z.string().trim().min(2).max(50),
+  status: z.enum(['active', 'inactive']).default('active'),
 });
 
 export type CreateMemberRequest = z.infer<typeof createMemberRequestSchema>;
 
 export const memberSchema = z.object({
+  addressLine1: z.string().nullable(),
+  addressLine2: z.string().nullable(),
+  city: z.string().nullable(),
+  country: z.string(),
   createdAt: z.string().datetime(),
   email: z.string().email().nullable(),
   fullName: z.string(),
   id: z.string().uuid(),
   phone: z.string().nullable(),
+  postalCode: z.string().nullable(),
+  region: z.string().nullable(),
+  notes: z.string().nullable(),
   status: z.enum(['active', 'inactive']),
+  updatedAt: z.string().datetime(),
 });
 
 export type MemberResponse = z.infer<typeof memberSchema>;
@@ -79,6 +104,7 @@ export const donationSchema = z.object({
   id: z.string().uuid(),
   member: z.object({ id: z.string().uuid(), fullName: z.string() }).nullable(),
   notes: z.string().nullable(),
+  operatorName: z.string(),
   receivedOn: z.string(),
 });
 
