@@ -8,6 +8,20 @@
       "when": 1785772037630,
       "tag": "0000_dizzy_ricochet",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1785776394574,
+      "tag": "0001_confused_dragon_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1785782042406,
+      "tag": "0002_tenant_runtime_rls",
+      "breakpoints": true
     }
   ]
 }

@@ -7,6 +7,7 @@ import {
   pgTable,
   text,
   timestamp,
+  unique,
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
@@ -25,6 +26,7 @@ export const churchRole = pgEnum('church_role', [
   'financial_operator',
   'auditor',
 ]);
+export const memberStatus = pgEnum('member_status', ['active', 'inactive']);
 
 export const churches = pgTable(
   'churches',
@@ -131,7 +133,47 @@ export const adminSessions = pgTable(
   ],
 );
 
+export const members = pgTable(
+  'members',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    churchId: uuid('church_id')
+      .notNull()
+      .references(() => churches.id, { onDelete: 'cascade' }),
+    fullName: text('full_name').notNull(),
+    email: text('email'),
+    phone: text('phone'),
+    status: memberStatus('status').notNull().default('active'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    unique('members_church_id_id_unique').on(table.churchId, table.id),
+    index('members_church_name_idx').on(table.churchId, table.fullName),
+    uniqueIndex('members_church_email_unique')
+      .on(table.churchId, sql`lower(${table.email})`)
+      .where(sql`${table.email} is not null`),
+    check(
+      'members_full_name_not_blank',
+      sql`length(trim(${table.fullName})) > 0`,
+    ),
+    check(
+      'members_email_normalized',
+      sql`${table.email} is null or ${table.email} = lower(${table.email})`,
+    ),
+    check(
+      'members_phone_e164',
+      sql`${table.phone} is null or ${table.phone} ~ '^\\+[1-9][0-9]{7,14}$'`,
+    ),
+  ],
+);
+
 export type Church = typeof churches.$inferSelect;
 export type AdminUser = typeof adminUsers.$inferSelect;
 export type ChurchMembership = typeof churchMemberships.$inferSelect;
 export type AdminSession = typeof adminSessions.$inferSelect;
+export type Member = typeof members.$inferSelect;
