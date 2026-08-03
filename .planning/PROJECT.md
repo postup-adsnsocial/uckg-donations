@@ -54,6 +54,8 @@ total dos dados de outras congregações.
 - A interface deve sempre ser mantida simultaneamente em `pt-BR`, `en` e `es`.
 - As 150 igrejas-alvo estão nos Estados Unidos; infraestrutura de produção deve priorizar região
   norte-americana próxima da API, mantendo timezone e locale configuráveis por igreja.
+- O responsável pelo produto é iniciante em tecnologia; decisões devem ser explicadas em linguagem
+  simples, com recomendação direta, impacto prático e perguntas voltadas ao negócio.
 
 ## Constraints
 
