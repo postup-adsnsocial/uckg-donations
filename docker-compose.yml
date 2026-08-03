@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: uckg_donations
+      POSTGRES_PASSWORD: uckg
+      POSTGRES_USER: uckg
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U uckg -d uckg_donations']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
