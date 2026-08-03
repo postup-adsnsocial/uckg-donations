@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import { apiRequest } from '../lib/api';
+import { BrandWordmark } from '../components/brand-wordmark';
 
 interface Membership {
   churchId: string;
@@ -166,15 +167,7 @@ export default function DashboardPage() {
   return (
     <main className="dashboard-shell">
       <aside className="dashboard-sidebar">
-        <div className="wordmark wordmark--sidebar">
-          <span className="wordmark__symbol" aria-hidden="true">
-            U
-          </span>
-          <span className="wordmark__copy">
-            <strong>Universal</strong>
-            <small>Gestão Financeira</small>
-          </span>
-        </div>
+        <BrandWordmark className="wordmark--sidebar" />
 
         <nav aria-label="Navegação principal">
           <a className="sidebar-link sidebar-link--active" href="#visao-geral">

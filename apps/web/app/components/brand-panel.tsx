@@ -1,17 +1,11 @@
+import { BrandWordmark } from './brand-wordmark';
+
 export function BrandPanel() {
   return (
     <aside className="brand-panel" aria-label="Universal Gestão Financeira">
       <div className="brand-panel__grid" aria-hidden="true" />
 
-      <div className="wordmark">
-        <span className="wordmark__symbol" aria-hidden="true">
-          U
-        </span>
-        <span className="wordmark__copy">
-          <strong>Universal</strong>
-          <small>Gestão Financeira</small>
-        </span>
-      </div>
+      <BrandWordmark priority />
 
       <div className="brand-panel__content">
         <p className="section-label section-label--light">

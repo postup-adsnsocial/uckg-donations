@@ -1,4 +1,5 @@
 import { BrandPanel } from '../components/brand-panel';
+import { BrandWordmark } from '../components/brand-wordmark';
 import { LoginForm } from './login-form';
 
 export default function LoginPage() {
@@ -8,15 +9,7 @@ export default function LoginPage() {
 
       <section className="auth-form-panel">
         <div className="auth-form-panel__inner">
-          <div className="mobile-wordmark wordmark">
-            <span className="wordmark__symbol" aria-hidden="true">
-              U
-            </span>
-            <span className="wordmark__copy">
-              <strong>Universal</strong>
-              <small>Gestão Financeira</small>
-            </span>
-          </div>
+          <BrandWordmark className="mobile-wordmark" priority />
 
           <header className="auth-header">
             <p className="section-label">Acesso seguro</p>
