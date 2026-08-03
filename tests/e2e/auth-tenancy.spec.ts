@@ -119,7 +119,7 @@ test.describe('administrative authentication and tenant isolation', () => {
   test('signs in through the web interface and opens the tenant dashboard', async ({
     page,
   }) => {
-    await page.goto('/login');
+    await page.goto('/pt-BR/login');
 
     await expect(
       page.getByRole('heading', { name: 'Bem-vindo de volta' }),
@@ -128,7 +128,7 @@ test.describe('administrative authentication and tenant isolation', () => {
     await page.getByLabel('Senha', { exact: true }).fill(password);
     await page.getByRole('button', { name: 'Entrar no painel' }).click();
 
-    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page).toHaveURL(/\/pt-BR\/dashboard$/);
     await expect(page.getByText(`E2E Church A ${suffix}`)).toBeVisible();
     await expect(page.getByText('Acesso configurado')).toBeVisible();
   });

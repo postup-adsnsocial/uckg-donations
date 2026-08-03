@@ -58,6 +58,18 @@ button {
   cursor: pointer;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
 .auth-shell {
   display: grid;
   min-height: 100dvh;
@@ -269,6 +281,7 @@ button {
 }
 
 .auth-form-panel {
+  position: relative;
   display: flex;
   min-height: 100dvh;
   flex-direction: column;
@@ -281,6 +294,47 @@ button {
       transparent 30%
     ),
     var(--surface);
+}
+
+.auth-form-panel__language {
+  position: absolute;
+  z-index: 2;
+  top: 28px;
+  right: clamp(28px, 4vw, 56px);
+}
+
+.locale-switcher {
+  display: flex;
+  height: 38px;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 0 9px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink-500);
+}
+
+.locale-switcher svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+}
+
+.locale-switcher select {
+  max-width: 92px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink-700);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .auth-form-panel__inner {
@@ -389,6 +443,7 @@ button {
   color: var(--blue-800);
   font-size: 0.72rem;
   font-weight: 750;
+  white-space: nowrap;
 }
 
 .form-error {
@@ -958,6 +1013,11 @@ select:focus-visible {
     padding: 28px 22px;
   }
 
+  .auth-form-panel__language {
+    top: 24px;
+    right: 22px;
+  }
+
   .mobile-wordmark {
     display: flex;
   }
@@ -982,6 +1042,14 @@ select:focus-visible {
 
   .dashboard-topbar__actions {
     gap: 10px;
+  }
+
+  .dashboard-topbar__actions .locale-switcher {
+    padding-inline: 7px;
+  }
+
+  .dashboard-topbar__actions .locale-switcher svg {
+    display: none;
   }
 
   .user-chip > div,

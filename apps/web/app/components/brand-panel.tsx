@@ -1,56 +1,40 @@
 import { BrandWordmark } from './brand-wordmark';
+import type { Dictionary } from '../i18n/dictionaries';
 
-export function BrandPanel() {
+interface BrandPanelProps {
+  copy: Dictionary['brand'];
+}
+
+export function BrandPanel({ copy }: BrandPanelProps) {
   return (
-    <aside className="brand-panel" aria-label="Universal Gestão Financeira">
+    <aside className="brand-panel" aria-label={`Universal ${copy.productName}`}>
       <div className="brand-panel__grid" aria-hidden="true" />
 
-      <BrandWordmark priority />
+      <BrandWordmark priority productName={copy.productName} />
 
       <div className="brand-panel__content">
         <p className="section-label section-label--light">
-          Painel administrativo
+          {copy.administrativePanel}
         </p>
-        <h1>Clareza para cuidar. Segurança para servir.</h1>
-        <p>
-          Uma visão responsável das contribuições, com isolamento por igreja e
-          rastreabilidade para cada operação.
-        </p>
+        <h1>{copy.title}</h1>
+        <p>{copy.description}</p>
       </div>
 
-      <ul className="trust-list" aria-label="Características da plataforma">
-        <li>
-          <span className="trust-list__icon" aria-hidden="true">
-            01
-          </span>
-          <span>
-            <strong>Multi-igreja</strong>
-            Dados separados por congregação
-          </span>
-        </li>
-        <li>
-          <span className="trust-list__icon" aria-hidden="true">
-            02
-          </span>
-          <span>
-            <strong>Auditoria contínua</strong>
-            Histórico íntegro e verificável
-          </span>
-        </li>
-        <li>
-          <span className="trust-list__icon" aria-hidden="true">
-            03
-          </span>
-          <span>
-            <strong>Acesso protegido</strong>
-            Permissões definidas por função
-          </span>
-        </li>
+      <ul className="trust-list" aria-label={copy.featuresLabel}>
+        {copy.features.map((feature, index) => (
+          <li key={feature.title}>
+            <span className="trust-list__icon" aria-hidden="true">
+              {String(index + 1).padStart(2, '0')}
+            </span>
+            <span>
+              <strong>{feature.title}</strong>
+              {feature.description}
+            </span>
+          </li>
+        ))}
       </ul>
 
-      <p className="brand-panel__footer">
-        Universal • Sistema de Gestão Financeira
-      </p>
+      <p className="brand-panel__footer">{copy.footer}</p>
     </aside>
   );
 }

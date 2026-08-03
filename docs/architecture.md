@@ -60,3 +60,14 @@ implementados em marcos posteriores.
 
 O próximo marco pode introduzir o domínio de membros, sempre associado a `church_id`, sem misturar
 contas administrativas com pessoas cadastradas pela igreja.
+
+## Internacionalização da interface
+
+A interface usa rotas localizadas e dicionários tipados antes da expansão dos domínios. Os idiomas
+suportados são `pt-BR`, `en` e `es`, com português brasileiro como padrão. A preferência escolhida é
+persistida em cookie e todas as navegações autenticadas preservam o segmento de idioma.
+
+Textos de interface devem ser adicionados aos três dicionários no mesmo pull request. Datas, números
+e valores monetários devem usar os formatadores compartilhados baseados em `Intl`; valores não devem
+ser formatados manualmente nos componentes. O idioma da interface é uma preferência do operador e
+não altera o `locale` ou o `timezone` cadastrado para a igreja.

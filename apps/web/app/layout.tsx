@@ -4,8 +4,8 @@ import type { ReactNode } from 'react';
 import './styles.css';
 
 export const metadata: Metadata = {
-  description: 'Plataforma de gestão de doações da UCKG',
-  title: 'UCKG Donations',
+  description: 'Universal Financial Management Platform',
+  title: 'Universal | Financial Management',
 };
 
 export default function RootLayout({

@@ -1,36 +1,53 @@
+'use client';
+
+import { useParams } from 'next/navigation';
+
 import { BrandPanel } from '../components/brand-panel';
 import { BrandWordmark } from '../components/brand-wordmark';
+import { LocaleSwitcher } from '../components/locale-switcher';
+import { localeFromRoute } from '../i18n/config';
+import { getDictionary } from '../i18n/dictionaries';
 import { LoginForm } from './login-form';
 
 export default function LoginPage() {
+  const params = useParams<{ locale?: string }>();
+  const locale = localeFromRoute(params.locale);
+  const dictionary = getDictionary(locale);
+
   return (
     <main className="auth-shell">
-      <BrandPanel />
+      <BrandPanel copy={dictionary.brand} />
 
       <section className="auth-form-panel">
+        <div className="auth-form-panel__language">
+          <LocaleSwitcher label={dictionary.languageLabel} locale={locale} />
+        </div>
+
         <div className="auth-form-panel__inner">
-          <BrandWordmark className="mobile-wordmark" priority />
+          <BrandWordmark
+            className="mobile-wordmark"
+            priority
+            productName={dictionary.brand.productName}
+          />
 
           <header className="auth-header">
-            <p className="section-label">Acesso seguro</p>
-            <h2>Bem-vindo de volta</h2>
-            <p>
-              Entre com suas credenciais para acessar o painel da sua igreja.
-            </p>
+            <p className="section-label">{dictionary.login.secureAccess}</p>
+            <h2>{dictionary.login.title}</h2>
+            <p>{dictionary.login.subtitle}</p>
           </header>
 
-          <LoginForm />
+          <LoginForm copy={dictionary.login} locale={locale} />
 
           <p className="support-note">
-            Problemas para acessar?{' '}
-            <span>Fale com o administrador do sistema.</span>
+            {dictionary.login.supportPrefix}{' '}
+            <span>{dictionary.login.supportAction}</span>
           </p>
         </div>
 
         <footer className="auth-form-panel__footer">
-          <span>Ambiente protegido</span>
+          <span>{dictionary.login.environmentProtected}</span>
           <span aria-hidden="true">•</span>
-          <span>Sessão segura de 12 horas</span>
+          <span>{dictionary.login.secureSession}</span>
         </footer>
       </section>
     </main>

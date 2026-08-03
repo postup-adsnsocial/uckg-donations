@@ -22,6 +22,9 @@ pnpm dev
 - API: <http://localhost:3001>
 - Health check: <http://localhost:3001/health>
 
+A interface está disponível em português brasileiro (`/pt-BR`), inglês (`/en`) e espanhol (`/es`).
+O seletor de idioma no login e no dashboard mantém a preferência no navegador.
+
 ## Bootstrap administrativo
 
 Após aplicar as migrations, preencha temporariamente as variáveis `SEED_*` no ambiente e execute:

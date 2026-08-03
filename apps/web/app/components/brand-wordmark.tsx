@@ -2,11 +2,13 @@ import Image from 'next/image';
 
 interface BrandWordmarkProps {
   className?: string;
+  productName: string;
   priority?: boolean;
 }
 
 export function BrandWordmark({
   className = '',
+  productName,
   priority = false,
 }: BrandWordmarkProps) {
   return (
@@ -22,7 +24,7 @@ export function BrandWordmark({
       </span>
       <span className="wordmark__copy">
         <strong>Universal</strong>
-        <small>Gestão Financeira</small>
+        <small>{productName}</small>
       </span>
     </div>
   );

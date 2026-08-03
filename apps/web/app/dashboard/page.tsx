@@ -1,10 +1,13 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
-import { apiRequest } from '../lib/api';
 import { BrandWordmark } from '../components/brand-wordmark';
+import { LocaleSwitcher } from '../components/locale-switcher';
+import { localeFromRoute } from '../i18n/config';
+import { getDictionary } from '../i18n/dictionaries';
+import { apiRequest } from '../lib/api';
 
 interface Membership {
   churchId: string;
@@ -31,14 +34,17 @@ interface CurrentChurch {
   role: Membership['role'] | null;
 }
 
-const roleLabels: Record<Membership['role'], string> = {
-  auditor: 'Auditoria',
-  church_admin: 'Administrador local',
-  financial_operator: 'Operação financeira',
-};
-
 export default function DashboardPage() {
+  const params = useParams<{ locale?: string }>();
   const router = useRouter();
+  const locale = localeFromRoute(params.locale);
+  const dictionary = getDictionary(locale);
+  const copy = dictionary.dashboard;
+  const roleLabels: Record<Membership['role'], string> = {
+    auditor: copy.roles.auditor,
+    church_admin: copy.roles.churchAdmin,
+    financial_operator: copy.roles.financialOperator,
+  };
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [selectedChurchId, setSelectedChurchId] = useState('');
@@ -56,7 +62,7 @@ export default function DashboardPage() {
       });
 
       if (response.status === 401) {
-        router.replace('/login');
+        router.replace(`/${locale}/login`);
         return;
       }
 
@@ -70,7 +76,7 @@ export default function DashboardPage() {
       setCurrentChurch((await response.json()) as CurrentChurch);
       setStatus('ready');
     },
-    [router],
+    [locale, router],
   );
 
   useEffect(() => {
@@ -79,7 +85,7 @@ export default function DashboardPage() {
         const response = await apiRequest('/auth/me');
 
         if (response.status === 401) {
-          router.replace('/login');
+          router.replace(`/${locale}/login`);
           return;
         }
 
@@ -115,12 +121,12 @@ export default function DashboardPage() {
     }
 
     void loadSession();
-  }, [loadChurch, router]);
+  }, [loadChurch, locale, router]);
 
   async function logout() {
     await apiRequest('/auth/logout', { method: 'POST' });
     localStorage.removeItem('uckg_selected_church');
-    router.replace('/login');
+    router.replace(`/${locale}/login`);
     router.refresh();
   }
 
@@ -130,7 +136,7 @@ export default function DashboardPage() {
         <span className="loading-mark" aria-hidden="true">
           U
         </span>
-        <p>Preparando seu ambiente…</p>
+        <p>{copy.preparing}</p>
       </main>
     );
   }
@@ -141,17 +147,14 @@ export default function DashboardPage() {
         <span className="dashboard-state__error" aria-hidden="true">
           !
         </span>
-        <h1>Não foi possível carregar o painel</h1>
-        <p>
-          Verifique sua conexão ou peça ao administrador para revisar seu
-          acesso.
-        </p>
+        <h1>{copy.errorTitle}</h1>
+        <p>{copy.errorDescription}</p>
         <button
           className="primary-button primary-button--compact"
           onClick={logout}
           type="button"
         >
-          Voltar ao login
+          {copy.backToLogin}
         </button>
       </main>
     );
@@ -167,46 +170,53 @@ export default function DashboardPage() {
   return (
     <main className="dashboard-shell">
       <aside className="dashboard-sidebar">
-        <BrandWordmark className="wordmark--sidebar" />
+        <BrandWordmark
+          className="wordmark--sidebar"
+          productName={dictionary.brand.productName}
+        />
 
-        <nav aria-label="Navegação principal">
+        <nav aria-label={copy.adminPanel}>
           <a className="sidebar-link sidebar-link--active" href="#visao-geral">
             <span aria-hidden="true">◫</span>
-            Visão geral
+            {copy.navigation.overview}
           </a>
           <span className="sidebar-link sidebar-link--disabled">
             <span aria-hidden="true">◇</span>
-            Membros
-            <small>Em breve</small>
+            {copy.navigation.members}
+            <small>{copy.navigation.soon}</small>
           </span>
           <span className="sidebar-link sidebar-link--disabled">
             <span aria-hidden="true">＋</span>
-            Doações
-            <small>Em breve</small>
+            {copy.navigation.donations}
+            <small>{copy.navigation.soon}</small>
           </span>
           <span className="sidebar-link sidebar-link--disabled">
             <span aria-hidden="true">▥</span>
-            Relatórios
-            <small>Em breve</small>
+            {copy.navigation.reports}
+            <small>{copy.navigation.soon}</small>
           </span>
         </nav>
 
         <button className="sidebar-logout" onClick={logout} type="button">
-          Sair do sistema
+          {copy.logout}
         </button>
       </aside>
 
       <section className="dashboard-main" id="visao-geral">
         <header className="dashboard-topbar">
           <div>
-            <p className="section-label">Painel administrativo</p>
-            <h1>Olá, {user.displayName.split(' ')[0]}</h1>
+            <p className="section-label">{copy.adminPanel}</p>
+            <h1>
+              {copy.hello} {user.displayName.split(' ')[0]}
+            </h1>
           </div>
 
           <div className="dashboard-topbar__actions">
+            <LocaleSwitcher label={dictionary.languageLabel} locale={locale} />
+
             {memberships.length > 1 ? (
               <label className="church-selector">
-                <span>Igreja</span>
+                <span>{copy.churchLabel}</span>
                 <select
                   onChange={(event) => void loadChurch(event.target.value)}
                   value={selectedChurchId}
@@ -237,7 +247,7 @@ export default function DashboardPage() {
           <section className="church-hero">
             <div>
               <p className="section-label section-label--light">
-                Congregação ativa
+                {copy.activeChurch}
               </p>
               <h2>{currentChurch.church.name}</h2>
               <p>
@@ -247,43 +257,42 @@ export default function DashboardPage() {
             <span className="role-badge">
               {currentChurch.role
                 ? roleLabels[currentChurch.role]
-                : 'Administrador global'}
+                : copy.roles.platformAdmin}
             </span>
           </section>
 
-          <section className="dashboard-grid" aria-label="Estado dos módulos">
+          <section
+            className="dashboard-grid"
+            aria-label={copy.modulesStateLabel}
+          >
             <article className="status-card">
               <span className="status-card__number">01</span>
               <div>
-                <p className="section-label">Identidade</p>
-                <h3>Acesso configurado</h3>
-                <p>Sessão, igreja e permissões validadas para este usuário.</p>
+                <p className="section-label">{copy.identityLabel}</p>
+                <h3>{copy.identityTitle}</h3>
+                <p>{copy.identityDescription}</p>
               </div>
-              <span className="status-pill status-pill--ready">Ativo</span>
+              <span className="status-pill status-pill--ready">
+                {copy.activeStatus}
+              </span>
             </article>
 
             <article className="status-card">
               <span className="status-card__number">02</span>
               <div>
-                <p className="section-label">Próximo módulo</p>
-                <h3>Cadastro de membros</h3>
-                <p>
-                  A base multi-igreja está pronta para receber o domínio de
-                  membros.
-                </p>
+                <p className="section-label">{copy.nextModule}</p>
+                <h3>{copy.membersTitle}</h3>
+                <p>{copy.membersDescription}</p>
               </div>
-              <span className="status-pill">Planejado</span>
+              <span className="status-pill">{copy.plannedStatus}</span>
             </article>
           </section>
 
           <section className="security-note">
             <span aria-hidden="true">✓</span>
             <div>
-              <strong>Ambiente protegido por tenant</strong>
-              <p>
-                Todas as próximas operações serão vinculadas à igreja
-                selecionada e verificadas pela API.
-              </p>
+              <strong>{copy.securityTitle}</strong>
+              <p>{copy.securityDescription}</p>
             </div>
           </section>
         </div>

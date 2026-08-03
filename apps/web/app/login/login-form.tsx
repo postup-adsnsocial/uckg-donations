@@ -4,8 +4,15 @@ import { useRouter } from 'next/navigation';
 import { type FormEvent, useState } from 'react';
 
 import { apiRequest } from '../lib/api';
+import type { Dictionary } from '../i18n/dictionaries';
+import type { Locale } from '../i18n/config';
 
-export function LoginForm() {
+interface LoginFormProps {
+  copy: Dictionary['login'];
+  locale: Locale;
+}
+
+export function LoginForm({ copy, locale }: LoginFormProps) {
   const router = useRouter();
   const [email, setEmail] = useState('post.assessoria@gmail.com');
   const [password, setPassword] = useState('');
@@ -26,19 +33,15 @@ export function LoginForm() {
 
       if (!response.ok) {
         setError(
-          response.status === 401
-            ? 'E-mail ou senha incorretos. Verifique os dados e tente novamente.'
-            : 'Não foi possível entrar agora. Tente novamente em instantes.',
+          response.status === 401 ? copy.invalidCredentials : copy.genericError,
         );
         return;
       }
 
-      router.push('/dashboard');
+      router.push(`/${locale}/dashboard`);
       router.refresh();
     } catch {
-      setError(
-        'A API não está disponível. Confirme se o ambiente local está em execução.',
-      );
+      setError(copy.apiUnavailable);
     } finally {
       setSubmitting(false);
     }
@@ -47,7 +50,7 @@ export function LoginForm() {
   return (
     <form className="login-form" onSubmit={handleSubmit} noValidate>
       <div className="field-group">
-        <label htmlFor="email">E-mail</label>
+        <label htmlFor="email">{copy.emailLabel}</label>
         <div className="field-control">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M4 6.75h16v10.5H4z" />
@@ -58,7 +61,7 @@ export function LoginForm() {
             id="email"
             name="email"
             onChange={(event) => setEmail(event.target.value)}
-            placeholder="nome@universal.org"
+            placeholder={copy.emailPlaceholder}
             required
             type="email"
             value={email}
@@ -67,7 +70,7 @@ export function LoginForm() {
       </div>
 
       <div className="field-group">
-        <label htmlFor="password">Senha</label>
+        <label htmlFor="password">{copy.passwordLabel}</label>
         <div className="field-control">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <rect x="5" y="10" width="14" height="10" rx="2" />
@@ -79,18 +82,18 @@ export function LoginForm() {
             minLength={6}
             name="password"
             onChange={(event) => setPassword(event.target.value)}
-            placeholder="Digite sua senha"
+            placeholder={copy.passwordPlaceholder}
             required
             type={showPassword ? 'text' : 'password'}
             value={password}
           />
           <button
-            aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+            aria-label={showPassword ? copy.hidePassword : copy.showPassword}
             className="password-toggle"
             onClick={() => setShowPassword((visible) => !visible)}
             type="button"
           >
-            {showPassword ? 'Ocultar' : 'Mostrar'}
+            {showPassword ? copy.hidePassword : copy.showPassword}
           </button>
         </div>
       </div>
@@ -103,7 +106,7 @@ export function LoginForm() {
       ) : null}
 
       <button className="primary-button" disabled={submitting} type="submit">
-        <span>{submitting ? 'Entrando…' : 'Entrar no painel'}</span>
+        <span>{submitting ? copy.submitting : copy.submit}</span>
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M5 12h14M14 7l5 5-5 5" />
         </svg>
