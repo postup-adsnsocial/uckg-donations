@@ -15,8 +15,6 @@ describe('password hashing', () => {
   });
 
   it('rejects passwords below the minimum length', async () => {
-    await expect(hashPassword('too-short')).rejects.toThrow(
-      'between 12 and 128',
-    );
+    await expect(hashPassword('short')).rejects.toThrow('between 6 and 128');
   });
 });

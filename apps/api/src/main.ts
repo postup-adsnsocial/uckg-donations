@@ -10,6 +10,7 @@ const app = await NestFactory.create(AppModule);
 app.enableShutdownHooks();
 
 app.enableCors({
+  credentials: true,
   origin: process.env.WEB_URL ?? 'http://localhost:3000',
 });
 

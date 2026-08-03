@@ -31,7 +31,7 @@ pnpm db:seed
 ```
 
 O comando é idempotente para o slug da igreja e o e-mail administrativo. A senha precisa ter entre
-12 e 128 caracteres, é armazenada com `scrypt` e nunca deve ser versionada. Depois do bootstrap,
+6 e 128 caracteres, é armazenada com `scrypt` e nunca deve ser versionada. Depois do bootstrap,
 remova `SEED_ADMIN_PASSWORD` do ambiente.
 
 Rotas administrativas iniciais:

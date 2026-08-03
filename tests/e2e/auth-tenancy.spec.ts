@@ -115,4 +115,21 @@ test.describe('administrative authentication and tenant isolation', () => {
     );
     expect(settings.status()).toBe(403);
   });
+
+  test('signs in through the web interface and opens the tenant dashboard', async ({
+    page,
+  }) => {
+    await page.goto('/login');
+
+    await expect(
+      page.getByRole('heading', { name: 'Bem-vindo de volta' }),
+    ).toBeVisible();
+    await page.getByLabel('E-mail').fill(email);
+    await page.getByLabel('Senha', { exact: true }).fill(password);
+    await page.getByRole('button', { name: 'Entrar no painel' }).click();
+
+    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page.getByText(`E2E Church A ${suffix}`)).toBeVisible();
+    await expect(page.getByText('Acesso configurado')).toBeVisible();
+  });
 });
