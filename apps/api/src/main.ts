@@ -1,17 +1,28 @@
 import 'reflect-metadata';
 
 import { NestFactory } from '@nestjs/core';
+import type { NestExpressApplication } from '@nestjs/platform-express';
+import { json, urlencoded } from 'express';
+import helmet from 'helmet';
 
 import { AppModule } from './app.module.js';
+import { ApiConfigService } from './config/api-config.service.js';
 
-const port = Number(process.env.API_PORT ?? 3001);
-const app = await NestFactory.create(AppModule);
+const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+  bodyParser: false,
+});
+const config = app.get(ApiConfigService).values;
 
-app.enableShutdownHooks();
+app.set('trust proxy', config.trustProxy);
+app.use(helmet());
+app.use(json({ limit: config.bodyLimit }));
+app.use(urlencoded({ extended: true, limit: config.bodyLimit }));
 
 app.enableCors({
   credentials: true,
-  origin: process.env.WEB_URL ?? 'http://localhost:3000',
+  origin: [...config.webOrigins],
 });
 
-await app.listen(port, '0.0.0.0');
+app.enableShutdownHooks();
+
+await app.listen(config.apiPort, '0.0.0.0');

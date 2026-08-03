@@ -26,7 +26,9 @@ describe('DatabaseService', () => {
       },
     } satisfies Pick<ApiConfigService, 'values'>;
 
-    const service = Reflect.construct(DatabaseService, [config]) as DatabaseService;
+    const service = Reflect.construct(DatabaseService, [
+      config,
+    ]) as DatabaseService;
 
     expect(service.pool.options).toMatchObject({
       application_name: 'uckg-api',

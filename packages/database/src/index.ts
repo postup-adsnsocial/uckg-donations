@@ -4,8 +4,27 @@ import { Pool } from 'pg';
 
 import * as schema from './schema.js';
 
-export function createDatabase(databaseUrl: string) {
-  const pool = new Pool({ connectionString: databaseUrl });
+export interface DatabasePoolOptions {
+  readonly applicationName?: string;
+  readonly connectionTimeoutMs?: number;
+  readonly idleTimeoutMs?: number;
+  readonly max?: number;
+  readonly statementTimeoutMs?: number;
+}
+
+export function createDatabase(
+  databaseUrl: string,
+  options: DatabasePoolOptions = {},
+) {
+  const pool = new Pool({
+    application_name: options.applicationName,
+    connectionString: databaseUrl,
+    connectionTimeoutMillis: options.connectionTimeoutMs,
+    idleTimeoutMillis: options.idleTimeoutMs,
+    max: options.max,
+    query_timeout: options.statementTimeoutMs,
+    statement_timeout: options.statementTimeoutMs,
+  });
   const database = drizzle(pool, { schema });
 
   return { database, pool };
