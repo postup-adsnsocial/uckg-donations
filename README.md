@@ -1,6 +1,6 @@
 # UCKG Donations
 
-Fundação do monólito modular multi-tenant para gestão de doações.
+MVP web multi-igreja para cadastro de membros, lançamento de envelopes e relatórios.
 
 ## Requisitos
 
@@ -24,6 +24,27 @@ pnpm dev
 
 A interface está disponível em português brasileiro (`/pt-BR`), inglês (`/en`) e espanhol (`/es`).
 O seletor de idioma no login e no dashboard mantém a preferência no navegador.
+
+## Fluxos do MVP
+
+- `/pt-BR/members`: lista, busca, cadastro completo, detalhe e edição de membros
+- `/pt-BR/envelopes`: histórico por período, lançamento, foto privada e detalhe
+- `/pt-BR/reports`: consolidação por período, total e geração de PDF arquivado
+- as mesmas telas existem sob `/en` e `/es`
+
+Todo cadastro e lançamento exibe a igreja ativa. Valores são armazenados em centavos de dólar
+e imagens/PDFs ficam fora das tabelas do PostgreSQL.
+
+## Supabase em produção
+
+O aplicativo usa PostgreSQL padrão: as migrations funcionam tanto no Docker local quanto no
+PostgreSQL do Supabase. Em produção, configure `DATABASE_URL` e `MIGRATION_DATABASE_URL` com as
+conexões fornecidas pelo Supabase, aplique `pnpm db:migrate` e execute
+[`supabase/storage.sql`](supabase/storage.sql) no editor SQL do projeto.
+
+Com `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` preenchidos, fotos e PDFs são enviados para os
+buckets privados `envelopes` e `reports`. Sem essas variáveis, o desenvolvimento local usa `.data/`.
+Nunca coloque a service role em uma variável `NEXT_PUBLIC_*` ou no navegador.
 
 ## Bootstrap administrativo
 
@@ -56,13 +77,15 @@ pnpm test:migrations
 pnpm build
 pnpm exec playwright install chromium firefox
 pnpm test:e2e
+pnpm test:mvp
+pnpm test:mvp:firefox
 pnpm test:visual
 ```
 
-O teste visual é executado depois dos testes funcionais. Ele compara screenshots aprovadas do
-login em português, inglês e espanhol, nos navegadores Chromium e Firefox e em larguras de 320,
-390 e 1440 pixels. O mesmo gate rejeita rolagem horizontal, textos de campos ou idiomas cortados
-e controles principais menores que 44 pixels.
+O teste visual é executado depois dos testes funcionais. Além do login, `test:mvp` percorre dashboard,
+membros, envelopes e relatórios, cria dados reais e registra screenshots em 1280, 375 e 320 pixels.
+Repita-o no Firefox com `test:mvp:firefox`. O gate rejeita rolagem horizontal e impede que uma nova
+tela seja considerada pronta sem revisão nos dois navegadores.
 
 Use `pnpm check:full` para executar toda a sequência local. Quando uma alteração visual for
 intencional e já tiver sido revisada nos arquivos gerados em `test-results/`, atualize as imagens

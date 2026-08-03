@@ -2,7 +2,7 @@ import { chromium, firefox } from '@playwright/test';
 import { hashPassword } from '../../packages/authorization/dist/index.js';
 import { createDatabase, schema } from '../../packages/database/dist/index.js';
 import { randomUUID } from 'node:crypto';
-import { rm } from 'node:fs/promises';
+import { mkdir, rm } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 const connection = createDatabase(
@@ -16,14 +16,47 @@ const memberName = `Member ${suffix}`;
 const envelopeImage = fileURLToPath(
   new URL('../../apps/web/public/universal-logo.png', import.meta.url),
 );
+const browserName =
+  process.env.MVP_BROWSER === 'firefox' ? 'firefox' : 'chromium';
+const screenshotRoot = `/tmp/uckg-mvp-${browserName}`;
 let churchId;
 let userId;
 let browser;
 
+async function assertResponsive(page, name) {
+  for (const viewport of [
+    { height: 800, width: 1280 },
+    { height: 812, width: 375 },
+    { height: 800, width: 320 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.screenshot({
+      fullPage: true,
+      path: `${screenshotRoot}/${name}-${viewport.width}.png`,
+    });
+    const overflow = await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth >
+        document.documentElement.clientWidth,
+    );
+    if (overflow)
+      throw new Error(
+        `${name} overflows at ${viewport.width}px in ${browserName}.`,
+      );
+  }
+}
+
 try {
+  await mkdir(screenshotRoot, { recursive: true });
   const [church] = await connection.database
     .insert(schema.churches)
-    .values({ name: `Browser MVP ${suffix}`, slug: `browser-mvp-${suffix}` })
+    .values({
+      name: `UCKG New York ${suffix}`,
+      slug: `browser-mvp-${suffix}`,
+      city: 'New York',
+      region: 'NY',
+      country: 'US',
+    })
     .returning({ id: schema.churches.id });
   const [user] = await connection.database
     .insert(schema.adminUsers)
@@ -36,104 +69,65 @@ try {
   if (!church || !user) throw new Error('Unable to create browser fixtures.');
   churchId = church.id;
   userId = user.id;
-  await connection.database.insert(schema.churchMemberships).values({
-    churchId,
-    role: 'church_admin',
-    userId,
-  });
+  await connection.database
+    .insert(schema.churchMemberships)
+    .values({ churchId, role: 'church_admin', userId });
 
-  const browserType =
-    process.env.MVP_BROWSER === 'firefox' ? firefox : chromium;
-  browser = await browserType.launch();
+  browser = await (browserName === 'firefox' ? firefox : chromium).launch();
   const page = await browser.newPage({
-    viewport: { width: 1440, height: 1000 },
+    viewport: { width: 1280, height: 800 },
   });
-  page.setDefaultTimeout(10_000);
-  console.log('Opening login...');
+  page.setDefaultTimeout(12_000);
   await page.goto('http://localhost:3000/pt-BR/login');
   await page.getByLabel('E-mail').fill(email);
   await page.getByLabel('Senha', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Entrar no painel' }).click();
   await page.waitForURL(/\/pt-BR\/dashboard$/);
-  console.log('Creating member...');
+  await assertResponsive(page, 'dashboard');
 
+  await page.goto('http://localhost:3000/pt-BR/members/new');
   await page.getByLabel('Nome completo').fill(memberName);
-  await page.getByLabel(/Telefone/).fill('+1 212 555 0100');
-  await page.getByRole('button', { name: 'Cadastrar membro' }).click();
-  await page.getByText('Membro cadastrado com sucesso.').waitFor();
-  console.log('Recording envelope...');
+  await page
+    .getByLabel('E-mail · Opcional')
+    .fill(`member-${suffix}@example.com`);
+  await page.getByLabel('Telefone · Opcional').fill('+12125550100');
+  await page.getByLabel('Endereço', { exact: true }).fill('350 Fifth Avenue');
+  await page.getByLabel('Cidade').fill('New York');
+  await page.getByLabel('Estado').selectOption('NY');
+  await page.getByLabel('ZIP Code').fill('10118');
+  await assertResponsive(page, 'member-new');
+  await page.getByRole('button', { name: 'Salvar' }).click();
+  await page.waitForURL(/\/pt-BR\/members\/[0-9a-f-]+\?saved=1$/);
+  await page.getByRole('heading', { name: 'Detalhes do membro' }).waitFor();
 
-  await page.getByLabel('Valor do envelope').fill('125.50');
+  await page.goto('http://localhost:3000/pt-BR/envelopes/new');
+  await page.getByLabel('Valor (USD)').fill('125.50');
   await page
     .getByLabel(/Membro relacionado/)
     .selectOption({ label: memberName });
-  await page.getByLabel(/Foto do envelope/).setInputFiles(envelopeImage);
+  await page.getByLabel(/Imagem do envelope/).setInputFiles(envelopeImage);
   await page.getByLabel(/Observação/).fill('Browser MVP verification');
-  await page.getByRole('button', { name: 'Salvar envelope' }).click();
-  await page.getByText('Envelope lançado com sucesso.').waitFor();
-  console.log('Capturing responsive views...');
-  await page.screenshot({ fullPage: true, path: '/tmp/uckg-mvp-desktop.png' });
+  await assertResponsive(page, 'envelope-new');
+  await page.getByRole('button', { name: 'Salvar' }).click();
+  await page.waitForURL(/\/pt-BR\/envelopes\/[0-9a-f-]+\?saved=1$/);
+  await page.getByRole('heading', { name: 'Detalhes do envelope' }).waitFor();
+  await page.getByRole('button', { name: 'Ver detalhes' }).click();
+  await page.locator('.envelope-preview').waitFor();
+  await assertResponsive(page, 'envelope-detail');
 
-  const desktopOverflow = await page.evaluate(
-    () =>
-      document.documentElement.scrollWidth >
-      document.documentElement.clientWidth,
-  );
-  if (desktopOverflow)
-    throw new Error('Desktop layout has horizontal overflow.');
+  await page.goto('http://localhost:3000/pt-BR/reports');
+  await page.getByRole('button', { name: 'Gerar relatório' }).click();
+  await page.getByText('$125.50', { exact: false }).first().waitFor();
+  await assertResponsive(page, 'reports');
 
-  await page.setViewportSize({ width: 375, height: 812 });
-  await page.screenshot({ fullPage: true, path: '/tmp/uckg-mvp-mobile.png' });
-  const mobileOverflow = await page.evaluate(
-    () =>
-      document.documentElement.scrollWidth >
-      document.documentElement.clientWidth,
-  );
-  if (mobileOverflow) throw new Error('Mobile layout has horizontal overflow.');
-
-  for (const localized of [
-    { code: 'en', heading: 'Register member' },
-    { code: 'es', heading: 'Registrar miembro' },
-  ]) {
-    await page.goto(`http://localhost:3000/${localized.code}/dashboard`);
-    await page.getByRole('heading', { name: localized.heading }).waitFor();
-    for (const viewport of [
-      { height: 720, width: 1280 },
-      { height: 812, width: 375 },
-      { height: 800, width: 320 },
-    ]) {
-      await page.setViewportSize(viewport);
-      const overflow = await page.evaluate(
-        () =>
-          document.documentElement.scrollWidth >
-          document.documentElement.clientWidth,
-      );
-      if (overflow) {
-        throw new Error(
-          `${localized.code} layout overflows at ${viewport.width}px.`,
-        );
-      }
-      if (viewport.width === 375) {
-        await page.screenshot({
-          fullPage: true,
-          path: `/tmp/uckg-mvp-${localized.code}-mobile.png`,
-        });
-      }
+  for (const locale of ['en', 'es']) {
+    for (const path of ['dashboard', 'members', 'envelopes', 'reports']) {
+      await page.goto(`http://localhost:3000/${locale}/${path}`);
+      await assertResponsive(page, `${locale}-${path}`);
     }
   }
-
-  await page.goto('http://localhost:3000/pt-BR/dashboard');
-  await page.setViewportSize({ width: 375, height: 812 });
-  await page.getByRole('button', { name: 'Ver imagem' }).click();
-  await page.getByRole('dialog').waitFor();
-  const imageVisible = await page
-    .getByRole('dialog')
-    .locator('img')
-    .isVisible();
-  if (!imageVisible) throw new Error('Private envelope image did not open.');
-
   console.log(
-    `MVP browser check passed in ${process.env.MVP_BROWSER ?? 'chromium'} on desktop and mobile.`,
+    `MVP visual and functional review passed in ${browserName}. Screenshots: ${screenshotRoot}`,
   );
 } finally {
   await browser?.close();
@@ -141,15 +135,12 @@ try {
     await connection.pool.query('delete from churches where id = $1', [
       churchId,
     ]);
-    await rm(`apps/api/.data/envelopes/${churchId}`, {
-      force: true,
-      recursive: true,
-    });
+    await rm(`.data/envelopes/${churchId}`, { force: true, recursive: true });
+    await rm(`.data/reports/${churchId}`, { force: true, recursive: true });
   }
-  if (userId) {
+  if (userId)
     await connection.pool.query('delete from admin_users where id = $1', [
       userId,
     ]);
-  }
   await connection.pool.end();
 }

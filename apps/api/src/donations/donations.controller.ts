@@ -8,6 +8,7 @@ import {
   Inject,
   Param,
   Post,
+  Query,
   Res,
   UploadedFile,
   UseInterceptors,
@@ -39,8 +40,43 @@ export class DonationsController {
   list(
     @CurrentTenant() tenant: ResolvedTenantContext,
     @CurrentUser() user: AuthenticatedAdmin,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+    @Query('memberId') memberId?: string,
   ) {
-    return this.donations.list(this.toTenantContext(tenant, user));
+    const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+    if (
+      (startDate && !datePattern.test(startDate)) ||
+      (endDate && !datePattern.test(endDate)) ||
+      (memberId && !churchIdSchema.safeParse(memberId).success)
+    ) {
+      throw new BadRequestException('Invalid envelope filters.');
+    }
+
+    return this.donations.list(this.toTenantContext(tenant, user), {
+      endDate,
+      memberId,
+      startDate,
+    });
+  }
+
+  @Get(':donationId')
+  @DomainRoute('donations:read')
+  get(
+    @CurrentTenant() tenant: ResolvedTenantContext,
+    @CurrentUser() user: AuthenticatedAdmin,
+    @Param('donationId') donationId: string,
+  ) {
+    const parsedId = churchIdSchema.safeParse(donationId);
+
+    if (!parsedId.success) {
+      throw new BadRequestException('Invalid envelope identifier.');
+    }
+
+    return this.donations.get(
+      this.toTenantContext(tenant, user),
+      parsedId.data,
+    );
   }
 
   @Post()

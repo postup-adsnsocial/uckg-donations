@@ -42,6 +42,17 @@ até 150 igrejas nos Estados Unidos.
 4. Fazer revisão funcional e visual nos três idiomas e nos tamanhos de tela suportados.
 5. Implantar banco, arquivos, API e site em serviços gerenciados nos Estados Unidos.
 
+## Estado atual — 2026-08-03
+
+- [x] Fluxo completo de membros com endereço dos EUA e igreja visível.
+- [x] Fluxo de envelopes com valor, data, membro opcional, imagem, observação e operador.
+- [x] Dashboard calculado a partir dos registros reais.
+- [x] Relatório por período com PDF e registro de arquivo por igreja.
+- [x] PostgreSQL portável e armazenamento com adaptador para buckets privados do Supabase.
+- [x] Rotas próprias em PT-BR, EN e ES e revisão responsiva automatizada preparada.
+- [ ] Executar migrations e o roteiro de navegador no ambiente local fora do sandbox.
+- [ ] Informar credenciais do projeto Supabase e da hospedagem para publicar o MVP.
+
 ## Critério de pronto
 
 Um operador consegue entrar, escolher sua igreja, cadastrar um membro, registrar uma doação com a

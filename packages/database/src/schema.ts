@@ -39,6 +39,14 @@ export const churches = pgTable(
     slug: text('slug').notNull(),
     locale: text('locale').notNull().default('pt-BR'),
     timezone: text('timezone').notNull().default('America/Sao_Paulo'),
+    addressLine1: text('address_line_1'),
+    addressLine2: text('address_line_2'),
+    city: text('city'),
+    region: text('region'),
+    postalCode: text('postal_code'),
+    country: text('country').notNull().default('US'),
+    phone: text('phone'),
+    email: text('email'),
     status: churchStatus('status').notNull().default('active'),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
@@ -146,6 +154,13 @@ export const members = pgTable(
     fullName: text('full_name').notNull(),
     email: text('email'),
     phone: text('phone'),
+    addressLine1: text('address_line_1'),
+    addressLine2: text('address_line_2'),
+    city: text('city'),
+    region: text('region'),
+    postalCode: text('postal_code'),
+    country: text('country').notNull().default('US'),
+    notes: text('notes'),
     status: memberStatus('status').notNull().default('active'),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
@@ -244,6 +259,40 @@ export const envelopeFiles = pgTable(
   ],
 );
 
+export const reportFiles = pgTable(
+  'report_files',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    churchId: uuid('church_id')
+      .notNull()
+      .references(() => churches.id, { onDelete: 'cascade' }),
+    startDate: date('start_date').notNull(),
+    endDate: date('end_date').notNull(),
+    envelopeCount: integer('envelope_count').notNull(),
+    totalCents: integer('total_cents').notNull(),
+    storageKey: text('storage_key').notNull(),
+    createdBy: uuid('created_by')
+      .notNull()
+      .references(() => adminUsers.id, { onDelete: 'restrict' }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index('report_files_church_created_idx').on(
+      table.churchId,
+      table.createdAt,
+    ),
+    uniqueIndex('report_files_storage_key_unique').on(table.storageKey),
+    check(
+      'report_files_period_valid',
+      sql`${table.startDate} <= ${table.endDate}`,
+    ),
+    check('report_files_count_valid', sql`${table.envelopeCount} >= 0`),
+    check('report_files_total_valid', sql`${table.totalCents} >= 0`),
+  ],
+);
+
 export type Church = typeof churches.$inferSelect;
 export type AdminUser = typeof adminUsers.$inferSelect;
 export type ChurchMembership = typeof churchMemberships.$inferSelect;
@@ -251,3 +300,4 @@ export type AdminSession = typeof adminSessions.$inferSelect;
 export type Member = typeof members.$inferSelect;
 export type Donation = typeof donations.$inferSelect;
 export type EnvelopeFile = typeof envelopeFiles.$inferSelect;
+export type ReportFile = typeof reportFiles.$inferSelect;

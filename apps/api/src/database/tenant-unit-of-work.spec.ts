@@ -60,14 +60,17 @@ describe('TenantUnitOfWork', () => {
     ['churchId', { actorId: 'actor', correlationId: 'correlation' }],
     ['actorId', { churchId: 'church', correlationId: 'correlation' }],
     ['correlationId', { actorId: 'actor', churchId: 'church' }],
-  ])('rejects missing %s before opening a transaction', async (_field, value) => {
-    const { database, subject } = createSubject();
-    const work = vi.fn();
+  ])(
+    'rejects missing %s before opening a transaction',
+    async (_field, value) => {
+      const { database, subject } = createSubject();
+      const work = vi.fn();
 
-    await expect(
-      subject.run(value as TenantContext, work),
-    ).rejects.toThrow('Tenant context requires churchId, actorId, and correlationId.');
-    expect(database.db.transaction).not.toHaveBeenCalled();
-    expect(work).not.toHaveBeenCalled();
-  });
+      await expect(subject.run(value as TenantContext, work)).rejects.toThrow(
+        'Tenant context requires churchId, actorId, and correlationId.',
+      );
+      expect(database.db.transaction).not.toHaveBeenCalled();
+      expect(work).not.toHaveBeenCalled();
+    },
+  );
 });

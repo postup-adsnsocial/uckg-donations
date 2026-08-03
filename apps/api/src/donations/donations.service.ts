@@ -1,16 +1,16 @@
 import { createHash, randomUUID } from 'node:crypto';
-import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
-import { extname, resolve } from 'node:path';
+import { extname } from 'node:path';
 
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { CreateDonationRequest } from '@uckg/contracts';
 import { schema } from '@uckg/database';
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, gte, lte, type SQL } from 'drizzle-orm';
 
 import {
   type TenantContext,
   TenantUnitOfWork,
 } from '../database/tenant-unit-of-work.js';
+import { PrivateObjectStorage } from '../storage/private-object-storage.js';
 
 export interface EnvelopeUpload {
   readonly buffer: Buffer;
@@ -21,16 +21,34 @@ export interface EnvelopeUpload {
 
 @Injectable()
 export class DonationsService {
-  private readonly storageRoot = resolve(
-    process.env.ENVELOPE_STORAGE_PATH ?? '.data/envelopes',
-  );
+  private readonly storageBucket =
+    process.env.ENVELOPE_STORAGE_BUCKET ?? 'envelopes';
 
   constructor(
     @Inject(TenantUnitOfWork)
     private readonly tenantUnitOfWork: TenantUnitOfWork,
+    @Inject(PrivateObjectStorage)
+    private readonly storage: PrivateObjectStorage,
   ) {}
 
-  list(context: TenantContext) {
+  list(
+    context: TenantContext,
+    filters: { startDate?: string; endDate?: string; memberId?: string } = {},
+  ) {
+    const predicates: SQL[] = [eq(schema.donations.churchId, context.churchId)];
+
+    if (filters.startDate) {
+      predicates.push(gte(schema.donations.receivedOn, filters.startDate));
+    }
+
+    if (filters.endDate) {
+      predicates.push(lte(schema.donations.receivedOn, filters.endDate));
+    }
+
+    if (filters.memberId) {
+      predicates.push(eq(schema.donations.memberId, filters.memberId));
+    }
+
     return this.tenantUnitOfWork.run(context, (transaction) =>
       transaction
         .select({
@@ -43,6 +61,7 @@ export class DonationsService {
           memberFullName: schema.members.fullName,
           memberId: schema.members.id,
           notes: schema.donations.notes,
+          operatorName: schema.adminUsers.displayName,
           receivedOn: schema.donations.receivedOn,
         })
         .from(schema.donations)
@@ -60,7 +79,11 @@ export class DonationsService {
             eq(schema.envelopeFiles.donationId, schema.donations.id),
           ),
         )
-        .where(eq(schema.donations.churchId, context.churchId))
+        .innerJoin(
+          schema.adminUsers,
+          eq(schema.adminUsers.id, schema.donations.createdBy),
+        )
+        .where(and(...predicates))
         .orderBy(
           desc(schema.donations.receivedOn),
           desc(schema.donations.createdAt),
@@ -81,10 +104,24 @@ export class DonationsService {
               ? { fullName: row.memberFullName!, id: row.memberId }
               : null,
             notes: row.notes,
+            operatorName: row.operatorName,
             receivedOn: row.receivedOn,
           })),
         ),
     );
+  }
+
+  async get(context: TenantContext, donationId: string) {
+    const donations = await this.list(context);
+    const donation = donations.find((item) => item.id === donationId);
+
+    if (!donation) {
+      throw new NotFoundException(
+        'Envelope record not found in the active church.',
+      );
+    }
+
+    return donation;
   }
 
   async create(context: TenantContext, input: CreateDonationRequest) {
@@ -133,11 +170,12 @@ export class DonationsService {
   ) {
     const extension = this.safeExtension(file.originalname, file.mimetype);
     const storageKey = `${context.churchId}/${donationId}-${randomUUID()}${extension}`;
-    const storagePath = resolve(this.storageRoot, storageKey);
-    const churchDirectory = resolve(this.storageRoot, context.churchId);
-
-    await mkdir(churchDirectory, { recursive: true });
-    await writeFile(storagePath, file.buffer, { flag: 'wx' });
+    await this.storage.upload(
+      this.storageBucket,
+      storageKey,
+      file.buffer,
+      file.mimetype,
+    );
 
     try {
       return await this.tenantUnitOfWork.run(context, async (transaction) => {
@@ -189,7 +227,7 @@ export class DonationsService {
         return attachment;
       });
     } catch (error) {
-      await unlink(storagePath).catch(() => undefined);
+      await this.storage.remove(this.storageBucket, storageKey);
       throw error;
     }
   }
@@ -222,7 +260,7 @@ export class DonationsService {
     }
 
     return {
-      buffer: await readFile(resolve(this.storageRoot, file.storageKey)),
+      buffer: await this.storage.download(this.storageBucket, file.storageKey),
       contentType: file.contentType,
       originalName: file.originalName,
     };

@@ -20,6 +20,7 @@ import { AppModule } from '../app.module.js';
 import { AuthService } from '../auth/auth.service.js';
 import { MembersService } from '../members/members.service.js';
 import { DonationsService } from '../donations/donations.service.js';
+import { ReportsService } from '../reports/reports.service.js';
 import { requiredPermissionsKey } from './permissions.decorator.js';
 import { churchPermissions } from './permissions.guard.js';
 import {
@@ -69,6 +70,7 @@ const registeredControllers = collectControllers(AppModule);
     { provide: AuthService, useValue: {} },
     { provide: MembersService, useValue: {} },
     { provide: DonationsService, useValue: {} },
+    { provide: ReportsService, useValue: {} },
     { provide: TenantService, useValue: {} },
   ],
 })
@@ -143,11 +145,16 @@ describe('route policy inventory', () => {
       'ChurchesController.settings',
       'DonationsController.attachEnvelope',
       'DonationsController.create',
+      'DonationsController.get',
       'DonationsController.getEnvelope',
       'DonationsController.list',
       'HealthController.getHealth',
       'MembersController.create',
+      'MembersController.get',
       'MembersController.list',
+      'MembersController.update',
+      'ReportsController.list',
+      'ReportsController.pdf',
     ]);
   });
 

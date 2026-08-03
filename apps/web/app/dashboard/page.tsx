@@ -1,307 +1,145 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
-import { BrandWordmark } from '../components/brand-wordmark';
-import { LocaleSwitcher } from '../components/locale-switcher';
-import { localeFromRoute } from '../i18n/config';
-import { getDictionary } from '../i18n/dictionaries';
+import { AppShell, type AppChurch } from '../components/app-shell';
+import { type Locale, localeFromRoute } from '../i18n/config';
+import { productCopies } from '../i18n/product-copy';
 import { apiRequest } from '../lib/api';
-import { MvpWorkspace } from './mvp-workspace';
-
-interface Membership {
-  churchId: string;
-  churchName: string;
-  churchSlug: string;
-  role: 'auditor' | 'church_admin' | 'financial_operator';
-}
-
-interface AuthenticatedUser {
-  displayName: string;
-  email: string;
-  id: string;
-  isPlatformAdmin: boolean;
-}
-
-interface CurrentChurch {
-  church: {
-    id: string;
-    locale: string;
-    name: string;
-    slug: string;
-    timezone: string;
-  };
-  role: Membership['role'] | null;
-}
+import { type EnvelopeRecord, formatMoney } from '../envelopes/types';
 
 export default function DashboardPage() {
   const params = useParams<{ locale?: string }>();
-  const router = useRouter();
   const locale = localeFromRoute(params.locale);
-  const dictionary = getDictionary(locale);
-  const copy = dictionary.dashboard;
-  const roleLabels: Record<Membership['role'], string> = {
-    auditor: copy.roles.auditor,
-    church_admin: copy.roles.churchAdmin,
-    financial_operator: copy.roles.financialOperator,
-  };
-  const [user, setUser] = useState<AuthenticatedUser | null>(null);
-  const [memberships, setMemberships] = useState<Membership[]>([]);
-  const [selectedChurchId, setSelectedChurchId] = useState('');
-  const [currentChurch, setCurrentChurch] = useState<CurrentChurch | null>(
-    null,
+  return (
+    <AppShell active="dashboard" locale={locale}>
+      {({ church }) => <Dashboard church={church} locale={locale} />}
+    </AppShell>
   );
-  const [status, setStatus] = useState<'error' | 'loading' | 'ready'>(
-    'loading',
-  );
+}
 
-  const loadChurch = useCallback(
-    async (churchId: string) => {
-      const response = await apiRequest('/churches/current', {
-        headers: { 'x-church-id': churchId },
-      });
+function Dashboard({ church, locale }: { church: AppChurch; locale: Locale }) {
+  const copy = productCopies[locale];
+  const [activeMembers, setActiveMembers] = useState(0);
+  const [items, setItems] = useState<EnvelopeRecord[]>([]);
+  const [loading, setLoading] = useState(true);
 
-      if (response.status === 401) {
-        router.replace(`/${locale}/login`);
-        return;
-      }
-
-      if (!response.ok) {
-        setStatus('error');
-        return;
-      }
-
-      localStorage.setItem('uckg_selected_church', churchId);
-      setSelectedChurchId(churchId);
-      setCurrentChurch((await response.json()) as CurrentChurch);
-      setStatus('ready');
-    },
-    [locale, router],
-  );
+  const load = useCallback(async () => {
+    setLoading(true);
+    const now = new Date();
+    const startDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+    const endDate = now.toISOString().slice(0, 10);
+    const [membersResponse, envelopesResponse] = await Promise.all([
+      apiRequest('/members?page=1&status=active', {
+        headers: { 'x-church-id': church.id },
+      }),
+      apiRequest(`/donations?startDate=${startDate}&endDate=${endDate}`, {
+        headers: { 'x-church-id': church.id },
+      }),
+    ]);
+    if (membersResponse.ok)
+      setActiveMembers(
+        ((await membersResponse.json()) as { total: number }).total,
+      );
+    if (envelopesResponse.ok)
+      setItems((await envelopesResponse.json()) as EnvelopeRecord[]);
+    setLoading(false);
+  }, [church.id]);
 
   useEffect(() => {
-    async function loadSession() {
-      try {
-        const response = await apiRequest('/auth/me');
-
-        if (response.status === 401) {
-          router.replace(`/${locale}/login`);
-          return;
-        }
-
-        if (!response.ok) {
-          setStatus('error');
-          return;
-        }
-
-        const data = (await response.json()) as {
-          memberships: Membership[];
-          user: AuthenticatedUser;
-        };
-
-        setUser(data.user);
-        setMemberships(data.memberships);
-
-        const storedChurch = localStorage.getItem('uckg_selected_church');
-        const selected = data.memberships.some(
-          (item) => item.churchId === storedChurch,
-        )
-          ? storedChurch
-          : data.memberships[0]?.churchId;
-
-        if (!selected) {
-          setStatus('error');
-          return;
-        }
-
-        await loadChurch(selected);
-      } catch {
-        setStatus('error');
-      }
-    }
-
-    void loadSession();
-  }, [loadChurch, locale, router]);
-
-  async function logout() {
-    await apiRequest('/auth/logout', { method: 'POST' });
-    localStorage.removeItem('uckg_selected_church');
-    router.replace(`/${locale}/login`);
-    router.refresh();
-  }
-
-  if (status === 'loading') {
-    return (
-      <main className="dashboard-state">
-        <span className="loading-mark" aria-hidden="true">
-          U
-        </span>
-        <p>{copy.preparing}</p>
-      </main>
-    );
-  }
-
-  if (status === 'error' || !user || !currentChurch) {
-    return (
-      <main className="dashboard-state">
-        <span className="dashboard-state__error" aria-hidden="true">
-          !
-        </span>
-        <h1>{copy.errorTitle}</h1>
-        <p>{copy.errorDescription}</p>
-        <button
-          className="primary-button primary-button--compact"
-          onClick={logout}
-          type="button"
-        >
-          {copy.backToLogin}
-        </button>
-      </main>
-    );
-  }
-
-  const initials = user.displayName
-    .split(' ')
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join('')
-    .toUpperCase();
+    void load();
+  }, [load]);
+  const total = items.reduce((sum, item) => sum + item.amountCents, 0);
 
   return (
-    <main className="dashboard-shell">
-      <aside className="dashboard-sidebar">
-        <BrandWordmark
-          className="wordmark--sidebar"
-          productName={dictionary.brand.productName}
-        />
-
-        <nav aria-label={copy.adminPanel}>
-          <a className="sidebar-link sidebar-link--active" href="#visao-geral">
-            <span aria-hidden="true">◫</span>
-            {copy.navigation.overview}
-          </a>
-          <a className="sidebar-link" href="#members">
-            <span aria-hidden="true">◇</span>
-            {copy.navigation.members}
-          </a>
-          <a className="sidebar-link" href="#envelopes">
-            <span aria-hidden="true">＋</span>
-            {copy.navigation.donations}
-          </a>
-          <span className="sidebar-link sidebar-link--disabled">
-            <span aria-hidden="true">▥</span>
-            {copy.navigation.reports}
-            <small>{copy.navigation.soon}</small>
-          </span>
-        </nav>
-
-        <button className="sidebar-logout" onClick={logout} type="button">
-          {copy.logout}
-        </button>
-      </aside>
-
-      <section className="dashboard-main" id="visao-geral">
-        <header className="dashboard-topbar">
-          <div>
-            <p className="section-label">{copy.adminPanel}</p>
-            <h1>
-              {copy.hello} {user.displayName.split(' ')[0]}
-            </h1>
-          </div>
-
-          <div className="dashboard-topbar__actions">
-            <LocaleSwitcher label={dictionary.languageLabel} locale={locale} />
-
-            {memberships.length > 1 ? (
-              <label className="church-selector">
-                <span>{copy.churchLabel}</span>
-                <select
-                  onChange={(event) => void loadChurch(event.target.value)}
-                  value={selectedChurchId}
-                >
-                  {memberships.map((membership) => (
-                    <option
-                      key={membership.churchId}
-                      value={membership.churchId}
-                    >
-                      {membership.churchName}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ) : null}
-
-            <div className="user-chip">
-              <span>{initials}</span>
-              <div>
-                <strong>{user.displayName}</strong>
-                <small>{user.email}</small>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        <div className="dashboard-content">
-          <section className="church-hero">
-            <div>
-              <p className="section-label section-label--light">
-                {copy.activeChurch}
-              </p>
-              <h2>{currentChurch.church.name}</h2>
-              <p>
-                {currentChurch.church.locale} · {currentChurch.church.timezone}
-              </p>
-            </div>
-            <span className="role-badge">
-              {currentChurch.role
-                ? roleLabels[currentChurch.role]
-                : copy.roles.platformAdmin}
-            </span>
-          </section>
-
-          <section
-            className="dashboard-grid"
-            aria-label={copy.modulesStateLabel}
+    <>
+      <header className="product-heading">
+        <div>
+          <p className="section-label">
+            {copy.common.church}: {church.name}
+          </p>
+          <h2>{copy.dashboard.title}</h2>
+          <p>{copy.dashboard.subtitle}</p>
+        </div>
+        <div className="heading-actions">
+          <Link
+            className="product-secondary-link"
+            href={`/${locale}/members/new`}
           >
-            <article className="status-card">
-              <span className="status-card__number">01</span>
-              <div>
-                <p className="section-label">{copy.identityLabel}</p>
-                <h3>{copy.identityTitle}</h3>
-                <p>{copy.identityDescription}</p>
-              </div>
-              <span className="status-pill status-pill--ready">
-                {copy.activeStatus}
-              </span>
-            </article>
-
-            <article className="status-card">
-              <span className="status-card__number">02</span>
-              <div>
-                <p className="section-label">{copy.nextModule}</p>
-                <h3>{copy.membersTitle}</h3>
-                <p>{copy.membersDescription}</p>
-              </div>
-              <span className="status-pill">{copy.plannedStatus}</span>
-            </article>
-          </section>
-
-          <MvpWorkspace
-            churchId={currentChurch.church.id}
-            copy={dictionary.workspace}
-            locale={locale}
-          />
-
-          <section className="security-note">
-            <span aria-hidden="true">✓</span>
-            <div>
-              <strong>{copy.securityTitle}</strong>
-              <p>{copy.securityDescription}</p>
-            </div>
-          </section>
+            ＋ {copy.dashboard.newMember}
+          </Link>
+          <Link
+            className="product-primary-link"
+            href={`/${locale}/envelopes/new`}
+          >
+            ＋ {copy.dashboard.newEnvelope}
+          </Link>
+        </div>
+      </header>
+      <div className="summary-grid">
+        <article>
+          <span>{copy.dashboard.members}</span>
+          <strong>{loading ? '—' : activeMembers}</strong>
+          <Link href={`/${locale}/members`}>{copy.members.title} →</Link>
+        </article>
+        <article>
+          <span>{copy.dashboard.envelopes}</span>
+          <strong>{loading ? '—' : items.length}</strong>
+          <Link href={`/${locale}/envelopes`}>{copy.envelopes.title} →</Link>
+        </article>
+        <article className="summary-card--accent">
+          <span>{copy.dashboard.total}</span>
+          <strong>{loading ? '—' : formatMoney(total, locale)}</strong>
+          <Link href={`/${locale}/reports`}>{copy.reports.title} →</Link>
+        </article>
+      </div>
+      <section className="product-panel">
+        <div className="panel-heading">
+          <h3>{copy.dashboard.latest}</h3>
+          <Link className="table-action" href={`/${locale}/envelopes`}>
+            {copy.envelopes.view}
+          </Link>
+        </div>
+        <div className="product-table-wrap">
+          {loading ? (
+            <p className="product-empty">{copy.common.loading}</p>
+          ) : items.length ? (
+            <table className="product-table">
+              <thead>
+                <tr>
+                  <th>{copy.envelopes.date}</th>
+                  <th>{copy.envelopes.member}</th>
+                  <th>{copy.envelopes.amount}</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.slice(0, 5).map((item) => (
+                  <tr key={item.id}>
+                    <td>{item.receivedOn}</td>
+                    <td>{item.member?.fullName ?? copy.common.anonymous}</td>
+                    <td>
+                      <strong>{formatMoney(item.amountCents, locale)}</strong>
+                    </td>
+                    <td>
+                      <Link
+                        className="table-action"
+                        href={`/${locale}/envelopes/${item.id}`}
+                      >
+                        {copy.envelopes.view}
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="product-empty">{copy.envelopes.empty}</p>
+          )}
         </div>
       </section>
-    </main>
+    </>
   );
 }

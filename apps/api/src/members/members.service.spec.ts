@@ -16,11 +16,18 @@ const context: TenantContext = {
 describe('MembersService tenant boundary', () => {
   it('lists members through the tenant transaction with an explicit predicate', async () => {
     const rows = [{ fullName: 'Member A', id: 'member-a' }];
-    const orderBy = vi.fn().mockResolvedValue(rows);
-    const where = vi.fn().mockReturnValue({ orderBy });
-    const from = vi.fn().mockReturnValue({ where });
+    const offset = vi.fn().mockResolvedValue(rows);
+    const limit = vi.fn().mockReturnValue({ offset });
+    const orderBy = vi.fn().mockReturnValue({ limit });
+    const itemWhere = vi.fn().mockReturnValue({ orderBy });
+    const totalWhere = vi.fn().mockResolvedValue([{ total: 1 }]);
+    const itemFrom = vi.fn().mockReturnValue({ where: itemWhere });
+    const totalFrom = vi.fn().mockReturnValue({ where: totalWhere });
     const transaction = {
-      select: vi.fn().mockReturnValue({ from }),
+      select: vi
+        .fn()
+        .mockReturnValueOnce({ from: itemFrom })
+        .mockReturnValueOnce({ from: totalFrom }),
     } as unknown as TenantTransaction;
     const unitOfWork = {
       run: vi.fn(
@@ -32,11 +39,16 @@ describe('MembersService tenant boundary', () => {
     };
     const service = new MembersService(unitOfWork as never);
 
-    await expect(service.list(context)).resolves.toBe(rows);
+    await expect(service.list(context)).resolves.toEqual({
+      items: rows,
+      page: 1,
+      pageSize: 20,
+      total: 1,
+    });
 
     expect(unitOfWork.run).toHaveBeenCalledWith(context, expect.any(Function));
-    expect(transaction.select).toHaveBeenCalledOnce();
-    expect(where).toHaveBeenCalledOnce();
+    expect(transaction.select).toHaveBeenCalledTimes(2);
+    expect(itemWhere).toHaveBeenCalledOnce();
     expect(orderBy).toHaveBeenCalledOnce();
   });
 
@@ -57,9 +69,15 @@ describe('MembersService tenant boundary', () => {
     };
     const service = new MembersService(unitOfWork as never);
     const input: CreateMemberRequest = {
+      addressLine1: '123 Main St',
+      city: 'New York',
+      country: 'US',
       email: 'member@example.com',
       fullName: 'Member A',
       phone: '+15555550100',
+      postalCode: '10001',
+      region: 'NY',
+      status: 'active',
     };
 
     await expect(service.create(context, input)).resolves.toBe(member);
@@ -67,9 +85,17 @@ describe('MembersService tenant boundary', () => {
     expect(unitOfWork.run).toHaveBeenCalledWith(context, expect.any(Function));
     expect(values).toHaveBeenCalledWith({
       churchId: context.churchId,
+      addressLine1: input.addressLine1,
+      addressLine2: null,
+      city: input.city,
+      country: input.country,
       email: input.email,
       fullName: input.fullName,
+      notes: null,
       phone: input.phone,
+      postalCode: input.postalCode,
+      region: input.region,
+      status: input.status,
     });
   });
 });
