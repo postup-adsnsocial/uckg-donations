@@ -7,6 +7,7 @@ import { AppShell, type AppChurch } from '../components/app-shell';
 import type { Locale } from '../i18n/config';
 import { productCopies } from '../i18n/product-copy';
 import { apiRequest } from '../lib/api';
+import type { MemberRecord } from '../members/types';
 import { type EnvelopeRecord, formatMoney } from './types';
 
 export function EnvelopesListPage({ locale }: { locale: Locale }) {
@@ -30,8 +31,10 @@ function EnvelopesList({
     `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-01`,
   );
   const [endDate, setEndDate] = useState(today.toISOString().slice(0, 10));
-  const [filters, setFilters] = useState({ startDate, endDate });
+  const [memberId, setMemberId] = useState('');
+  const [filters, setFilters] = useState({ startDate, endDate, memberId });
   const [items, setItems] = useState<EnvelopeRecord[]>([]);
+  const [members, setMembers] = useState<MemberRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -47,6 +50,17 @@ function EnvelopesList({
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    apiRequest('/members?page=1&pageSize=200&status=active', {
+      headers: { 'x-church-id': church.id },
+    }).then(async (response) => {
+      if (response.ok)
+        setMembers(
+          ((await response.json()) as { items: MemberRecord[] }).items,
+        );
+    });
+  }, [church.id]);
   const total = items.reduce((sum, item) => sum + item.amountCents, 0);
 
   return (
@@ -81,7 +95,7 @@ function EnvelopesList({
           className="filter-bar"
           onSubmit={(event) => {
             event.preventDefault();
-            setFilters({ startDate, endDate });
+            setFilters({ startDate, endDate, memberId });
           }}
         >
           <label>
@@ -92,6 +106,20 @@ function EnvelopesList({
               onChange={(event) => setStartDate(event.target.value)}
               required
             />
+          </label>
+          <label>
+            <span>{copy.envelopes.member}</span>
+            <select
+              value={memberId}
+              onChange={(event) => setMemberId(event.target.value)}
+            >
+              <option value="">{copy.envelopes.allMembers}</option>
+              {members.map((member) => (
+                <option key={member.id} value={member.id}>
+                  {member.fullName}
+                </option>
+              ))}
+            </select>
           </label>
           <label>
             <span>{copy.envelopes.endDate}</span>

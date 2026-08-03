@@ -37,17 +37,23 @@ export class MembersController {
     @Query('search') search?: string,
     @Query('page') pageValue?: string,
     @Query('status') statusValue?: string,
+    @Query('pageSize') pageSizeValue?: string,
   ) {
     const status =
       statusValue === 'active' || statusValue === 'inactive'
         ? statusValue
         : undefined;
     const page = Math.max(1, Number.parseInt(pageValue ?? '1', 10) || 1);
+    const pageSize = Math.min(
+      200,
+      Math.max(1, Number.parseInt(pageSizeValue ?? '20', 10) || 20),
+    );
     return this.members.list(
       this.toTenantContext(tenant, user),
       search?.slice(0, 160),
       page,
       status,
+      pageSize,
     );
   }
 
