@@ -49,6 +49,12 @@ clareza e isolamento total dos dados de outras congregações.
 - [ ] **DON-06**: Toda associação entre doação e membro é validada na mesma igreja e tentativas cross-tenant falham sem revelar PII.
 - [ ] **DON-07**: Entrada, lote, confirmação, detalhe e correção de doações funcionam nas três línguas e passam pelo gate visual.
 
+### Envelope Images
+
+- [ ] **ENV-01**: Operador autorizado envia e consulta imagens de envelopes da igreja ativa vinculadas à doação ou ao lote correspondente.
+- [ ] **ENV-02**: Arquivos de envelopes são privados e sua metadata registra igreja, responsável, horário, tipo, tamanho e checksum; acesso cross-tenant falha sem revelar a existência do arquivo.
+- [ ] **ENV-03**: Uploads aceitam somente tipos e tamanhos configurados, preservam uma versão legível do arquivo recebido e geram uma visualização otimizada para a interface.
+
 ### Reporting
 
 - [ ] **REP-01**: Operador autorizado consulta totais e quantidade de doações para um período definido no timezone da igreja.
@@ -56,6 +62,7 @@ clareza e isolamento total dos dados de outras congregações.
 - [ ] **REP-03**: Operador autorizado consulta o histórico de contribuições de um membro sem incluir dados de outra igreja.
 - [ ] **REP-04**: Operador exporta CSV compatível com os filtros ativos e com os mesmos totais exibidos na interface.
 - [ ] **REP-05**: Relatórios exibem moeda, timezone, filtros e horário de geração, e funcionam em PT-BR, EN e ES.
+- [ ] **REP-06**: Operador gera, arquiva e baixa um relatório PDF privado com os mesmos filtros, totais e proveniência exibidos na interface.
 
 ### Operations and Large Exports
 
@@ -63,6 +70,7 @@ clareza e isolamento total dos dados de outras congregações.
 - [ ] **OPS-02**: Operador acompanha estado da exportação e baixa somente artefatos da igreja que está autorizado a acessar.
 - [ ] **OPS-03**: Jobs possuem tentativas limitadas, backoff, estado de falha visível, métricas e desligamento gracioso.
 - [ ] **OPS-04**: Sessões expiradas são limpas e backups, restauração e rollback de migrations possuem procedimento testado antes do lançamento.
+- [ ] **OPS-05**: Backups e restauração dos arquivos privados de envelopes e PDFs são testados separadamente do backup do banco de dados.
 
 ### Experience Quality
 
@@ -122,29 +130,33 @@ clareza e isolamento total dos dados de outras congregações.
 | MEM-05      | Phase 3 | Pending |
 | MEM-06      | Phase 3 | Pending |
 | DON-01      | Phase 4 | Pending |
-| DON-02      | Phase 4 | Pending |
 | DON-03      | Phase 4 | Pending |
 | DON-04      | Phase 4 | Pending |
 | DON-05      | Phase 4 | Pending |
 | DON-06      | Phase 4 | Pending |
 | DON-07      | Phase 4 | Pending |
+| ENV-01      | Phase 4 | Pending |
+| ENV-02      | Phase 4 | Pending |
+| ENV-03      | Phase 4 | Pending |
 | REP-01      | Phase 5 | Pending |
 | REP-02      | Phase 5 | Pending |
 | REP-03      | Phase 5 | Pending |
 | REP-04      | Phase 5 | Pending |
 | REP-05      | Phase 5 | Pending |
+| REP-06      | Phase 5 | Pending |
 | OPS-01      | Phase 6 | Pending |
 | OPS-02      | Phase 6 | Pending |
 | OPS-03      | Phase 6 | Pending |
 | OPS-04      | Phase 6 | Pending |
+| OPS-05      | Phase 6 | Pending |
 | UX-01       | Phase 6 | Pending |
 | UX-02       | Phase 6 | Pending |
 | UX-03       | Phase 6 | Pending |
 
 **Coverage:**
 
-- v1 requirements: 36 total
-- Mapped to phases: 36
+- v1 requirements: 41 total
+- Mapped to phases: 41
 - Unmapped: 0 ✓
 
 ---

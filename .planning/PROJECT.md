@@ -30,6 +30,8 @@ total dos dados de outras congregações.
 - [ ] Operadores financeiros conseguem registrar doações vinculadas à igreja e, quando aplicável, ao membro
 - [ ] Operadores conseguem consultar histórico e totais financeiros confiáveis
 - [ ] Relatórios essenciais respeitam locale, timezone e moeda configurados para a igreja
+- [ ] Imagens privadas de envelopes ficam vinculadas ao registro financeiro da igreja ativa
+- [ ] Relatórios podem ser gerados e arquivados em PDF com os mesmos filtros e totais da interface
 - [ ] Toda nova interface mantém acabamento profissional nas três línguas e nos breakpoints suportados
 - [ ] Controles de segurança pendentes para produção são concluídos antes do lançamento
 
@@ -74,6 +76,7 @@ total dos dados de outras congregações.
 | Gate visual obrigatório após E2E                           | Impede regressões de acabamento e traduções truncadas                   | ✓ Good    |
 | Membros antes de doações                                   | Estabelece a identidade opcional do doador antes do registro financeiro | — Pending |
 | PostgreSQL gerenciado e portável em região dos EUA         | Atende as 150 igrejas americanas sem acoplamento a um provedor específico | — Pending |
+| Arquivos fora do banco relacional                          | Envelopes e PDFs crescem separadamente; o banco guarda metadata e vínculo | — Pending |
 
 ## Evolution
 

@@ -68,7 +68,7 @@ operacional e o gate completo de qualidade da experiência.
 
 **Goal**: Operadores financeiros registram contribuições exatas e auditáveis, individualmente ou em lote, com histórico imutável e correção explícita.
 **Depends on**: Phase 3
-**Requirements**: DON-01, DON-02, DON-03, DON-04, DON-05, DON-06, DON-07
+**Requirements**: DON-01, DON-02, DON-03, DON-04, DON-05, DON-06, DON-07, ENV-01, ENV-02, ENV-03
 **Success Criteria** (what must be TRUE):
 
 1. Operador financeiro registra uma doação positiva identificada ou anônima com fundo, forma de recebimento e data recebida válidos para a igreja ativa.
@@ -76,6 +76,7 @@ operacional e o gate completo de qualidade da experiência.
 3. Reenvios concorrentes ou cliques repetidos com a mesma chave retornam o mesmo resultado sem criar doações duplicadas.
 4. Doação postada não pode ser editada ou apagada; operador autorizado a corrige por estorno e substituição vinculados ao original.
 5. Operador autorizado consulta detalhe e histórico paginado pelos filtros definidos, sem vínculos cross-tenant, e completa entrada, lote, confirmação e correção em PT-BR, EN e ES com aprovação visual.
+6. Operador autorizado anexa e consulta imagens privadas de envelopes da igreja ativa, enquanto tentativas cross-tenant falham sem revelar o arquivo.
    **Plans**: TBD
    **UI hint**: yes
 
@@ -83,13 +84,14 @@ operacional e o gate completo de qualidade da experiência.
 
 **Goal**: Operadores autorizados consultam histórico, totais, breakdowns e exportações que reconciliam com o ledger nos limites locais da igreja.
 **Depends on**: Phase 4
-**Requirements**: REP-01, REP-02, REP-03, REP-04, REP-05
+**Requirements**: REP-01, REP-02, REP-03, REP-04, REP-05, REP-06
 **Success Criteria** (what must be TRUE):
 
 1. Operador autorizado consulta quantidade e total exato de doações para um período interpretado no timezone da igreja.
 2. Breakdowns por fundo e forma de recebimento reconciliam com o total usando os mesmos filtros e regras do histórico.
 3. Operador autorizado consulta contribuições de um membro sem incluir registros ou PII de outra igreja.
 4. CSV e interface apresentam os mesmos registros e totais para os filtros ativos, com moeda, timezone, filtros e horário de geração visíveis em PT-BR, EN e ES.
+5. Um PDF privado arquivado reproduz os filtros, totais e proveniência do relatório exibido.
    **Plans**: TBD
    **UI hint**: yes
 
@@ -97,14 +99,15 @@ operacional e o gate completo de qualidade da experiência.
 
 **Goal**: Operadores executam exportações grandes com segurança e a plataforma pode ser lançada com jobs resilientes, recuperação testada e experiência visual íntegra.
 **Depends on**: Phase 5
-**Requirements**: OPS-01, OPS-02, OPS-03, OPS-04, UX-01, UX-02, UX-03
+**Requirements**: OPS-01, OPS-02, OPS-03, OPS-04, OPS-05, UX-01, UX-02, UX-03
 **Success Criteria** (what must be TRUE):
 
 1. Operador inicia uma exportação grande sem bloquear o registro de doações, e pedidos repetidos não criam trabalhos ou artefatos duplicados.
 2. Operador acompanha estados pendente, em execução, concluído ou falho e baixa somente artefatos de uma igreja à qual ainda possui acesso.
 3. Falhas de job são tentadas novamente com limite e backoff, ficam visíveis com métricas úteis e não perdem trabalho durante desligamento gracioso.
 4. Sessões expiradas são removidas e responsáveis executam com sucesso os procedimentos testados de backup, restauração e rollback de migration antes do lançamento.
-5. Toda nova interface apresenta loading, vazio, erro, sucesso e retry úteis nas três línguas, sem truncamento ou rolagem horizontal indevida, com controles primários de pelo menos 44 px e baselines visuais alteradas somente após inspeção.
+5. Arquivos privados de envelopes e PDFs possuem backup e restauração testados independentemente do banco relacional.
+6. Toda nova interface apresenta loading, vazio, erro, sucesso e retry úteis nas três línguas, sem truncamento ou rolagem horizontal indevida, com controles primários de pelo menos 44 px e baselines visuais alteradas somente após inspeção.
    **Plans**: TBD
    **UI hint**: yes
 
