@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import type { CreateMemberRequest } from '@uckg/contracts';
 import { schema } from '@uckg/database';
-import { and, asc, eq, ilike, or, sql } from 'drizzle-orm';
+import { and, asc, eq, ilike, isNull, or, sql } from 'drizzle-orm';
 
 import {
   type TenantContext,
@@ -28,6 +28,7 @@ const memberFields = {
   region: schema.members.region,
   status: schema.members.status,
   updatedAt: schema.members.updatedAt,
+  deletedAt: schema.members.deletedAt,
 };
 
 @Injectable()
@@ -54,6 +55,7 @@ export class MembersService {
       : undefined;
     const predicate = and(
       eq(schema.members.churchId, context.churchId),
+      isNull(schema.members.deletedAt),
       status ? eq(schema.members.status, status) : undefined,
       searchPredicate,
     );
@@ -147,6 +149,33 @@ export class MembersService {
     } catch (error) {
       this.rethrowConflict(error);
     }
+  }
+
+  async delete(context: TenantContext, id: string) {
+    const member = await this.tenantUnitOfWork.run(
+      context,
+      async (transaction) => {
+        const [deleted] = await transaction
+          .update(schema.members)
+          .set({
+            deletedAt: new Date(),
+            status: 'inactive',
+            updatedAt: new Date(),
+          })
+          .where(
+            and(
+              eq(schema.members.churchId, context.churchId),
+              eq(schema.members.id, id),
+              isNull(schema.members.deletedAt),
+            ),
+          )
+          .returning({ id: schema.members.id });
+        return deleted;
+      },
+    );
+
+    if (!member) throw new NotFoundException('Member not found.');
+    return { deleted: true, id: member.id };
   }
 
   private values(input: CreateMemberRequest) {

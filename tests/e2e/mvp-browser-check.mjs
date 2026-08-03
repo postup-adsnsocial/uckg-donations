@@ -2,7 +2,7 @@ import { chromium, firefox } from '@playwright/test';
 import { hashPassword } from '../../packages/authorization/dist/index.js';
 import { createDatabase, schema } from '../../packages/database/dist/index.js';
 import { randomUUID } from 'node:crypto';
-import { mkdir, rm } from 'node:fs/promises';
+import { mkdir, rm, stat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 const connection = createDatabase(
@@ -102,6 +102,10 @@ try {
 
   await page.goto('http://localhost:3000/pt-BR/envelopes/new');
   await page.getByLabel('Valor (USD)').fill('125.50');
+  const amountType = await page.getByLabel('Valor (USD)').getAttribute('type');
+  if (amountType === 'number')
+    throw new Error('Amount field remains sensitive to mouse wheel changes.');
+  await page.getByLabel('Forma de pagamento').selectOption('check');
   await page
     .getByLabel(/Membro relacionado/)
     .selectOption({ label: memberName });
@@ -109,7 +113,14 @@ try {
   await page.getByLabel(/Observação/).fill('Browser MVP verification');
   await assertResponsive(page, 'envelope-new');
   await page.getByRole('button', { name: 'Salvar' }).click();
-  await page.waitForURL(/\/pt-BR\/envelopes\/[0-9a-f-]+\?saved=1$/);
+  await page.waitForURL(/\/pt-BR\/envelopes\?saved=1$/);
+  await page.getByText('Envelope lançado com sucesso.').waitFor();
+  const envelopeTable = page.locator('.product-table');
+  await envelopeTable.getByText(memberName, { exact: true }).waitFor();
+  const detailLinks = envelopeTable.getByRole('link', { name: 'Ver detalhes' });
+  if ((await detailLinks.count()) !== 1)
+    throw new Error('Expected one envelope detail link.');
+  await detailLinks.click();
   await page
     .getByRole('heading', { level: 2, name: 'Detalhes do envelope' })
     .waitFor();
@@ -120,7 +131,31 @@ try {
   await page.goto('http://localhost:3000/pt-BR/reports');
   await page.getByRole('button', { name: 'Gerar relatório' }).click();
   await page.getByRole('button', { name: '↓ Baixar PDF' }).waitFor();
+  const [pdfDownload] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: '↓ Baixar PDF' }).click(),
+  ]);
+  const pdfPath = await pdfDownload.path();
+  if (!pdfPath || (await stat(pdfPath)).size < 5_000) {
+    throw new Error('Detailed PDF was not generated with its envelope image.');
+  }
+  await page.getByLabel('Tipo de relatório').selectOption('member_totals');
+  await page.getByText(memberName).waitFor();
   await assertResponsive(page, 'reports');
+
+  await page.goto('http://localhost:3000/pt-BR/members');
+  const memberTable = page.locator('.product-table');
+  await memberTable.getByText(memberName, { exact: true }).waitFor();
+  const memberDetailsLink = memberTable.getByRole('link', {
+    name: 'Detalhes do membro',
+  });
+  if ((await memberDetailsLink.count()) !== 1)
+    throw new Error('Expected one member detail link.');
+  await memberDetailsLink.click();
+  page.once('dialog', (dialog) => dialog.accept());
+  await page.getByRole('button', { name: 'Excluir membro' }).click();
+  await page.waitForURL(/\/pt-BR\/members\?deleted=1$/);
+  await page.getByText('Membro excluído com sucesso.').waitFor();
 
   for (const locale of ['en', 'es']) {
     for (const path of ['dashboard', 'members', 'envelopes', 'reports']) {

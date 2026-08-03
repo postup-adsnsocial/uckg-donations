@@ -62,6 +62,7 @@ export class DonationsService {
           memberId: schema.members.id,
           notes: schema.donations.notes,
           operatorName: schema.adminUsers.displayName,
+          paymentMethod: schema.donations.paymentMethod,
           receivedOn: schema.donations.receivedOn,
         })
         .from(schema.donations)
@@ -105,6 +106,7 @@ export class DonationsService {
               : null,
             notes: row.notes,
             operatorName: row.operatorName,
+            paymentMethod: row.paymentMethod,
             receivedOn: row.receivedOn,
           })),
         ),
@@ -151,6 +153,7 @@ export class DonationsService {
           createdBy: context.actorId,
           memberId: input.memberId ?? null,
           notes: input.notes ?? null,
+          paymentMethod: input.paymentMethod,
           receivedOn: input.receivedOn,
         })
         .returning({ id: schema.donations.id });

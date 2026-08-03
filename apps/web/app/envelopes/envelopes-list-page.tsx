@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import { AppShell, type AppChurch } from '../components/app-shell';
@@ -26,6 +27,7 @@ function EnvelopesList({
   locale: Locale;
 }) {
   const copy = productCopies[locale];
+  const searchParams = useSearchParams();
   const today = new Date();
   const [startDate, setStartDate] = useState(
     `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-01`,
@@ -80,6 +82,12 @@ function EnvelopesList({
           ＋ {copy.envelopes.new}
         </Link>
       </header>
+      {searchParams.get('saved') ? (
+        <div className="toast toast--success" role="status">
+          <span>✓</span>
+          {copy.envelopes.saved}
+        </div>
+      ) : null}
       <div className="summary-grid summary-grid--compact">
         <article>
           <span>{copy.envelopes.count}</span>
@@ -142,6 +150,7 @@ function EnvelopesList({
                   <th>{copy.envelopes.date}</th>
                   <th>{copy.envelopes.member}</th>
                   <th>{copy.envelopes.amount}</th>
+                  <th>{copy.envelopes.paymentMethod}</th>
                   <th>{copy.envelopes.image}</th>
                   <th></th>
                 </tr>
@@ -164,6 +173,7 @@ function EnvelopesList({
                     <td>
                       <strong>{formatMoney(item.amountCents, locale)}</strong>
                     </td>
+                    <td>{copy.envelopes[item.paymentMethod]}</td>
                     <td>{item.envelope ? '✓' : '—'}</td>
                     <td>
                       <Link

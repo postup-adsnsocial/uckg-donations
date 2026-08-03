@@ -1,0 +1,2 @@
+DROP INDEX "members_church_email_unique";--> statement-breakpoint
+CREATE UNIQUE INDEX "members_church_email_unique" ON "members" USING btree ("church_id",lower("email")) WHERE "members"."email" is not null and "members"."deleted_at" is null;

@@ -55,6 +55,7 @@ function EnvelopeForm({
         memberId: formData.get('memberId') || null,
         notes: formData.get('notes') || undefined,
         receivedOn: formData.get('receivedOn'),
+        paymentMethod: formData.get('paymentMethod'),
       }),
       headers: { 'x-church-id': church.id },
       method: 'POST',
@@ -78,7 +79,7 @@ function EnvelopeForm({
         return;
       }
     }
-    router.push(`/${locale}/envelopes/${donation.id}?saved=1`);
+    router.push(`/${locale}/envelopes?saved=1`);
   }
 
   return (
@@ -113,11 +114,10 @@ function EnvelopeForm({
               <span>{copy.envelopes.amount} (USD)</span>
               <input
                 name="amount"
-                type="number"
+                type="text"
                 inputMode="decimal"
-                min="0.01"
-                max="1000000"
-                step="0.01"
+                maxLength={12}
+                pattern="[0-9]+([.,][0-9]{1,2})?"
                 required
                 placeholder="0.00"
               />
@@ -130,6 +130,14 @@ function EnvelopeForm({
                 required
                 defaultValue={new Date().toISOString().slice(0, 10)}
               />
+            </label>
+            <label className="form-field">
+              <span>{copy.envelopes.paymentMethod}</span>
+              <select name="paymentMethod" defaultValue="cash" required>
+                <option value="cash">{copy.envelopes.cash}</option>
+                <option value="card">{copy.envelopes.card}</option>
+                <option value="check">{copy.envelopes.check}</option>
+              </select>
             </label>
             <label className="form-field form-field--wide">
               <span>

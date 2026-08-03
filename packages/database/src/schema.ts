@@ -30,6 +30,11 @@ export const churchRole = pgEnum('church_role', [
   'auditor',
 ]);
 export const memberStatus = pgEnum('member_status', ['active', 'inactive']);
+export const donationPaymentMethod = pgEnum('donation_payment_method', [
+  'card',
+  'cash',
+  'check',
+]);
 
 export const churches = pgTable(
   'churches',
@@ -168,13 +173,14 @@ export const members = pgTable(
     updatedAt: timestamp('updated_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true }),
   },
   (table) => [
     unique('members_church_id_id_unique').on(table.churchId, table.id),
     index('members_church_name_idx').on(table.churchId, table.fullName),
     uniqueIndex('members_church_email_unique')
       .on(table.churchId, sql`lower(${table.email})`)
-      .where(sql`${table.email} is not null`),
+      .where(sql`${table.email} is not null and ${table.deletedAt} is null`),
     check(
       'members_full_name_not_blank',
       sql`length(trim(${table.fullName})) > 0`,
@@ -201,6 +207,9 @@ export const donations = pgTable(
     amountCents: integer('amount_cents').notNull(),
     receivedOn: date('received_on').notNull(),
     notes: text('notes'),
+    paymentMethod: donationPaymentMethod('payment_method')
+      .notNull()
+      .default('cash'),
     createdBy: uuid('created_by')
       .notNull()
       .references(() => adminUsers.id, { onDelete: 'restrict' }),
@@ -271,6 +280,7 @@ export const reportFiles = pgTable(
     envelopeCount: integer('envelope_count').notNull(),
     totalCents: integer('total_cents').notNull(),
     storageKey: text('storage_key').notNull(),
+    reportType: text('report_type').notNull().default('detailed'),
     createdBy: uuid('created_by')
       .notNull()
       .references(() => adminUsers.id, { onDelete: 'restrict' }),
@@ -290,6 +300,10 @@ export const reportFiles = pgTable(
     ),
     check('report_files_count_valid', sql`${table.envelopeCount} >= 0`),
     check('report_files_total_valid', sql`${table.totalCents} >= 0`),
+    check(
+      'report_files_type_valid',
+      sql`${table.reportType} in ('detailed', 'member_totals', 'payment_methods')`,
+    ),
   ],
 );
 

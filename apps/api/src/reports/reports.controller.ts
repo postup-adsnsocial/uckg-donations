@@ -20,7 +20,7 @@ import type {
 import type { TenantContext } from '../database/tenant-unit-of-work.js';
 import { CurrentTenant } from '../tenancy/current-tenant.decorator.js';
 import { DomainRoute } from '../tenancy/domain-route.decorator.js';
-import { ReportsService } from './reports.service.js';
+import { ReportsService, type ReportType } from './reports.service.js';
 
 @Controller('reports')
 export class ReportsController {
@@ -44,12 +44,15 @@ export class ReportsController {
     @CurrentUser() user: AuthenticatedAdmin,
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
+    @Query('reportType') reportTypeValue: string,
     @Res() response: Response,
   ) {
+    const reportType = reportTypeValue as ReportType;
     if (
       !/^\d{4}-\d{2}-\d{2}$/.test(startDate) ||
       !/^\d{4}-\d{2}-\d{2}$/.test(endDate) ||
-      startDate > endDate
+      startDate > endDate ||
+      !['detailed', 'member_totals', 'payment_methods'].includes(reportType)
     )
       throw new BadRequestException('Invalid report period.');
     const report = await this.reports.generate(
@@ -57,6 +60,7 @@ export class ReportsController {
       tenant.church.name,
       startDate,
       endDate,
+      reportType,
     );
     response.setHeader('Content-Type', 'application/pdf');
     response.setHeader(

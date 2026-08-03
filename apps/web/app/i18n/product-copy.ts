@@ -34,12 +34,19 @@ export interface ProductCopy {
     email: string;
     edit: string;
     details: string;
+    delete: string;
+    deleteConfirm: string;
+    deleted: string;
+    deleting: string;
     saved: string;
     error: string;
   };
   envelopes: {
     allMembers: string;
     amount: string;
+    card: string;
+    cash: string;
+    check: string;
     count: string;
     date: string;
     details: string;
@@ -52,6 +59,7 @@ export interface ProductCopy {
     new: string;
     notes: string;
     operator: string;
+    paymentMethod: string;
     saved: string;
     startDate: string;
     title: string;
@@ -70,10 +78,20 @@ export interface ProductCopy {
   };
   reports: {
     archive: string;
+    customPeriod: string;
+    detailed: string;
     download: string;
     empty: string;
     generate: string;
     intro: string;
+    last30Days: string;
+    lastMonth: string;
+    memberTotals: string;
+    paymentMethods: string;
+    period: string;
+    reportType: string;
+    thisMonth: string;
+    thisYear: string;
     title: string;
   };
 }
@@ -99,6 +117,11 @@ export const productCopies: Record<Locale, ProductCopy> = {
       country: 'País',
       created: 'Cadastrado em',
       details: 'Detalhes do membro',
+      delete: 'Excluir membro',
+      deleteConfirm:
+        'Excluir este membro? O histórico de doações será preservado.',
+      deleted: 'Membro excluído com sucesso.',
+      deleting: 'Excluindo…',
       edit: 'Editar membro',
       email: 'E-mail',
       empty: 'Nenhum membro encontrado.',
@@ -120,6 +143,9 @@ export const productCopies: Record<Locale, ProductCopy> = {
     envelopes: {
       allMembers: 'Todos os membros',
       amount: 'Valor',
+      card: 'Cartão',
+      cash: 'Dinheiro',
+      check: 'Cheque',
       count: 'Envelopes',
       date: 'Data de recebimento',
       details: 'Detalhes do envelope',
@@ -132,6 +158,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       new: 'Lançar envelope',
       notes: 'Observação',
       operator: 'Operador',
+      paymentMethod: 'Forma de pagamento',
       saved: 'Envelope lançado com sucesso.',
       startDate: 'Data inicial',
       title: 'Envelopes',
@@ -150,10 +177,20 @@ export const productCopies: Record<Locale, ProductCopy> = {
     },
     reports: {
       archive: 'Relatórios arquivados',
+      customPeriod: 'Período personalizado',
+      detailed: 'Lançamentos + imagens',
       download: 'Baixar PDF',
       empty: 'Escolha o período para gerar o relatório.',
       generate: 'Gerar relatório',
       intro: 'Totais e lançamentos consolidados em um PDF.',
+      last30Days: 'Últimos 30 dias',
+      lastMonth: 'Mês anterior',
+      memberTotals: 'Totais por membro',
+      paymentMethods: 'Totais por pagamento',
+      period: 'Período',
+      reportType: 'Tipo de relatório',
+      thisMonth: 'Este mês',
+      thisYear: 'Este ano',
       title: 'Relatórios',
     },
   },
@@ -177,6 +214,10 @@ export const productCopies: Record<Locale, ProductCopy> = {
       country: 'Country',
       created: 'Registered on',
       details: 'Member details',
+      delete: 'Delete member',
+      deleteConfirm: 'Delete this member? Donation history will be preserved.',
+      deleted: 'Member deleted successfully.',
+      deleting: 'Deleting…',
       edit: 'Edit member',
       email: 'Email',
       empty: 'No members found.',
@@ -198,6 +239,9 @@ export const productCopies: Record<Locale, ProductCopy> = {
     envelopes: {
       allMembers: 'All members',
       amount: 'Amount',
+      card: 'Card',
+      cash: 'Cash',
+      check: 'Check',
       count: 'Envelopes',
       date: 'Date received',
       details: 'Envelope details',
@@ -210,6 +254,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       new: 'Record envelope',
       notes: 'Note',
       operator: 'Operator',
+      paymentMethod: 'Payment method',
       saved: 'Envelope recorded successfully.',
       startDate: 'Start date',
       title: 'Envelopes',
@@ -228,10 +273,20 @@ export const productCopies: Record<Locale, ProductCopy> = {
     },
     reports: {
       archive: 'Archived reports',
+      customPeriod: 'Custom period',
+      detailed: 'Entries + images',
       download: 'Download PDF',
       empty: 'Select a period to generate the report.',
       generate: 'Generate report',
       intro: 'Consolidated totals and entries in a PDF.',
+      last30Days: 'Last 30 days',
+      lastMonth: 'Previous month',
+      memberTotals: 'Totals by member',
+      paymentMethods: 'Totals by payment',
+      period: 'Period',
+      reportType: 'Report type',
+      thisMonth: 'This month',
+      thisYear: 'This year',
       title: 'Reports',
     },
   },
@@ -255,6 +310,11 @@ export const productCopies: Record<Locale, ProductCopy> = {
       country: 'País',
       created: 'Registrado el',
       details: 'Detalles del miembro',
+      delete: 'Eliminar miembro',
+      deleteConfirm:
+        '¿Eliminar este miembro? Se conservará el historial de donaciones.',
+      deleted: 'Miembro eliminado correctamente.',
+      deleting: 'Eliminando…',
       edit: 'Editar miembro',
       email: 'Correo electrónico',
       empty: 'No se encontraron miembros.',
@@ -278,6 +338,9 @@ export const productCopies: Record<Locale, ProductCopy> = {
     envelopes: {
       allMembers: 'Todos los miembros',
       amount: 'Valor',
+      card: 'Tarjeta',
+      cash: 'Efectivo',
+      check: 'Cheque',
       count: 'Sobres',
       date: 'Fecha de recepción',
       details: 'Detalles del sobre',
@@ -290,6 +353,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       new: 'Registrar sobre',
       notes: 'Observación',
       operator: 'Operador',
+      paymentMethod: 'Forma de pago',
       saved: 'Sobre registrado correctamente.',
       startDate: 'Fecha inicial',
       title: 'Sobres',
@@ -308,10 +372,20 @@ export const productCopies: Record<Locale, ProductCopy> = {
     },
     reports: {
       archive: 'Informes archivados',
+      customPeriod: 'Período personalizado',
+      detailed: 'Registros + imágenes',
       download: 'Descargar PDF',
       empty: 'Elige el período para generar el informe.',
       generate: 'Generar informe',
       intro: 'Totales y registros consolidados en un PDF.',
+      last30Days: 'Últimos 30 días',
+      lastMonth: 'Mes anterior',
+      memberTotals: 'Totales por miembro',
+      paymentMethods: 'Totales por pago',
+      period: 'Período',
+      reportType: 'Tipo de informe',
+      thisMonth: 'Este mes',
+      thisYear: 'Este año',
       title: 'Informes',
     },
   },

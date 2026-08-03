@@ -4,6 +4,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -114,6 +115,19 @@ export class MembersController {
       this.toTenantContext(tenant, user),
       this.parseId(id),
       parsed.data,
+    );
+  }
+
+  @Delete(':id')
+  @DomainRoute('members:write')
+  delete(
+    @CurrentTenant() tenant: ResolvedTenantContext,
+    @CurrentUser() user: AuthenticatedAdmin,
+    @Param('id') id: string,
+  ) {
+    return this.members.delete(
+      this.toTenantContext(tenant, user),
+      this.parseId(id),
     );
   }
 

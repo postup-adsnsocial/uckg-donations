@@ -10,6 +10,7 @@ export interface EnvelopeRecord {
   member: { fullName: string; id: string } | null;
   notes: string | null;
   operatorName: string;
+  paymentMethod: 'card' | 'cash' | 'check';
   receivedOn: string;
 }
 

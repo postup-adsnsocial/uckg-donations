@@ -4,6 +4,7 @@ export interface MemberRecord {
   city: string | null;
   country: string;
   createdAt: string;
+  deletedAt: string | null;
   email: string | null;
   fullName: string;
   id: string;

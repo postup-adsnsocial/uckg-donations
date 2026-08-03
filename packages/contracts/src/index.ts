@@ -74,6 +74,7 @@ export const memberSchema = z.object({
   region: z.string().nullable(),
   notes: z.string().nullable(),
   status: z.enum(['active', 'inactive']),
+  deletedAt: z.string().datetime().nullable(),
   updatedAt: z.string().datetime(),
 });
 
@@ -87,6 +88,7 @@ export const createDonationRequestSchema = z.object({
     z.string().trim().max(500).optional(),
   ),
   receivedOn: z.iso.date(),
+  paymentMethod: z.enum(['card', 'cash', 'check']),
 });
 
 export type CreateDonationRequest = z.infer<typeof createDonationRequestSchema>;
@@ -105,6 +107,7 @@ export const donationSchema = z.object({
   member: z.object({ id: z.string().uuid(), fullName: z.string() }).nullable(),
   notes: z.string().nullable(),
   operatorName: z.string(),
+  paymentMethod: z.enum(['card', 'cash', 'check']),
   receivedOn: z.string(),
 });
 

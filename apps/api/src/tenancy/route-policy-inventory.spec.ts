@@ -150,6 +150,7 @@ describe('route policy inventory', () => {
       'DonationsController.list',
       'HealthController.getHealth',
       'MembersController.create',
+      'MembersController.delete',
       'MembersController.get',
       'MembersController.list',
       'MembersController.update',

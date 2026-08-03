@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { AppShell, type AppChurch } from '../components/app-shell';
@@ -34,8 +34,10 @@ function MemberDetail({
   locale: Locale;
 }) {
   const copy = productCopies[locale];
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [member, setMember] = useState<MemberRecord | null>(null);
+  const [deleting, setDeleting] = useState(false);
   useEffect(() => {
     apiRequest(`/members/${id}`, {
       headers: { 'x-church-id': church.id },
@@ -44,6 +46,19 @@ function MemberDetail({
     });
   }, [church.id, id]);
   if (!member) return <p className="product-empty">{copy.common.loading}</p>;
+  async function deleteMember() {
+    if (!window.confirm(copy.members.deleteConfirm)) return;
+    setDeleting(true);
+    const response = await apiRequest(`/members/${id}`, {
+      headers: { 'x-church-id': church.id },
+      method: 'DELETE',
+    });
+    if (response.ok) {
+      router.push(`/${locale}/members?deleted=1`);
+      return;
+    }
+    setDeleting(false);
+  }
   const date = new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(
     new Date(member.createdAt),
   );
@@ -67,6 +82,14 @@ function MemberDetail({
           >
             {copy.members.edit}
           </Link>
+          <button
+            className="danger-button"
+            disabled={deleting}
+            type="button"
+            onClick={() => void deleteMember()}
+          >
+            {deleting ? copy.members.deleting : copy.members.delete}
+          </button>
         </div>
       </header>
       {searchParams.get('saved') ? (

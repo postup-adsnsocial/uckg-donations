@@ -1,12 +1,23 @@
 import { randomUUID } from 'node:crypto';
+
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { schema } from '@uckg/database';
 import { and, desc, eq } from 'drizzle-orm';
+import {
+  PDFDocument,
+  rgb,
+  StandardFonts,
+  type PDFFont,
+  type PDFPage,
+} from 'pdf-lib';
 
 import type { TenantContext } from '../database/tenant-unit-of-work.js';
 import { TenantUnitOfWork } from '../database/tenant-unit-of-work.js';
 import { DonationsService } from '../donations/donations.service.js';
 import { PrivateObjectStorage } from '../storage/private-object-storage.js';
+
+export type ReportType = 'detailed' | 'member_totals' | 'payment_methods';
+type DonationItem = Awaited<ReturnType<DonationsService['list']>>[number];
 
 @Injectable()
 export class ReportsService {
@@ -29,6 +40,7 @@ export class ReportsService {
           endDate: schema.reportFiles.endDate,
           envelopeCount: schema.reportFiles.envelopeCount,
           id: schema.reportFiles.id,
+          reportType: schema.reportFiles.reportType,
           startDate: schema.reportFiles.startDate,
           totalCents: schema.reportFiles.totalCents,
         })
@@ -76,11 +88,19 @@ export class ReportsService {
     churchName: string,
     startDate: string,
     endDate: string,
+    reportType: ReportType,
   ) {
     const items = await this.donations.list(context, { endDate, startDate });
     const totalCents = items.reduce((sum, item) => sum + item.amountCents, 0);
-    const buffer = this.createPdf(churchName, startDate, endDate, items);
-    const storageKey = `${context.churchId}/${startDate}_${endDate}_${randomUUID()}.pdf`;
+    const buffer = await this.createPdf(
+      context,
+      churchName,
+      startDate,
+      endDate,
+      reportType,
+      items,
+    );
+    const storageKey = `${context.churchId}/${reportType}_${startDate}_${endDate}_${randomUUID()}.pdf`;
     await this.storage.upload(
       this.storageBucket,
       storageKey,
@@ -94,68 +114,271 @@ export class ReportsService {
         createdBy: context.actorId,
         endDate,
         envelopeCount: items.length,
+        reportType,
         startDate,
         storageKey,
         totalCents,
       });
     });
 
-    return { buffer, filename: `uckg-donations-${startDate}-${endDate}.pdf` };
+    return {
+      buffer,
+      filename: `uckg-donations-${reportType}-${startDate}-${endDate}.pdf`,
+    };
   }
 
-  private createPdf(
+  private async createPdf(
+    context: TenantContext,
     churchName: string,
     startDate: string,
     endDate: string,
-    items: Awaited<ReturnType<DonationsService['list']>>,
+    reportType: ReportType,
+    items: DonationItem[],
   ) {
-    const plain = (value: string) =>
-      value
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^\x20-\x7e]/g, '?')
-        .replace(/[()\\]/g, '\\$&');
+    const document = await PDFDocument.create();
+    const regular = await document.embedFont(StandardFonts.Helvetica);
+    const bold = await document.embedFont(StandardFonts.HelveticaBold);
     const total = items.reduce((sum, item) => sum + item.amountCents, 0);
-    const lines = [
-      'UCKG DONATIONS - REPORT',
-      plain(churchName),
-      `${startDate} to ${endDate}`,
-      `Envelopes: ${items.length}    Total: USD ${(total / 100).toFixed(2)}`,
-      '',
-      'Date         Member                                  Amount',
-      ...items.slice(0, 30).map(
-        (item) =>
-          `${item.receivedOn}   ${plain(item.member?.fullName ?? 'Anonymous')
-            .slice(0, 34)
-            .padEnd(34)} USD ${(item.amountCents / 100).toFixed(2)}`,
-      ),
-    ];
-    const stream = lines
-      .map(
-        (line, index) =>
-          `BT /F1 ${index < 2 ? 16 : 10} Tf 48 ${760 - index * 20} Td (${line}) Tj ET`,
-      )
-      .join('\n');
-    const objects = [
-      '<< /Type /Catalog /Pages 2 0 R >>',
-      '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
-      '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>',
-      `<< /Length ${Buffer.byteLength(stream)} >>\nstream\n${stream}\nendstream`,
-      '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
-    ];
-    let pdf = '%PDF-1.4\n';
-    const offsets = [0];
-    objects.forEach((object, index) => {
-      offsets.push(Buffer.byteLength(pdf));
-      pdf += `${index + 1} 0 obj\n${object}\nendobj\n`;
+    let page = this.addPage(
+      document,
+      bold,
+      regular,
+      churchName,
+      startDate,
+      endDate,
+      items.length,
+      total,
+    );
+    let y = 655;
+
+    if (reportType === 'detailed') {
+      for (const item of items) {
+        if (y < 135) {
+          page = this.addPage(
+            document,
+            bold,
+            regular,
+            churchName,
+            startDate,
+            endDate,
+            items.length,
+            total,
+          );
+          y = 655;
+        }
+        page.drawRectangle({
+          x: 42,
+          y: y - 82,
+          width: 528,
+          height: 92,
+          color: rgb(0.97, 0.98, 0.99),
+          borderColor: rgb(0.87, 0.9, 0.93),
+          borderWidth: 1,
+        });
+        page.drawText(this.clean(item.member?.fullName ?? 'Anonymous'), {
+          x: 56,
+          y: y - 12,
+          font: bold,
+          size: 11,
+          color: rgb(0.05, 0.12, 0.22),
+        });
+        page.drawText(
+          `${item.receivedOn}  |  ${this.methodLabel(item.paymentMethod)}  |  USD ${(item.amountCents / 100).toFixed(2)}`,
+          {
+            x: 56,
+            y: y - 31,
+            font: regular,
+            size: 9,
+            color: rgb(0.24, 0.31, 0.42),
+          },
+        );
+        page.drawText(`Operator: ${this.clean(item.operatorName)}`, {
+          x: 56,
+          y: y - 49,
+          font: regular,
+          size: 8,
+          color: rgb(0.38, 0.44, 0.53),
+        });
+        if (item.notes)
+          page.drawText(this.clean(item.notes).slice(0, 62), {
+            x: 56,
+            y: y - 67,
+            font: regular,
+            size: 8,
+            color: rgb(0.38, 0.44, 0.53),
+          });
+
+        if (item.envelope) {
+          try {
+            const file = await this.donations.getEnvelope(context, item.id);
+            const image =
+              file.contentType === 'image/png'
+                ? await document.embedPng(file.buffer)
+                : await document.embedJpg(file.buffer);
+            const dimensions = image.scaleToFit(100, 70);
+            page.drawImage(image, {
+              x: 456,
+              y: y - 71,
+              width: dimensions.width,
+              height: dimensions.height,
+            });
+          } catch {
+            page.drawText('Image unavailable', {
+              x: 458,
+              y: y - 38,
+              font: regular,
+              size: 8,
+              color: rgb(0.55, 0.25, 0.25),
+            });
+          }
+        } else {
+          page.drawText('No image', {
+            x: 485,
+            y: y - 38,
+            font: regular,
+            size: 8,
+            color: rgb(0.5, 0.55, 0.62),
+          });
+        }
+        y -= 104;
+      }
+    } else {
+      const rows =
+        reportType === 'member_totals'
+          ? this.memberTotals(items)
+          : this.paymentTotals(items);
+      page.drawText(
+        reportType === 'member_totals'
+          ? 'DONATION TOTALS BY MEMBER'
+          : 'TOTALS BY PAYMENT METHOD',
+        { x: 48, y, font: bold, size: 12, color: rgb(0.02, 0.28, 0.5) },
+      );
+      y -= 30;
+      for (const row of rows) {
+        if (y < 70) {
+          page = this.addPage(
+            document,
+            bold,
+            regular,
+            churchName,
+            startDate,
+            endDate,
+            items.length,
+            total,
+          );
+          y = 655;
+        }
+        page.drawText(this.clean(row.label).slice(0, 55), {
+          x: 52,
+          y,
+          font: regular,
+          size: 10,
+          color: rgb(0.05, 0.12, 0.22),
+        });
+        page.drawText(String(row.count), {
+          x: 410,
+          y,
+          font: regular,
+          size: 10,
+        });
+        page.drawText(`USD ${(row.totalCents / 100).toFixed(2)}`, {
+          x: 470,
+          y,
+          font: bold,
+          size: 10,
+        });
+        page.drawLine({
+          start: { x: 48, y: y - 8 },
+          end: { x: 565, y: y - 8 },
+          thickness: 0.5,
+          color: rgb(0.88, 0.9, 0.93),
+        });
+        y -= 28;
+      }
+    }
+
+    return Buffer.from(await document.save());
+  }
+
+  private addPage(
+    document: PDFDocument,
+    bold: PDFFont,
+    regular: PDFFont,
+    churchName: string,
+    startDate: string,
+    endDate: string,
+    count: number,
+    totalCents: number,
+  ): PDFPage {
+    const page = document.addPage([612, 792]);
+    page.drawRectangle({
+      x: 0,
+      y: 720,
+      width: 612,
+      height: 72,
+      color: rgb(0.01, 0.19, 0.32),
     });
-    const xref = Buffer.byteLength(pdf);
-    pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n${offsets
-      .slice(1)
-      .map((offset) => `${String(offset).padStart(10, '0')} 00000 n `)
-      .join(
-        '\n',
-      )}\ntrailer << /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
-    return Buffer.from(pdf, 'ascii');
+    page.drawText('UNIVERSAL  |  DONATIONS REPORT', {
+      x: 44,
+      y: 758,
+      font: bold,
+      size: 15,
+      color: rgb(1, 1, 1),
+    });
+    page.drawText(this.clean(churchName), {
+      x: 44,
+      y: 737,
+      font: regular,
+      size: 10,
+      color: rgb(0.78, 0.88, 0.94),
+    });
+    page.drawText(`${startDate} to ${endDate}`, {
+      x: 44,
+      y: 690,
+      font: bold,
+      size: 11,
+      color: rgb(0.05, 0.12, 0.22),
+    });
+    page.drawText(
+      `${count} envelopes  |  USD ${(totalCents / 100).toFixed(2)}`,
+      { x: 365, y: 690, font: bold, size: 11, color: rgb(0.02, 0.36, 0.61) },
+    );
+    return page;
+  }
+
+  private memberTotals(items: DonationItem[]) {
+    const totals = new Map<string, { count: number; totalCents: number }>();
+    for (const item of items) {
+      const label = item.member?.fullName ?? 'Anonymous';
+      const current = totals.get(label) ?? { count: 0, totalCents: 0 };
+      current.count += 1;
+      current.totalCents += item.amountCents;
+      totals.set(label, current);
+    }
+    return [...totals.entries()]
+      .map(([label, value]) => ({ label, ...value }))
+      .sort((a, b) => b.totalCents - a.totalCents);
+  }
+
+  private paymentTotals(items: DonationItem[]) {
+    return (['cash', 'card', 'check'] as const).map((method) => {
+      const filtered = items.filter((item) => item.paymentMethod === method);
+      return {
+        count: filtered.length,
+        label: this.methodLabel(method),
+        totalCents: filtered.reduce((sum, item) => sum + item.amountCents, 0),
+      };
+    });
+  }
+
+  private methodLabel(method: DonationItem['paymentMethod']) {
+    return { card: 'Card', cash: 'Cash', check: 'Check' }[method];
+  }
+
+  private clean(value: string) {
+    return value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^\x20-\x7e]/g, '?');
   }
 }

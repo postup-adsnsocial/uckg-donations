@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import { AppShell, type AppChurch } from '../components/app-shell';
@@ -25,6 +26,7 @@ function MembersList({
   locale: Locale;
 }) {
   const copy = productCopies[locale];
+  const searchParams = useSearchParams();
   const [items, setItems] = useState<MemberRecord[]>([]);
   const [search, setSearch] = useState('');
   const [query, setQuery] = useState('');
@@ -68,6 +70,12 @@ function MembersList({
           ＋ {copy.members.new}
         </Link>
       </header>
+      {searchParams.get('deleted') ? (
+        <div className="toast toast--success" role="status">
+          <span>✓</span>
+          {copy.members.deleted}
+        </div>
+      ) : null}
       <section className="product-panel">
         <form
           className="search-bar"

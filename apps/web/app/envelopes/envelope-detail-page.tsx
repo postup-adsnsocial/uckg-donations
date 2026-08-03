@@ -102,6 +102,10 @@ function EnvelopeDetail({
               <dd>{item.operatorName}</dd>
             </div>
             <div>
+              <dt>{copy.envelopes.paymentMethod}</dt>
+              <dd>{copy.envelopes[item.paymentMethod]}</dd>
+            </div>
+            <div>
               <dt>{copy.envelopes.notes}</dt>
               <dd>{item.notes ?? '—'}</dd>
             </div>
