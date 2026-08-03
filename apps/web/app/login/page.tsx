@@ -19,16 +19,16 @@ export default function LoginPage() {
       <BrandPanel copy={dictionary.brand} />
 
       <section className="auth-form-panel">
-        <div className="auth-form-panel__language">
-          <LocaleSwitcher label={dictionary.languageLabel} locale={locale} />
-        </div>
-
         <div className="auth-form-panel__inner">
           <BrandWordmark
             className="mobile-wordmark"
             priority
             productName={dictionary.brand.productName}
           />
+
+          <div className="auth-form-panel__language">
+            <LocaleSwitcher label={dictionary.languageLabel} locale={locale} />
+          </div>
 
           <header className="auth-header">
             <p className="section-label">{dictionary.login.secureAccess}</p>

@@ -297,10 +297,9 @@ button {
 }
 
 .auth-form-panel__language {
-  position: absolute;
-  z-index: 2;
-  top: 28px;
-  right: clamp(28px, 4vw, 56px);
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 18px;
 }
 
 .locale-switcher {
@@ -1011,11 +1010,6 @@ select:focus-visible {
   .auth-form-panel {
     min-height: 100dvh;
     padding: 28px 22px;
-  }
-
-  .auth-form-panel__language {
-    top: 24px;
-    right: 22px;
   }
 
   .mobile-wordmark {
