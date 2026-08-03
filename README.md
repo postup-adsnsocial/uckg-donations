@@ -54,9 +54,19 @@ pnpm typecheck
 pnpm test
 pnpm test:migrations
 pnpm build
-pnpm exec playwright install chromium
+pnpm exec playwright install chromium firefox
 pnpm test:e2e
+pnpm test:visual
 ```
+
+O teste visual é executado depois dos testes funcionais. Ele compara screenshots aprovadas do
+login em português, inglês e espanhol, nos navegadores Chromium e Firefox e em larguras de 320,
+390 e 1440 pixels. O mesmo gate rejeita rolagem horizontal, textos de campos ou idiomas cortados
+e controles principais menores que 44 pixels.
+
+Use `pnpm check:full` para executar toda a sequência local. Quando uma alteração visual for
+intencional e já tiver sido revisada nos arquivos gerados em `test-results/`, atualize as imagens
+de referência com `pnpm test:visual:update` e versione essas imagens junto com a alteração.
 
 Consulte [docs/architecture.md](docs/architecture.md) para os limites do Marco 0 e as regras que
 orientam o Marco 1.

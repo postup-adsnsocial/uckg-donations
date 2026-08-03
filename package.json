@@ -12,6 +12,7 @@
     "build": "pnpm -r --if-present build",
     "build:packages": "pnpm --filter './packages/**' build",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "check:full": "pnpm check && pnpm test:migrations && pnpm test:e2e && pnpm test:visual",
     "dev": "concurrently -k -n api,web,worker -c blue,green,magenta \"pnpm --filter @uckg/api dev\" \"pnpm --filter @uckg/web dev\" \"pnpm --filter @uckg/worker dev\"",
     "predev": "pnpm build:packages",
     "db:migrate": "pnpm --filter @uckg/database db:migrate",
@@ -23,6 +24,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:migrations": "pnpm --filter @uckg/database test:migrations",
+    "test:visual": "playwright test --config=playwright.visual.config.ts",
+    "test:visual:update": "playwright test --config=playwright.visual.config.ts --update-snapshots",
     "typecheck": "pnpm -r --if-present typecheck",
     "db:generate": "pnpm --filter @uckg/database db:generate"
   },
