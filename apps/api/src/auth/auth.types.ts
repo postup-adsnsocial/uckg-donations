@@ -2,21 +2,21 @@ import type { ChurchRole } from '@uckg/authorization';
 import type { Request } from 'express';
 
 export interface AuthenticatedAdmin {
-  displayName: string;
-  email: string;
-  id: string;
-  isPlatformAdmin: boolean;
+  readonly displayName: string;
+  readonly email: string;
+  readonly id: string;
+  readonly isPlatformAdmin: boolean;
 }
 
 export interface TenantContext {
-  church: {
-    id: string;
-    locale: string;
-    name: string;
-    slug: string;
-    timezone: string;
+  readonly church: {
+    readonly id: string;
+    readonly locale: string;
+    readonly name: string;
+    readonly slug: string;
+    readonly timezone: string;
   };
-  role: ChurchRole | null;
+  readonly role: ChurchRole | null;
 }
 
 export interface AuthenticatedRequest extends Request {
