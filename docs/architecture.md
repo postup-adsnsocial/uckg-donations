@@ -24,13 +24,39 @@ contexto autenticado fornece `churchId`; operações sem contexto são negadas, 
 devem filtrar o tenant por padrão. Constraints, índices e testes devem tornar acesso cross-tenant um
 erro verificável, não apenas uma convenção.
 
+## Identidade e tenancy — Marco 1
+
+A identidade administrativa é própria e separada do futuro domínio de membros. Senhas usam
+`scrypt` com salt aleatório. O login cria um token opaco de 256 bits; somente seu hash SHA-256 é
+persistido, e o token é entregue em cookie `httpOnly`, `SameSite=Strict` e `Secure` em produção.
+Sessões expiram após 12 horas.
+
+Rotas autenticadas resolvem o usuário pela sessão. Rotas de domínio exigem também `x-church-id` e
+confirmam uma membership ativa antes de construir o tenant context. A ausência do contexto ou uma
+tentativa cross-tenant resulta em negação por padrão. Administradores de plataforma podem selecionar
+qualquer igreja ativa, mas isso é explícito no contexto da requisição.
+
+Papéis por igreja:
+
+- `church_admin`: configurações, memberships, finanças e auditoria;
+- `financial_operator`: leitura da igreja e operações financeiras;
+- `auditor`: leitura da igreja e auditoria;
+- `platform_admin`: flag global, fora das memberships e com acesso explícito a tenants ativos.
+
+As tabelas `churches`, `admin_users`, `church_memberships` e `admin_sessions` possuem constraints,
+índices e chaves estrangeiras. O teste de migrations cria um banco vazio temporário, aplica toda a
+cadeia e o remove ao final.
+
+Antes de produção, login deve receber rate limiting e auditoria de eventos de autenticação. Isso não
+altera o modelo de sessão ou o isolamento implementado neste marco.
+
 ## Limites do Marco 0
 
 Este marco entrega somente a fundação executável, os processos, a infraestrutura local e os gates de
 qualidade. Igrejas, usuários administrativos, membros, doações, relatórios, autenticação e filas são
 implementados em marcos posteriores.
 
-## Próximo marco
+## Próximo marco após identidade
 
-O Marco 1 introduz igrejas, identidade administrativa, tenant context, papéis, permissões, migrations
-e testes de isolamento antes de qualquer dado financeiro ou pessoal.
+O próximo marco pode introduzir o domínio de membros, sempre associado a `church_id`, sem misturar
+contas administrativas com pessoas cadastradas pela igreja.

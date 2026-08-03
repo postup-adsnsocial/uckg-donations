@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsx watch src/main.ts",
+    "seed": "tsx src/seed.ts",
     "start": "node dist/main.js",
     "typecheck": "tsc --noEmit"
   },
@@ -13,10 +14,17 @@
     "@nestjs/common": "11.1.6",
     "@nestjs/core": "11.1.6",
     "@nestjs/platform-express": "11.1.6",
+    "@uckg/authorization": "workspace:*",
+    "@uckg/contracts": "workspace:*",
+    "@uckg/database": "workspace:*",
+    "drizzle-orm": "0.44.4",
+    "pg": "8.16.3",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.2"
   },
   "devDependencies": {
+    "@types/express": "5.0.3",
+    "@types/pg": "8.15.5",
     "tsx": "4.20.3"
   }
 }

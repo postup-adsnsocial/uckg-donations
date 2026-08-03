@@ -2,7 +2,9 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "noEmit": false,
-    "outDir": "dist"
+    "outDir": "dist",
+    "rootDir": "src"
   },
-  "exclude": ["drizzle.config.ts", "src/**/*.spec.ts"]
+  "exclude": ["src/**/*.spec.ts"],
+  "include": ["src/**/*.ts"]
 }
