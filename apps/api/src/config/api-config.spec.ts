@@ -5,7 +5,8 @@ import { validateApiEnvironment } from './api-config.js';
 const productionEnvironment = {
   NODE_ENV: 'production',
   API_PORT: '3001',
-  DATABASE_URL: 'postgresql://runtime-user:runtime-password@db.example.com:5432/uckg',
+  DATABASE_URL:
+    'postgresql://runtime-user:runtime-password@db.example.com:5432/uckg',
   WEB_ORIGINS: 'https://admin.example.com,https://ops.example.com',
   TRUST_PROXY: '10.0.0.0/8,172.16.0.0/12',
   METRICS_TOKEN: 'metrics-token-with-at-least-32-characters',
