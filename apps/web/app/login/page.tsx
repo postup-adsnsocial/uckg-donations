@@ -26,10 +26,6 @@ export default function LoginPage() {
             productName={dictionary.brand.productName}
           />
 
-          <div className="auth-form-panel__language">
-            <LocaleSwitcher label={dictionary.languageLabel} locale={locale} />
-          </div>
-
           <header className="auth-header">
             <p className="section-label">{dictionary.login.secureAccess}</p>
             <h2>{dictionary.login.title}</h2>
@@ -42,6 +38,10 @@ export default function LoginPage() {
             {dictionary.login.supportPrefix}{' '}
             <span>{dictionary.login.supportAction}</span>
           </p>
+
+          <div className="auth-form-panel__language">
+            <LocaleSwitcher label={dictionary.languageLabel} locale={locale} />
+          </div>
         </div>
 
         <footer className="auth-form-panel__footer">

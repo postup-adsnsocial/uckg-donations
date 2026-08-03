@@ -298,8 +298,8 @@ button {
 
 .auth-form-panel__language {
   display: flex;
-  justify-content: flex-start;
-  margin-bottom: 18px;
+  justify-content: center;
+  margin-top: 28px;
 }
 
 .locale-switcher {
@@ -312,17 +312,6 @@ button {
   padding: 0 9px;
   background: rgba(255, 255, 255, 0.92);
   color: var(--ink-500);
-}
-
-.locale-switcher svg {
-  width: 16px;
-  height: 16px;
-  flex: 0 0 auto;
-  fill: none;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.6;
 }
 
 .locale-switcher select {
@@ -1040,10 +1029,6 @@ select:focus-visible {
 
   .dashboard-topbar__actions .locale-switcher {
     padding-inline: 7px;
-  }
-
-  .dashboard-topbar__actions .locale-switcher svg {
-    display: none;
   }
 
   .user-chip > div,

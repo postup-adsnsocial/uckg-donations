@@ -11,6 +11,12 @@ export const localeNames: Record<Locale, string> = {
   es: 'Español',
 };
 
+export const localeFlags: Record<Locale, string> = {
+  'pt-BR': '🇧🇷',
+  en: '🇺🇸',
+  es: '🇪🇸',
+};
+
 export function isLocale(value: unknown): value is Locale {
   return typeof value === 'string' && locales.includes(value as Locale);
 }
