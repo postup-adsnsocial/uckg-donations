@@ -6,30 +6,25 @@ import {
   Controller,
   Get,
   Post,
-  UseGuards,
 } from '@nestjs/common';
 import { createMemberRequestSchema } from '@uckg/contracts';
 
 import { CurrentUser } from '../auth/current-user.decorator.js';
-import { SessionAuthGuard } from '../auth/session-auth.guard.js';
 import type {
   AuthenticatedAdmin,
   TenantContext as ResolvedTenantContext,
 } from '../auth/auth.types.js';
 import type { TenantContext } from '../database/tenant-unit-of-work.js';
 import { CurrentTenant } from '../tenancy/current-tenant.decorator.js';
-import { PermissionsGuard } from '../tenancy/permissions.guard.js';
-import { RequirePermissions } from '../tenancy/permissions.decorator.js';
-import { TenantGuard } from '../tenancy/tenant.guard.js';
+import { DomainRoute } from '../tenancy/domain-route.decorator.js';
 import { MembersService } from './members.service.js';
 
 @Controller('members')
-@UseGuards(SessionAuthGuard, TenantGuard, PermissionsGuard)
 export class MembersController {
   constructor(private readonly members: MembersService) {}
 
   @Get()
-  @RequirePermissions('members:read')
+  @DomainRoute('members:read')
   list(
     @CurrentTenant() tenant: ResolvedTenantContext,
     @CurrentUser() user: AuthenticatedAdmin,
@@ -38,7 +33,7 @@ export class MembersController {
   }
 
   @Post()
-  @RequirePermissions('members:write')
+  @DomainRoute('members:write')
   create(
     @CurrentTenant() tenant: ResolvedTenantContext,
     @CurrentUser() user: AuthenticatedAdmin,

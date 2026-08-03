@@ -1,19 +1,31 @@
-import { METHOD_METADATA, PATH_METADATA } from '@nestjs/common/constants.js';
 import {
+  Module,
+  type INestApplicationContext,
+  type Type,
+} from '@nestjs/common';
+import {
+  METHOD_METADATA,
+  MODULE_METADATA,
+  PATH_METADATA,
+} from '@nestjs/common/constants.js';
+import {
+  DiscoveryModule,
   DiscoveryService,
   MetadataScanner,
   NestFactory,
 } from '@nestjs/core';
-import type { INestApplicationContext, Type } from '@nestjs/common';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { AppModule } from '../app.module.js';
+import { AuthService } from '../auth/auth.service.js';
+import { MembersService } from '../members/members.service.js';
 import { requiredPermissionsKey } from './permissions.decorator.js';
 import { churchPermissions } from './permissions.guard.js';
 import {
   routePolicies,
   routePolicyMetadataKeys,
 } from './route-policy.decorator.js';
+import { TenantService } from './tenant.service.js';
 
 interface InventoriedRoute {
   controller: Type<unknown>;
@@ -21,14 +33,57 @@ interface InventoriedRoute {
   label: string;
 }
 
+function collectControllers(
+  rootModule: Type<unknown>,
+  visited = new Set<Type<unknown>>(),
+): Type<unknown>[] {
+  if (visited.has(rootModule)) {
+    return [];
+  }
+
+  visited.add(rootModule);
+  const controllers =
+    (Reflect.getMetadata(MODULE_METADATA.CONTROLLERS, rootModule) as
+      | Type<unknown>[]
+      | undefined) ?? [];
+  const imports =
+    (Reflect.getMetadata(MODULE_METADATA.IMPORTS, rootModule) as
+      | Type<unknown>[]
+      | undefined) ?? [];
+
+  return [
+    ...controllers,
+    ...imports.flatMap((importedModule) =>
+      collectControllers(importedModule, visited),
+    ),
+  ];
+}
+
+const registeredControllers = collectControllers(AppModule);
+
+@Module({
+  controllers: registeredControllers,
+  imports: [DiscoveryModule],
+  providers: [
+    { provide: AuthService, useValue: {} },
+    { provide: MembersService, useValue: {} },
+    { provide: TenantService, useValue: {} },
+  ],
+})
+class RouteInventoryModule {}
+
 describe('route policy inventory', () => {
   let application: INestApplicationContext;
   let routes: InventoriedRoute[];
 
   beforeAll(async () => {
-    application = await NestFactory.createApplicationContext(AppModule, {
-      logger: false,
-    });
+    application = await NestFactory.createApplicationContext(
+      RouteInventoryModule,
+      {
+        abortOnError: false,
+        logger: false,
+      },
+    );
     const discovery = application.get(DiscoveryService);
     const scanner = new MetadataScanner();
 
@@ -64,7 +119,7 @@ describe('route policy inventory', () => {
 
             return [
               {
-                controller,
+                controller: controller as Type<unknown>,
                 handler: handler as (...args: never[]) => unknown,
                 label: `${controller.name}.${methodName}`,
               },
@@ -74,7 +129,7 @@ describe('route policy inventory', () => {
   });
 
   afterAll(async () => {
-    await application.close();
+    await application?.close();
   });
 
   it('discovers every registered HTTP handler', () => {
@@ -108,14 +163,8 @@ describe('route policy inventory', () => {
   it('requires known, non-empty permissions for every domain handler', () => {
     for (const route of routes) {
       const isDomain =
-        Reflect.getMetadata(
-          routePolicyMetadataKeys.domain,
-          route.handler,
-        ) ??
-        Reflect.getMetadata(
-          routePolicyMetadataKeys.domain,
-          route.controller,
-        );
+        Reflect.getMetadata(routePolicyMetadataKeys.domain, route.handler) ??
+        Reflect.getMetadata(routePolicyMetadataKeys.domain, route.controller);
 
       if (!isDomain) {
         continue;

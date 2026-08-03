@@ -16,12 +16,17 @@ import type { AuthenticatedAdmin } from './auth.types.js';
 import { readCookie, sessionCookieName } from './cookies.js';
 import { CurrentUser } from './current-user.decorator.js';
 import { SessionAuthGuard } from './session-auth.guard.js';
+import {
+  IdentityRoute,
+  PublicRoute,
+} from '../tenancy/route-policy.decorator.js';
 
 @Controller('auth')
 export class AuthController {
   constructor(@Inject(AuthService) private readonly authService: AuthService) {}
 
   @Post('login')
+  @PublicRoute()
   async login(
     @Body() body: unknown,
     @Res({ passthrough: true }) response: Response,
@@ -49,6 +54,7 @@ export class AuthController {
   }
 
   @Post('logout')
+  @IdentityRoute()
   @UseGuards(SessionAuthGuard)
   async logout(
     @CurrentUser() _user: AuthenticatedAdmin,
@@ -71,6 +77,7 @@ export class AuthController {
   }
 
   @Get('me')
+  @IdentityRoute()
   @UseGuards(SessionAuthGuard)
   async me(@CurrentUser() user: AuthenticatedAdmin) {
     return {
