@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { json, urlencoded } from 'express';
-import helmet from 'helmet';
+import {helmet} from 'helmet';
 
 import { AppModule } from './app.module.js';
 import { ApiConfigService } from './config/api-config.service.js';
