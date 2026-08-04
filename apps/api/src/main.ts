@@ -28,4 +28,4 @@ app.enableCors({
 
 app.enableShutdownHooks();
 
-await app.listen(config.apiPort, '0.0.0.0');
+await app.listen(process.env.PORT ?? config.apiPort, '0.0.0.0');
