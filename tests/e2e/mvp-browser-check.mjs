@@ -138,9 +138,18 @@ try {
   );
   if (launchFieldOrder.join(',') !== 'member,date,amount,payment,image,notes')
     throw new Error(`Unexpected launch field order: ${launchFieldOrder}`);
-  await page
-    .getByLabel(/Membro relacionado/)
-    .selectOption({ label: memberName });
+  const memberSearch = page.getByRole('combobox', {
+    name: /Membro relacionado/,
+  });
+  await memberSearch.fill(memberName.slice(0, -3));
+  const memberOption = page.getByRole('option', {
+    name: new RegExp(memberName),
+  });
+  await memberOption.waitFor();
+  await assertResponsive(page, 'envelope-member-search');
+  await memberOption.click();
+  if ((await page.locator('input[name="memberId"]').inputValue()) === '')
+    throw new Error('Member autocomplete did not select a member.');
   await page.getByLabel('Data de recebimento').waitFor();
   await page.getByLabel('Valor (USD)').fill('125.50');
   const amountType = await page.getByLabel('Valor (USD)').getAttribute('type');

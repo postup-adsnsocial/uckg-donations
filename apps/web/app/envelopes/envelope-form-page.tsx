@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
 import { AppShell, type AppChurch } from '../components/app-shell';
 import type { Locale } from '../i18n/config';
@@ -59,6 +59,221 @@ function UploadIcon() {
   );
 }
 
+function SearchIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24">
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="m15.5 15.5 5 5" />
+    </svg>
+  );
+}
+
+function MemberCombobox({
+  churchId,
+  labels,
+}: {
+  churchId: string;
+  labels: {
+    anonymous: string;
+    empty: string;
+    loading: string;
+    member: string;
+    optional: string;
+    search: string;
+  };
+}) {
+  const inputId = useId();
+  const listboxId = useId();
+  const [query, setQuery] = useState('');
+  const [members, setMembers] = useState<MemberRecord[]>([]);
+  const [selectedMember, setSelectedMember] = useState<MemberRecord | null>(
+    null,
+  );
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const options: Array<MemberRecord | null> = [null, ...members];
+
+  useEffect(() => {
+    if (selectedMember) return;
+    const controller = new AbortController();
+    let active = true;
+    const timer = window.setTimeout(
+      () => {
+        const params = new URLSearchParams({
+          page: '1',
+          pageSize: '20',
+          status: 'active',
+        });
+        if (query.trim()) params.set('search', query.trim());
+        setLoading(true);
+        void apiRequest(`/members?${params}`, {
+          headers: { 'x-church-id': churchId },
+          signal: controller.signal,
+        })
+          .then(async (response) => {
+            if (!response.ok || !active) return;
+            const result = (await response.json()) as {
+              items: MemberRecord[];
+            };
+            if (!active) return;
+            setMembers(result.items);
+            setActiveIndex(0);
+          })
+          .catch(() => undefined)
+          .finally(() => {
+            if (active) setLoading(false);
+          });
+      },
+      query ? 220 : 0,
+    );
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [churchId, query, selectedMember]);
+
+  function choose(member: MemberRecord | null) {
+    setSelectedMember(member);
+    setQuery(member?.fullName ?? '');
+    setOpen(false);
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Escape') {
+      setOpen(false);
+      return;
+    }
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      setOpen(true);
+      setActiveIndex((current) => {
+        const direction = event.key === 'ArrowDown' ? 1 : -1;
+        return Math.min(
+          Math.max(current + direction, 0),
+          Math.max(options.length - 1, 0),
+        );
+      });
+      return;
+    }
+    if (event.key === 'Enter' && open) {
+      event.preventDefault();
+      choose(options[activeIndex] ?? null);
+    }
+  }
+
+  return (
+    <div className="form-field form-field--wide member-combobox">
+      <span id={`${inputId}-label`}>
+        {labels.member} · {labels.optional}
+      </span>
+      <input name="memberId" type="hidden" value={selectedMember?.id ?? ''} />
+      <div
+        className="member-combobox__control"
+        onBlur={(event) => {
+          if (event.currentTarget.contains(event.relatedTarget)) return;
+          setOpen(false);
+          if (!selectedMember) setQuery('');
+        }}
+      >
+        <span className="member-combobox__search-icon">
+          <SearchIcon />
+        </span>
+        <input
+          aria-activedescendant={
+            open ? `${listboxId}-option-${activeIndex}` : undefined
+          }
+          aria-autocomplete="list"
+          aria-controls={listboxId}
+          aria-expanded={open}
+          aria-labelledby={`${inputId}-label`}
+          autoComplete="off"
+          id={inputId}
+          placeholder={labels.search}
+          role="combobox"
+          type="search"
+          value={query}
+          onChange={(event) => {
+            setSelectedMember(null);
+            setQuery(event.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => setOpen(true)}
+          onKeyDown={handleKeyDown}
+        />
+        {selectedMember ? (
+          <button
+            aria-label={labels.anonymous}
+            className="member-combobox__clear"
+            type="button"
+            onClick={() => choose(null)}
+          >
+            ×
+          </button>
+        ) : null}
+        {open ? (
+          <div
+            aria-label={labels.member}
+            className="member-combobox__options"
+            id={listboxId}
+            role="listbox"
+          >
+            <button
+              aria-selected={!selectedMember}
+              className={activeIndex === 0 ? 'is-active' : undefined}
+              id={`${listboxId}-option-0`}
+              role="option"
+              type="button"
+              onClick={() => choose(null)}
+              onMouseEnter={() => setActiveIndex(0)}
+            >
+              <span className="member-combobox__avatar">A</span>
+              <span>
+                <strong>{labels.anonymous}</strong>
+              </span>
+              {!selectedMember ? <span aria-hidden="true">✓</span> : null}
+            </button>
+            {loading ? (
+              <p className="member-combobox__message">{labels.loading}</p>
+            ) : members.length ? (
+              members.map((member, index) => (
+                <button
+                  aria-selected={selectedMember?.id === member.id}
+                  className={
+                    activeIndex === index + 1 ? 'is-active' : undefined
+                  }
+                  id={`${listboxId}-option-${index + 1}`}
+                  key={member.id}
+                  role="option"
+                  type="button"
+                  onClick={() => choose(member)}
+                  onMouseEnter={() => setActiveIndex(index + 1)}
+                >
+                  <span className="member-combobox__avatar">
+                    {member.fullName.slice(0, 1).toLocaleUpperCase()}
+                  </span>
+                  <span>
+                    <strong>{member.fullName}</strong>
+                    {member.email || member.phone ? (
+                      <small>{member.email ?? member.phone}</small>
+                    ) : null}
+                  </span>
+                  {selectedMember?.id === member.id ? (
+                    <span aria-hidden="true">✓</span>
+                  ) : null}
+                </button>
+              ))
+            ) : query.trim() ? (
+              <p className="member-combobox__message">{labels.empty}</p>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 export function EnvelopeFormPage({ locale }: { locale: Locale }) {
   return (
     <AppShell active="launch" locale={locale}>
@@ -76,7 +291,6 @@ function EnvelopeForm({
 }) {
   const copy = productCopies[locale];
   const router = useRouter();
-  const [members, setMembers] = useState<MemberRecord[]>([]);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -92,19 +306,6 @@ function EnvelopeForm({
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const cameraSessionRef = useRef(0);
-
-  useEffect(() => {
-    apiRequest('/members?page=1&pageSize=200&status=active', {
-      headers: { 'x-church-id': church.id },
-    }).then(async (response) => {
-      if (response.ok)
-        setMembers(
-          ((await response.json()) as { items: MemberRecord[] }).items.filter(
-            (member) => member.status === 'active',
-          ),
-        );
-    });
-  }, [church.id]);
 
   useEffect(() => {
     if (cameraStatus !== 'live' || !videoRef.current || !streamRef.current)
@@ -327,19 +528,17 @@ function EnvelopeForm({
         <fieldset>
           <legend>{copy.envelopes.details}</legend>
           <div className="form-grid">
-            <label className="form-field form-field--wide">
-              <span>
-                {copy.envelopes.member} · {copy.common.optional}
-              </span>
-              <select name="memberId" defaultValue="">
-                <option value="">{copy.common.anonymous}</option>
-                {members.map((member) => (
-                  <option key={member.id} value={member.id}>
-                    {member.fullName}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <MemberCombobox
+              churchId={church.id}
+              labels={{
+                anonymous: copy.common.anonymous,
+                empty: copy.members.empty,
+                loading: copy.common.loading,
+                member: copy.envelopes.member,
+                optional: copy.common.optional,
+                search: copy.members.search,
+              }}
+            />
             <label className="form-field">
               <span>{copy.envelopes.date}</span>
               <input
