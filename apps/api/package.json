@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "pnpm --filter @uckg/authorization --filter @uckg/contracts --filter @uckg/database build && tsc -p tsconfig.build.json",
     "dev": "tsx watch src/main.ts",
     "seed": "tsx src/seed.ts",
     "start": "node dist/main.js",
