@@ -5,7 +5,7 @@ milestone_name: milestone
 status: executing
 stopped_at: Completed 01-03-PLAN.md
 last_updated: '2026-08-03T19:07:53.883Z'
-last_activity: 2026-08-03
+last_activity: 2026-08-04
 progress:
   total_phases: 6
   completed_phases: 0
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-08-03)
 Phase: 01 (tenant-and-production-safety-foundation) — EXECUTING
 Plan: 5 of 7
 Status: Ready to execute
-Last activity: 2026-08-03
+Last activity: 2026-08-04 - Completed quick task 260803-x57: member list actions and donation history
 
 Progress: [██████░░░░] 57%
 
@@ -83,6 +83,12 @@ None yet.
 - [Phase 2]: Audit retention/visibility, supported currencies, fund/method governance, and accounting-close policy need confirmation during phase discussion.
 - [Phase 4]: Donation meaning, batch controls, anonymous/unidentified semantics, reversal authority and duplicate policy need confirmation before schema freeze.
 - [Phase 5-6]: Report rules, artifact storage, export volume, hosting observability and recovery targets need confirmation during their phase discussions.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260803-x57 | Reorganizar lista de membros e adicionar histórico de lançamentos | 2026-08-04 | `0df1ba0` | [260803-x57](./quick/260803-x57-reorganizar-a-lista-de-membros-com-nome-/) |
 
 ## Session Continuity
 
