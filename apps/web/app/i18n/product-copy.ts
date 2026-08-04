@@ -14,6 +14,7 @@ export interface ProductCopy {
     saving: string;
   };
   members: {
+    actions: string;
     address1: string;
     address2: string;
     city: string;
@@ -36,6 +37,7 @@ export interface ProductCopy {
     details: string;
     delete: string;
     deleteConfirm: string;
+    deleteError: string;
     deleted: string;
     deleting: string;
     saved: string;
@@ -148,6 +150,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       saving: 'Salvando…',
     },
     members: {
+      actions: 'Ações',
       address1: 'Endereço',
       address2: 'Complemento',
       city: 'Cidade',
@@ -157,6 +160,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       delete: 'Excluir membro',
       deleteConfirm:
         'Excluir este membro? O histórico de doações será preservado.',
+      deleteError: 'Não foi possível excluir o membro. Tente novamente.',
       deleted: 'Membro excluído com sucesso.',
       deleting: 'Excluindo…',
       edit: 'Editar membro',
@@ -293,6 +297,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       saving: 'Saving…',
     },
     members: {
+      actions: 'Actions',
       address1: 'Address',
       address2: 'Address line 2',
       city: 'City',
@@ -301,6 +306,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       details: 'Member details',
       delete: 'Delete member',
       deleteConfirm: 'Delete this member? Donation history will be preserved.',
+      deleteError: 'Unable to delete the member. Try again.',
       deleted: 'Member deleted successfully.',
       deleting: 'Deleting…',
       edit: 'Edit member',
@@ -435,6 +441,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       saving: 'Guardando…',
     },
     members: {
+      actions: 'Acciones',
       address1: 'Dirección',
       address2: 'Complemento',
       city: 'Ciudad',
@@ -444,6 +451,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       delete: 'Eliminar miembro',
       deleteConfirm:
         '¿Eliminar este miembro? Se conservará el historial de donaciones.',
+      deleteError: 'No fue posible eliminar el miembro. Inténtalo de nuevo.',
       deleted: 'Miembro eliminado correctamente.',
       deleting: 'Eliminando…',
       edit: 'Editar miembro',

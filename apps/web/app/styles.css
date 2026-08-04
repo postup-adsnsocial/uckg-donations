@@ -1466,6 +1466,79 @@ select:focus-visible {
   cursor: pointer;
 }
 
+.member-name-link {
+  color: var(--ink-950);
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition:
+    color 160ms ease,
+    text-decoration-color 160ms ease;
+}
+
+.member-name-link:hover,
+.member-name-link:focus-visible {
+  color: var(--blue-800);
+  text-decoration-color: currentColor;
+}
+
+.member-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.member-action {
+  display: inline-grid;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #ffffff;
+  color: var(--blue-800);
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.member-action:hover {
+  border-color: #b5c7d7;
+  background: var(--blue-50);
+}
+
+.member-action:focus-visible {
+  outline: 3px solid rgba(0, 75, 135, 0.2);
+  outline-offset: 2px;
+}
+
+.member-action svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.member-action--danger {
+  color: #b42318;
+}
+
+.member-action--danger:hover {
+  border-color: #f0b8b3;
+  background: #fff0ef;
+}
+
+.member-action:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
 .record-status {
   display: inline-flex;
   border-radius: 999px;
@@ -3311,6 +3384,16 @@ select:focus-visible {
     justify-content: center;
     border: 1px solid var(--line);
     border-radius: 8px;
+  }
+
+  .member-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(44px, 1fr));
+    width: 100%;
+  }
+
+  .member-action {
+    width: 100%;
   }
 
   .form-actions {

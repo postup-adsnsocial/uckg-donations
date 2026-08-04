@@ -33,6 +33,9 @@ function MembersList({
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleted, setDeleted] = useState(false);
+  const [deleteError, setDeleteError] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -56,6 +59,32 @@ function MembersList({
     void load();
   }, [load]);
 
+  async function deleteMember(member: MemberRecord) {
+    if (!window.confirm(copy.members.deleteConfirm)) return;
+
+    setDeletingId(member.id);
+    setDeleteError(false);
+
+    try {
+      const response = await apiRequest(`/members/${member.id}`, {
+        headers: { 'x-church-id': church.id },
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        setDeleteError(true);
+        return;
+      }
+
+      setDeleted(true);
+      await load();
+    } catch {
+      setDeleteError(true);
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   return (
     <>
       <header className="product-heading">
@@ -70,11 +99,16 @@ function MembersList({
           ＋ {copy.members.new}
         </Link>
       </header>
-      {searchParams.get('deleted') ? (
+      {searchParams.get('deleted') || deleted ? (
         <div className="toast toast--success" role="status">
           <span>✓</span>
           {copy.members.deleted}
         </div>
+      ) : null}
+      {deleteError ? (
+        <p className="form-feedback form-feedback--error" role="alert">
+          {copy.members.deleteError}
+        </p>
       ) : null}
       <section className="product-panel">
         <form
@@ -106,14 +140,23 @@ function MembersList({
                   <th>{copy.members.phone}</th>
                   <th>{copy.members.city}</th>
                   <th>{copy.members.status}</th>
-                  <th></th>
+                  <th>
+                    <span className="sr-only">{copy.members.actions}</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {items.map((member) => (
                   <tr key={member.id}>
                     <td>
-                      <strong>{member.fullName}</strong>
+                      <strong>
+                        <Link
+                          className="member-name-link"
+                          href={`/${locale}/members/${member.id}`}
+                        >
+                          {member.fullName}
+                        </Link>
+                      </strong>
                       <small>{member.email ?? '—'}</small>
                     </td>
                     <td>{member.phone ?? '—'}</td>
@@ -132,12 +175,34 @@ function MembersList({
                       </span>
                     </td>
                     <td>
-                      <Link
-                        className="table-action"
-                        href={`/${locale}/members/${member.id}`}
-                      >
-                        {copy.members.details}
-                      </Link>
+                      <div className="member-actions">
+                        <Link
+                          aria-label={copy.members.details}
+                          className="member-action"
+                          href={`/${locale}/members/${member.id}`}
+                          title={copy.members.details}
+                        >
+                          <MemberActionIcon action="view" />
+                        </Link>
+                        <Link
+                          aria-label={copy.members.edit}
+                          className="member-action"
+                          href={`/${locale}/members/${member.id}/edit`}
+                          title={copy.members.edit}
+                        >
+                          <MemberActionIcon action="edit" />
+                        </Link>
+                        <button
+                          aria-label={copy.members.delete}
+                          className="member-action member-action--danger"
+                          disabled={deletingId === member.id}
+                          title={copy.members.delete}
+                          type="button"
+                          onClick={() => void deleteMember(member)}
+                        >
+                          <MemberActionIcon action="delete" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -168,5 +233,30 @@ function MembersList({
         ) : null}
       </section>
     </>
+  );
+}
+
+function MemberActionIcon({ action }: { action: 'delete' | 'edit' | 'view' }) {
+  if (action === 'view') {
+    return (
+      <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+        <path d="M2.8 12s3.3-5.5 9.2-5.5 9.2 5.5 9.2 5.5-3.3 5.5-9.2 5.5S2.8 12 2.8 12Z" />
+        <circle cx="12" cy="12" r="2.7" />
+      </svg>
+    );
+  }
+
+  if (action === 'edit') {
+    return (
+      <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+        <path d="m14.7 5.3 4 4M4.5 19.5l3.8-.8L19 8a1.9 1.9 0 0 0 0-2.7l-.3-.3A1.9 1.9 0 0 0 16 5L5.3 15.7l-.8 3.8Z" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+      <path d="M4.5 7.2h15M9.2 3.8h5.6l.7 3.4H8.5l.7-3.4ZM7 7.2l.7 13h8.6l.7-13M10 10.5v6.2M14 10.5v6.2" />
+    </svg>
   );
 }
