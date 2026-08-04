@@ -9,6 +9,7 @@ import { getDictionary } from '../i18n/dictionaries';
 import { apiRequest } from '../lib/api';
 import { BrandWordmark } from './brand-wordmark';
 import { LocaleSwitcher } from './locale-switcher';
+import { ProductIcon, type ProductIconName } from './product-icon';
 
 export interface AppChurch {
   id: string;
@@ -78,6 +79,39 @@ export function AppShell({ active, children, locale }: AppShellProps) {
     [locale, router],
   );
 
+  const refreshPlatformChurches = useCallback(
+    async (preferredChurchId = '') => {
+      const response = await apiRequest('/churches');
+      if (!response.ok) {
+        setStatus('error');
+        return;
+      }
+
+      const churches = (await response.json()) as AppChurch[];
+      const availableMemberships = churches.map((item) => ({
+        churchId: item.id,
+        churchName: item.name,
+        churchSlug: item.slug,
+        role: 'church_admin' as const,
+      }));
+      setMemberships(availableMemberships);
+
+      const stored = localStorage.getItem('uckg_selected_church') ?? '';
+      const selected = [preferredChurchId, stored].find((candidate) =>
+        availableMemberships.some((item) => item.churchId === candidate),
+      );
+      const nextChurchId = selected ?? availableMemberships[0]?.churchId;
+
+      if (!nextChurchId) {
+        setStatus('error');
+        return;
+      }
+
+      await loadChurch(nextChurchId);
+    },
+    [loadChurch],
+  );
+
   useEffect(() => {
     async function load() {
       const response = await apiRequest('/auth/me');
@@ -94,19 +128,12 @@ export function AppShell({ active, children, locale }: AppShellProps) {
         user: AppUser;
       };
       setUser(data.user);
-      let availableMemberships = data.memberships;
       if (data.user.isPlatformAdmin) {
-        const churchesResponse = await apiRequest('/churches');
-        if (churchesResponse.ok) {
-          const churches = (await churchesResponse.json()) as AppChurch[];
-          availableMemberships = churches.map((item) => ({
-            churchId: item.id,
-            churchName: item.name,
-            churchSlug: item.slug,
-            role: 'church_admin',
-          }));
-        }
+        await refreshPlatformChurches();
+        return;
       }
+
+      const availableMemberships = data.memberships;
       setMemberships(availableMemberships);
       const stored = localStorage.getItem('uckg_selected_church');
       const selected = availableMemberships.some(
@@ -121,7 +148,20 @@ export function AppShell({ active, children, locale }: AppShellProps) {
       await loadChurch(selected);
     }
     void load();
-  }, [loadChurch, locale, router]);
+  }, [loadChurch, locale, refreshPlatformChurches, router]);
+
+  useEffect(() => {
+    if (!user?.isPlatformAdmin) return;
+
+    const refresh = () => {
+      void refreshPlatformChurches(selectedChurchId);
+    };
+    window.addEventListener('uckg:churches-changed', refresh);
+
+    return () => {
+      window.removeEventListener('uckg:churches-changed', refresh);
+    };
+  }, [refreshPlatformChurches, selectedChurchId, user?.isPlatformAdmin]);
 
   async function logout() {
     await apiRequest('/auth/logout', { method: 'POST' });
@@ -131,9 +171,20 @@ export function AppShell({ active, children, locale }: AppShellProps) {
 
   if (status === 'loading') {
     return (
-      <main className="dashboard-state">
-        <span className="loading-mark">U</span>
-        <p>{copy.preparing}</p>
+      <main className="dashboard-state dashboard-state--loading">
+        <section className="loading-panel" aria-live="polite">
+          <BrandWordmark
+            className="wordmark--loading"
+            priority
+            productName={dictionary.brand.productName}
+          />
+          <div className="loading-panel__copy">
+            <p>{copy.preparing}</p>
+            <span className="loading-progress" aria-hidden="true">
+              <span />
+            </span>
+          </div>
+        </section>
       </main>
     );
   }
@@ -153,9 +204,14 @@ export function AppShell({ active, children, locale }: AppShellProps) {
     );
   }
 
-  const links = [
+  const links: Array<{
+    icon: ProductIconName;
+    id: AppShellProps['active'];
+    label: string;
+    path: string;
+  }> = [
     {
-      icon: '◫',
+      icon: 'overview',
       id: 'dashboard' as const,
       label: copy.navigation.overview,
       path: 'dashboard',
@@ -163,7 +219,7 @@ export function AppShell({ active, children, locale }: AppShellProps) {
     ...(user.isPlatformAdmin
       ? [
           {
-            icon: '▦',
+            icon: 'churches' as const,
             id: 'churches' as const,
             label: copy.navigation.churches,
             path: 'churches',
@@ -171,19 +227,19 @@ export function AppShell({ active, children, locale }: AppShellProps) {
         ]
       : []),
     {
-      icon: '◇',
+      icon: 'members',
       id: 'members' as const,
       label: copy.navigation.members,
       path: 'members',
     },
     {
-      icon: '＋',
+      icon: 'launch',
       id: 'launch' as const,
       label: copy.navigation.launch,
       path: 'envelopes/new',
     },
     {
-      icon: '▥',
+      icon: 'reports',
       id: 'reports' as const,
       label: copy.navigation.reports,
       path: 'reports',
@@ -210,13 +266,14 @@ export function AppShell({ active, children, locale }: AppShellProps) {
               href={`/${locale}/${link.path}`}
               key={link.id}
             >
-              <span aria-hidden="true">{link.icon}</span>
+              <ProductIcon name={link.icon} />
               {link.label}
             </Link>
           ))}
         </nav>
         <button className="sidebar-logout" onClick={logout} type="button">
-          {copy.logout}
+          <ProductIcon name="logout" />
+          <span>{copy.logout}</span>
         </button>
       </aside>
 
@@ -262,7 +319,8 @@ export function AppShell({ active, children, locale }: AppShellProps) {
               href={`/${locale}/${link.path}`}
               key={link.id}
             >
-              {link.label}
+              <ProductIcon name={link.icon} />
+              <span>{link.label}</span>
             </Link>
           ))}
         </nav>

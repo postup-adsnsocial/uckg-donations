@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { type FormEvent, useEffect, useRef, useState } from 'react';
 
 import {
   AppShell,
@@ -10,6 +10,16 @@ import {
 import type { Locale } from '../i18n/config';
 import { productCopies } from '../i18n/product-copy';
 import { apiRequest } from '../lib/api';
+
+type ChurchMessage =
+  | 'created'
+  | 'deleted'
+  | 'deleteError'
+  | 'error'
+  | 'lastChurchError'
+  | 'updated'
+  | 'updateError'
+  | '';
 
 export function ChurchesPage({ locale }: { locale: Locale }) {
   return (
@@ -22,9 +32,12 @@ export function ChurchesPage({ locale }: { locale: Locale }) {
 function ChurchesContent({ locale, user }: { locale: Locale; user: AppUser }) {
   const copy = productCopies[locale];
   const [items, setItems] = useState<AppChurch[]>([]);
+  const [editingId, setEditingId] = useState('');
+  const [editingName, setEditingName] = useState('');
   const [loading, setLoading] = useState(true);
+  const [pendingId, setPendingId] = useState('');
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<'created' | 'error' | ''>('');
+  const [message, setMessage] = useState<ChurchMessage>('');
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -65,6 +78,71 @@ function ChurchesContent({ locale, user }: { locale: Locale; user: AppUser }) {
     );
     setMessage('created');
     formRef.current?.reset();
+    window.dispatchEvent(new Event('uckg:churches-changed'));
+  }
+
+  function startEditing(church: AppChurch) {
+    setEditingId(church.id);
+    setEditingName(church.name);
+    setMessage('');
+  }
+
+  async function updateChurch(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const name = editingName.trim();
+    if (name.length < 2) return;
+
+    const id = editingId;
+    setPendingId(id);
+    setMessage('');
+    const response = await apiRequest(`/churches/${id}`, {
+      body: JSON.stringify({ name }),
+      method: 'PATCH',
+    });
+    setPendingId('');
+
+    if (!response.ok) {
+      setMessage('updateError');
+      return;
+    }
+
+    const updated = (await response.json()) as AppChurch;
+    setItems((current) =>
+      current
+        .map((item) => (item.id === updated.id ? updated : item))
+        .sort((left, right) => left.name.localeCompare(right.name, locale)),
+    );
+    setEditingId('');
+    setEditingName('');
+    setMessage('updated');
+    window.dispatchEvent(new Event('uckg:churches-changed'));
+  }
+
+  async function deleteChurch(church: AppChurch) {
+    const confirmed = window.confirm(
+      copy.churches.deleteConfirm.replace('{name}', church.name),
+    );
+    if (!confirmed) return;
+
+    setPendingId(church.id);
+    setMessage('');
+    const response = await apiRequest(`/churches/${church.id}`, {
+      method: 'DELETE',
+    });
+    setPendingId('');
+
+    if (!response.ok) {
+      setMessage(response.status === 409 ? 'lastChurchError' : 'deleteError');
+      return;
+    }
+
+    setItems((current) => current.filter((item) => item.id !== church.id));
+    if (editingId === church.id) {
+      setEditingId('');
+      setEditingName('');
+    }
+    setMessage('deleted');
+    window.dispatchEvent(new Event('uckg:churches-changed'));
   }
 
   if (!user.isPlatformAdmin) {
@@ -80,15 +158,27 @@ function ChurchesContent({ locale, user }: { locale: Locale; user: AppUser }) {
           <p>{copy.churches.intro}</p>
         </div>
       </header>
-      {message === 'created' ? (
+      {['created', 'deleted', 'updated'].includes(message) ? (
         <div className="toast toast--success" role="status">
           <span>✓</span>
-          {copy.churches.created}
+          {message === 'created'
+            ? copy.churches.created
+            : message === 'updated'
+              ? copy.churches.updated
+              : copy.churches.deleted}
         </div>
       ) : null}
-      {message === 'error' ? (
+      {['deleteError', 'error', 'lastChurchError', 'updateError'].includes(
+        message,
+      ) ? (
         <p className="form-feedback form-feedback--error" role="alert">
-          {copy.churches.error}
+          {message === 'updateError'
+            ? copy.churches.updateError
+            : message === 'deleteError'
+              ? copy.churches.deleteError
+              : message === 'lastChurchError'
+                ? copy.churches.lastChurchError
+                : copy.churches.error}
         </p>
       ) : null}
       <section className="church-management-grid">
@@ -122,9 +212,77 @@ function ChurchesContent({ locale, user }: { locale: Locale; user: AppUser }) {
             <ul>
               {items.map((item) => (
                 <li key={item.id}>
-                  <span aria-hidden="true">U</span>
-                  <strong>{item.name}</strong>
-                  <small>{copy.common.active}</small>
+                  <span className="church-list__mark" aria-hidden="true">
+                    U
+                  </span>
+                  {editingId === item.id ? (
+                    <form className="church-edit-form" onSubmit={updateChurch}>
+                      <label>
+                        <span>{copy.churches.name}</span>
+                        <input
+                          autoFocus
+                          maxLength={160}
+                          minLength={2}
+                          onChange={(event) =>
+                            setEditingName(event.target.value)
+                          }
+                          required
+                          value={editingName}
+                        />
+                      </label>
+                      <div>
+                        <button disabled={pendingId === item.id} type="submit">
+                          {pendingId === item.id
+                            ? copy.common.saving
+                            : copy.common.save}
+                        </button>
+                        <button
+                          disabled={pendingId === item.id}
+                          onClick={() => {
+                            setEditingId('');
+                            setEditingName('');
+                          }}
+                          type="button"
+                        >
+                          {copy.common.cancel}
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <>
+                      <div className="church-list__identity">
+                        <strong>{item.name}</strong>
+                        <small>{copy.common.active}</small>
+                      </div>
+                      <div className="church-actions">
+                        <button
+                          aria-label={`${copy.churches.edit}: ${item.name}`}
+                          className="church-action"
+                          disabled={pendingId === item.id}
+                          onClick={() => startEditing(item)}
+                          title={copy.churches.edit}
+                          type="button"
+                        >
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="m4 20 4.25-1 10.5-10.5a2.12 2.12 0 0 0-3-3L5.25 16 4 20Z" />
+                            <path d="m14.5 6.5 3 3" />
+                          </svg>
+                        </button>
+                        <button
+                          aria-label={`${copy.churches.delete}: ${item.name}`}
+                          className="church-action church-action--danger"
+                          disabled={pendingId === item.id}
+                          onClick={() => void deleteChurch(item)}
+                          title={copy.churches.delete}
+                          type="button"
+                        >
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v5m4-5v5" />
+                          </svg>
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </li>
               ))}
             </ul>

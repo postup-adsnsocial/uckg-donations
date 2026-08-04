@@ -17,14 +17,22 @@ export interface ProductCopy {
     create: string;
     created: string;
     creating: string;
+    delete: string;
+    deleteConfirm: string;
+    deleteError: string;
+    deleted: string;
+    edit: string;
     empty: string;
     error: string;
     intro: string;
+    lastChurchError: string;
     listTitle: string;
     name: string;
     namePlaceholder: string;
     restricted: string;
     title: string;
+    updateError: string;
+    updated: string;
   };
   members: {
     actions: string;
@@ -101,6 +109,8 @@ export interface ProductCopy {
     view: string;
   };
   dashboard: {
+    churches: string;
+    churchesDescription: string;
     donations: string;
     donationsDescription: string;
     launch: string;
@@ -170,16 +180,26 @@ export const productCopies: Record<Locale, ProductCopy> = {
       create: 'Criar igreja',
       created: 'Igreja criada com sucesso.',
       creating: 'Criando…',
+      delete: 'Excluir igreja',
+      deleteConfirm:
+        'Excluir “{name}” do menu? Os membros, doações e relatórios serão preservados.',
+      deleteError: 'Não foi possível excluir a igreja. Tente novamente.',
+      deleted: 'Igreja excluída do menu com sucesso.',
+      edit: 'Editar igreja',
       empty: 'Nenhuma igreja cadastrada.',
       error:
         'Não foi possível criar a igreja. Revise o nome e tente novamente.',
       intro:
         'Cadastre apenas o nome necessário para separar membros, lançamentos e relatórios.',
+      lastChurchError: 'A última igreja ativa não pode ser excluída.',
       listTitle: 'Igrejas disponíveis',
       name: 'Nome da igreja',
       namePlaceholder: 'Ex.: UCKG New York',
       restricted: 'Esta área é exclusiva do administrador da plataforma.',
       title: 'Igrejas',
+      updateError:
+        'Não foi possível salvar o novo nome da igreja. Tente novamente.',
+      updated: 'Nome da igreja atualizado com sucesso.',
     },
     members: {
       actions: 'Ações',
@@ -262,6 +282,9 @@ export const productCopies: Record<Locale, ProductCopy> = {
       view: 'Ver detalhes',
     },
     dashboard: {
+      churches: 'Igrejas',
+      churchesDescription:
+        'Cadastre, renomeie e organize as igrejas disponíveis na plataforma.',
       donations: 'Doações',
       donationsDescription:
         'Consulte os lançamentos e as imagens dos envelopes.',
@@ -337,15 +360,24 @@ export const productCopies: Record<Locale, ProductCopy> = {
       create: 'Create church',
       created: 'Church created successfully.',
       creating: 'Creating…',
+      delete: 'Delete church',
+      deleteConfirm:
+        'Remove “{name}” from the menu? Members, donations and reports will be preserved.',
+      deleteError: 'The church could not be deleted. Try again.',
+      deleted: 'Church removed from the menu successfully.',
+      edit: 'Edit church',
       empty: 'No churches have been created.',
       error: 'The church could not be created. Review the name and try again.',
       intro:
         'Add only the name needed to separate members, entries and reports.',
+      lastChurchError: 'The last active church cannot be deleted.',
       listTitle: 'Available churches',
       name: 'Church name',
       namePlaceholder: 'Example: UCKG New York',
       restricted: 'This area is restricted to the platform administrator.',
       title: 'Churches',
+      updateError: 'The new church name could not be saved. Try again.',
+      updated: 'Church name updated successfully.',
     },
     members: {
       actions: 'Actions',
@@ -426,6 +458,9 @@ export const productCopies: Record<Locale, ProductCopy> = {
       view: 'View details',
     },
     dashboard: {
+      churches: 'Churches',
+      churchesDescription:
+        'Create, rename and organize the churches available on the platform.',
       donations: 'Donations',
       donationsDescription: 'Review donation entries and envelope images.',
       launch: 'Record',
@@ -499,16 +534,26 @@ export const productCopies: Record<Locale, ProductCopy> = {
       create: 'Crear iglesia',
       created: 'Iglesia creada correctamente.',
       creating: 'Creando…',
+      delete: 'Eliminar iglesia',
+      deleteConfirm:
+        '¿Eliminar “{name}” del menú? Se conservarán los miembros, las donaciones y los informes.',
+      deleteError: 'No fue posible eliminar la iglesia. Inténtalo de nuevo.',
+      deleted: 'Iglesia eliminada del menú correctamente.',
+      edit: 'Editar iglesia',
       empty: 'No hay iglesias registradas.',
       error:
         'No fue posible crear la iglesia. Revisa el nombre e inténtalo de nuevo.',
       intro:
         'Registra únicamente el nombre necesario para separar miembros, registros e informes.',
+      lastChurchError: 'No se puede eliminar la última iglesia activa.',
       listTitle: 'Iglesias disponibles',
       name: 'Nombre de la iglesia',
       namePlaceholder: 'Ej.: UCKG New York',
       restricted: 'Esta área es exclusiva del administrador de la plataforma.',
       title: 'Iglesias',
+      updateError:
+        'No fue posible guardar el nuevo nombre de la iglesia. Inténtalo de nuevo.',
+      updated: 'Nombre de la iglesia actualizado correctamente.',
     },
     members: {
       actions: 'Acciones',
@@ -593,6 +638,9 @@ export const productCopies: Record<Locale, ProductCopy> = {
       view: 'Ver detalles',
     },
     dashboard: {
+      churches: 'Iglesias',
+      churchesDescription:
+        'Crea, renombra y organiza las iglesias disponibles en la plataforma.',
       donations: 'Donaciones',
       donationsDescription:
         'Consulta los registros y las imágenes de los sobres.',

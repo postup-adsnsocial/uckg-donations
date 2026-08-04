@@ -3,55 +3,55 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
-import { AppShell, type AppChurch } from '../components/app-shell';
+import {
+  AppShell,
+  type AppChurch,
+  type AppUser,
+} from '../components/app-shell';
+import { ProductIcon, type ProductIconName } from '../components/product-icon';
 import { type Locale, localeFromRoute } from '../i18n/config';
 import { productCopies } from '../i18n/product-copy';
 
-type ModuleId = 'launch' | 'members' | 'reports';
+type ModuleId = 'churches' | 'launch' | 'members' | 'reports';
 
 export default function DashboardPage() {
   const params = useParams<{ locale?: string }>();
   const locale = localeFromRoute(params.locale);
   return (
     <AppShell active="dashboard" locale={locale}>
-      {({ church }) => <Dashboard church={church} locale={locale} />}
+      {({ church, user }) => (
+        <Dashboard church={church} locale={locale} user={user} />
+      )}
     </AppShell>
   );
 }
 
-function ModuleIcon({ id }: { id: ModuleId }) {
-  if (id === 'members') {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M16 20v-1.7a3.3 3.3 0 0 0-3.3-3.3H6.3A3.3 3.3 0 0 0 3 18.3V20" />
-        <circle cx="9.5" cy="7.5" r="3.5" />
-        <path d="M16.5 4.2a3.5 3.5 0 0 1 0 6.6M21 20v-1.7a3.3 3.3 0 0 0-2.5-3.2" />
-      </svg>
-    );
-  }
-  if (id === 'launch') {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M12 5v14M5 12h14" />
-      </svg>
-    );
-  }
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24">
-      <path d="M5 20V10M12 20V4M19 20v-7" />
-      <path d="M3 20h18" />
-    </svg>
-  );
-}
-
-function Dashboard({ church, locale }: { church: AppChurch; locale: Locale }) {
+function Dashboard({
+  church,
+  locale,
+  user,
+}: {
+  church: AppChurch;
+  locale: Locale;
+  user: AppUser;
+}) {
   const copy = productCopies[locale];
   const modules: Array<{
     description: string;
     href: string;
-    id: ModuleId;
+    id: ModuleId & ProductIconName;
     title: string;
   }> = [
+    ...(user.isPlatformAdmin
+      ? [
+          {
+            description: copy.dashboard.churchesDescription,
+            href: `/${locale}/churches`,
+            id: 'churches' as const,
+            title: copy.dashboard.churches,
+          },
+        ]
+      : []),
     {
       description: copy.dashboard.membersDescription,
       href: `/${locale}/members`,
@@ -91,7 +91,7 @@ function Dashboard({ church, locale }: { church: AppChurch; locale: Locale }) {
             key={module.id}
           >
             <span className="overview-card__icon">
-              <ModuleIcon id={module.id} />
+              <ProductIcon name={module.id} />
             </span>
             <span className="overview-card__copy">
               <strong>{module.title}</strong>

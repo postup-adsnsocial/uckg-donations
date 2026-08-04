@@ -14,6 +14,7 @@ const email = `browser-mvp-${suffix}@example.com`;
 const password = `browser-password-${suffix}`;
 const memberName = `Member ${suffix}`;
 const managedChurchName = `UCKG Brooklyn ${suffix}`;
+const managedChurchUpdatedName = `UCKG Brooklyn Center ${suffix}`;
 const envelopeImage = fileURLToPath(
   new URL('../../apps/web/public/universal-logo.png', import.meta.url),
 );
@@ -97,10 +98,14 @@ try {
     );
   }
   const overviewCardCount = await overviewCards.count();
-  if (overviewCardCount !== 3)
+  if (overviewCardCount !== 4)
     throw new Error(
-      `Overview must display three module access cards; found ${overviewCardCount}.`,
+      `Platform overview must display four module access cards; found ${overviewCardCount}.`,
     );
+  await page
+    .locator('.overview-grid')
+    .getByRole('link', { name: /Igrejas/ })
+    .waitFor();
   if (await page.getByRole('link', { name: 'Doações', exact: true }).count())
     throw new Error('Donations must not appear in the product navigation.');
   await page
@@ -138,6 +143,33 @@ try {
     .locator('.church-list')
     .getByText(managedChurchName, { exact: true })
     .waitFor();
+  const managedChurchRow = page.locator('.church-list li').filter({
+    hasText: managedChurchName,
+  });
+  await managedChurchRow
+    .getByRole('button', { name: `Editar igreja: ${managedChurchName}` })
+    .click();
+  const managedChurchEditForm = page.locator('.church-edit-form');
+  await managedChurchEditForm
+    .getByRole('textbox')
+    .fill(managedChurchUpdatedName);
+  const [updateChurchResponse] = await Promise.all([
+    page.waitForResponse(
+      (response) =>
+        response.url().endsWith(`/churches/${managedChurchId}`) &&
+        response.request().method() === 'PATCH',
+    ),
+    managedChurchEditForm.getByRole('button', { name: 'Salvar' }).click(),
+  ]);
+  if (!updateChurchResponse.ok())
+    throw new Error(
+      `Church update failed (${updateChurchResponse.status()}): ${await updateChurchResponse.text()}`,
+    );
+  await page.getByText('Nome da igreja atualizado com sucesso.').waitFor();
+  await page
+    .locator('.church-list')
+    .getByText(managedChurchUpdatedName, { exact: true })
+    .waitFor();
   await assertResponsive(page, 'churches');
 
   await page.goto('http://localhost:3000/pt-BR/members/new');
@@ -156,7 +188,7 @@ try {
   await page.getByRole('heading', { level: 2, name: memberName }).waitFor();
   await page
     .locator('.detail-card dl')
-    .getByText(managedChurchName, { exact: true })
+    .getByText(managedChurchUpdatedName, { exact: true })
     .waitFor();
   const addressCard = page
     .locator('.detail-card')
@@ -327,6 +359,32 @@ try {
     .getByRole('button', { name: 'Excluir membro' })
     .click();
   await page.getByText('Membro excluído com sucesso.').waitFor();
+
+  await page.goto('http://localhost:3000/pt-BR/churches');
+  const updatedChurchRow = page.locator('.church-list li').filter({
+    hasText: managedChurchUpdatedName,
+  });
+  await updatedChurchRow.waitFor();
+  page.once('dialog', (dialog) => dialog.accept());
+  const [deleteChurchResponse] = await Promise.all([
+    page.waitForResponse(
+      (response) =>
+        response.url().endsWith(`/churches/${managedChurchId}`) &&
+        response.request().method() === 'DELETE',
+    ),
+    updatedChurchRow
+      .getByRole('button', {
+        name: `Excluir igreja: ${managedChurchUpdatedName}`,
+      })
+      .click(),
+  ]);
+  if (!deleteChurchResponse.ok())
+    throw new Error(
+      `Church deletion failed (${deleteChurchResponse.status()}): ${await deleteChurchResponse.text()}`,
+    );
+  await page.getByText('Igreja excluída do menu com sucesso.').waitFor();
+  if ((await updatedChurchRow.count()) !== 0)
+    throw new Error('Deleted church remains visible in the church menu.');
 
   for (const locale of ['en', 'es']) {
     for (const path of [
