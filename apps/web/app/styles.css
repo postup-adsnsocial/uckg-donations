@@ -1618,6 +1618,115 @@ select:focus-visible {
   box-shadow: 0 0 0 4px rgba(0, 75, 135, 0.09);
 }
 
+.payment-method-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.payment-method-option {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 84px;
+  align-items: center;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 14px 38px 14px 14px;
+  background: #ffffff;
+  color: var(--ink-700);
+  cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background-color 150ms ease;
+}
+
+.payment-method-option:hover {
+  border-color: #9fbdd2;
+  background: #fbfdff;
+}
+
+.payment-method-option input {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.payment-method-option__icon {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--blue-50);
+  color: var(--blue-800);
+}
+
+.payment-method-option__icon svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.payment-method-option strong {
+  overflow-wrap: anywhere;
+  font-size: 0.82rem;
+  line-height: 1.25;
+}
+
+.payment-method-option__check {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  width: 21px;
+  height: 21px;
+  place-items: center;
+  border: 1px solid #cbd7e0;
+  border-radius: 50%;
+  background: #ffffff;
+  color: transparent;
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+.payment-method-option:has(input:checked) {
+  border-color: var(--blue-700);
+  background: var(--blue-50);
+  box-shadow: 0 0 0 3px rgba(0, 75, 135, 0.08);
+  color: var(--blue-950);
+}
+
+.payment-method-option:has(input:checked) .payment-method-option__icon {
+  background: var(--blue-800);
+  color: #ffffff;
+}
+
+.payment-method-option:has(input:checked) .payment-method-option__check {
+  border-color: var(--blue-800);
+  background: var(--blue-800);
+  color: #ffffff;
+}
+
+.payment-method-option:has(input:focus-visible) {
+  outline: 3px solid rgba(0, 75, 135, 0.22);
+  outline-offset: 2px;
+}
+
 .form-actions {
   display: flex;
   align-items: center;
@@ -2197,6 +2306,32 @@ select:focus-visible {
 
   .form-field {
     grid-column: 1 / -1;
+  }
+
+  .payment-method-option {
+    min-height: 108px;
+    align-content: center;
+    justify-items: center;
+    grid-template-columns: 1fr;
+    gap: 7px;
+    padding: 13px 8px 11px;
+    text-align: center;
+  }
+
+  .payment-method-option__icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .payment-method-option__check {
+    top: 7px;
+    right: 7px;
+  }
+
+  .payment-method-option strong {
+    overflow-wrap: normal;
+    font-size: 0.72rem;
+    white-space: nowrap;
   }
 
   .product-table,

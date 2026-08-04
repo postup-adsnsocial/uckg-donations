@@ -128,7 +128,12 @@ try {
   const amountType = await page.getByLabel('Valor (USD)').getAttribute('type');
   if (amountType === 'number')
     throw new Error('Amount field remains sensitive to mouse wheel changes.');
-  await page.getByLabel('Forma de pagamento').selectOption('check');
+  const paymentMethods = page.getByRole('radiogroup', {
+    name: 'Forma de pagamento',
+  });
+  if ((await paymentMethods.getByRole('radio').count()) !== 3)
+    throw new Error('Expected three visual payment method options.');
+  await paymentMethods.getByRole('radio', { name: 'Cheque' }).check();
   await page
     .getByLabel(/Membro relacionado/)
     .selectOption({ label: memberName });

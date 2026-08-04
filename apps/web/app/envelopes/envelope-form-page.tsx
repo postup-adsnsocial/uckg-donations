@@ -10,6 +10,34 @@ import { productCopies } from '../i18n/product-copy';
 import { apiRequest } from '../lib/api';
 import type { MemberRecord } from '../members/types';
 
+type PaymentMethod = 'card' | 'cash' | 'check';
+
+function PaymentMethodIcon({ method }: { method: PaymentMethod }) {
+  if (method === 'card') {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <rect x="2.75" y="5" width="18.5" height="14" rx="2.5" />
+        <path d="M3 9.5h18M7 15h4" />
+      </svg>
+    );
+  }
+  if (method === 'cash') {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <rect x="2.75" y="5.5" width="18.5" height="13" rx="2" />
+        <path d="M6.5 8.5a2 2 0 0 1-2 2v3a2 2 0 0 1 2 2h11a2 2 0 0 1 2-2v-3a2 2 0 0 1-2-2h-11Z" />
+        <circle cx="12" cy="12" r="2.25" />
+      </svg>
+    );
+  }
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24">
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <path d="M7 9h6M7 13h10M7 17h5M15.5 8.5l1.25 1.25L19 7.5" />
+    </svg>
+  );
+}
+
 export function EnvelopeFormPage({ locale }: { locale: Locale }) {
   return (
     <AppShell active="launch" locale={locale}>
@@ -131,14 +159,44 @@ function EnvelopeForm({
                 defaultValue={new Date().toISOString().slice(0, 10)}
               />
             </label>
-            <label className="form-field">
-              <span>{copy.envelopes.paymentMethod}</span>
-              <select name="paymentMethod" defaultValue="cash" required>
-                <option value="cash">{copy.envelopes.cash}</option>
-                <option value="card">{copy.envelopes.card}</option>
-                <option value="check">{copy.envelopes.check}</option>
-              </select>
-            </label>
+            <div className="form-field form-field--wide payment-method-field">
+              <span id="payment-method-label">
+                {copy.envelopes.paymentMethod}
+              </span>
+              <div
+                aria-labelledby="payment-method-label"
+                className="payment-method-options"
+                role="radiogroup"
+              >
+                {(
+                  [
+                    ['cash', copy.envelopes.cash],
+                    ['card', copy.envelopes.card],
+                    ['check', copy.envelopes.check],
+                  ] as const
+                ).map(([method, label]) => (
+                  <label className="payment-method-option" key={method}>
+                    <input
+                      defaultChecked={method === 'cash'}
+                      name="paymentMethod"
+                      required
+                      type="radio"
+                      value={method}
+                    />
+                    <span className="payment-method-option__icon">
+                      <PaymentMethodIcon method={method} />
+                    </span>
+                    <strong>{label}</strong>
+                    <span
+                      aria-hidden="true"
+                      className="payment-method-option__check"
+                    >
+                      ✓
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
             <label className="form-field form-field--wide">
               <span>
                 {copy.envelopes.member} · {copy.common.optional}
