@@ -2,11 +2,10 @@ ALTER TABLE "members" ADD CONSTRAINT "members_church_id_id_unique" UNIQUE("churc
 DO $$
 BEGIN
 	IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'uckg_runtime') THEN
-		CREATE ROLE uckg_runtime;
+		CREATE ROLE uckg_runtime NOSUPERUSER NOCREATEDB NOCREATEROLE NOLOGIN NOREPLICATION NOBYPASSRLS;
 	END IF;
 END
 $$;--> statement-breakpoint
-ALTER ROLE uckg_runtime NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;--> statement-breakpoint
 REVOKE CREATE ON SCHEMA public FROM PUBLIC;--> statement-breakpoint
 REVOKE ALL ON ALL TABLES IN SCHEMA public FROM PUBLIC;--> statement-breakpoint
 GRANT USAGE ON SCHEMA public TO uckg_runtime;--> statement-breakpoint
