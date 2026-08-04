@@ -137,7 +137,15 @@ try {
   await page
     .getByLabel(/Membro relacionado/)
     .selectOption({ label: memberName });
+  await page
+    .getByRole('button', { name: 'Fotografar envelope', exact: true })
+    .waitFor();
+  await page
+    .getByRole('button', { name: 'Selecionar imagem', exact: true })
+    .waitFor();
+  await assertResponsive(page, 'envelope-new-empty');
   await page.getByLabel(/Imagem do envelope/).setInputFiles(envelopeImage);
+  await page.getByText('Imagem pronta para envio').waitFor();
   await page.getByLabel(/Observação/).fill('Browser MVP verification');
   await assertResponsive(page, 'envelope-new');
   await page.getByRole('button', { name: 'Salvar' }).click();

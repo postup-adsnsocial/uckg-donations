@@ -2153,6 +2153,269 @@ select:focus-visible {
   font-weight: 750;
 }
 
+.visually-hidden-input {
+  position: absolute;
+  width: 1px !important;
+  height: 1px;
+  min-height: 0 !important;
+  overflow: hidden;
+  margin: -1px;
+  padding: 0 !important;
+  border: 0 !important;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.image-source-panel {
+  display: grid;
+  gap: 15px;
+  border: 1px dashed #b8c8d4;
+  border-radius: 12px;
+  padding: 18px;
+  background: #fbfdff;
+}
+
+.image-source-panel > p,
+.envelope-image-selection p {
+  margin: 0;
+  color: var(--ink-500);
+  font-size: 0.75rem;
+  line-height: 1.55;
+}
+
+.image-source-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.image-source-button {
+  display: inline-flex;
+  min-width: 0;
+  min-height: 52px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 10px 16px;
+  background: #ffffff;
+  color: var(--blue-900);
+  font-size: 0.78rem;
+  font-weight: 750;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.image-source-button:hover {
+  border-color: #9fbdd2;
+  background: var(--blue-50);
+}
+
+.image-source-button--primary {
+  border-color: var(--blue-800);
+  background: var(--blue-800);
+  color: #ffffff;
+}
+
+.image-source-button--primary:hover {
+  border-color: var(--blue-950);
+  background: var(--blue-950);
+}
+
+.image-source-button svg,
+.camera-primary-action svg,
+.camera-message svg {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.envelope-image-selection {
+  display: grid;
+  align-items: center;
+  grid-template-columns: minmax(130px, 190px) minmax(0, 1fr);
+  gap: 18px;
+  border: 1px solid #b9d5c5;
+  border-radius: 12px;
+  padding: 14px;
+  background: #f8fcfa;
+}
+
+.envelope-image-selection img {
+  width: 100%;
+  height: 124px;
+  border-radius: 8px;
+  background: #eef2f4;
+  object-fit: contain;
+}
+
+.envelope-image-selection > div {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+}
+
+.envelope-image-selection strong {
+  color: var(--ink-950);
+  font-size: 0.82rem;
+}
+
+.image-remove-button {
+  width: fit-content;
+  min-height: 40px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #a1251b;
+  font-size: 0.75rem;
+  font-weight: 750;
+}
+
+.camera-dialog-backdrop {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  padding: 24px;
+  background: rgba(7, 20, 32, 0.78);
+  backdrop-filter: blur(5px);
+}
+
+.camera-dialog {
+  width: min(720px, 100%);
+  overflow: hidden;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.32);
+}
+
+.camera-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px 22px;
+}
+
+.camera-dialog__header h3 {
+  margin: 0 0 5px;
+  color: var(--ink-950);
+  font-size: 1rem;
+}
+
+.camera-dialog__header p {
+  margin: 0;
+  color: var(--ink-500);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.camera-dialog__close {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--ink-700);
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.camera-viewport {
+  position: relative;
+  display: grid;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-height: 62vh;
+  place-items: center;
+  overflow: hidden;
+  background: #071420;
+}
+
+.camera-viewport video,
+.camera-viewport > img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.camera-message {
+  display: grid;
+  max-width: 390px;
+  justify-items: center;
+  gap: 14px;
+  padding: 28px;
+  color: #ffffff;
+  text-align: center;
+}
+
+.camera-message p {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.camera-message--error svg {
+  width: 38px;
+  height: 38px;
+  flex-basis: 38px;
+}
+
+.camera-spinner {
+  width: 34px;
+  height: 34px;
+  border: 3px solid rgba(255, 255, 255, 0.28);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: camera-spin 0.8s linear infinite;
+}
+
+@keyframes camera-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.camera-dialog__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 22px 20px;
+}
+
+.camera-dialog__actions button {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 0 18px;
+  background: #ffffff;
+  color: var(--ink-700);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.camera-dialog__actions .camera-primary-action {
+  border-color: var(--blue-800);
+  background: var(--blue-800);
+  color: #ffffff;
+}
+
 .report-hint {
   border: 1px dashed var(--line);
   border-radius: 14px;
@@ -2332,6 +2595,38 @@ select:focus-visible {
     overflow-wrap: normal;
     font-size: 0.72rem;
     white-space: nowrap;
+  }
+
+  .camera-dialog-backdrop {
+    align-items: end;
+    padding: 12px;
+  }
+
+  .camera-dialog {
+    border-radius: 15px;
+  }
+
+  .camera-dialog__header {
+    padding: 17px 17px 14px;
+  }
+
+  .camera-dialog__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 14px 17px 17px;
+  }
+
+  .camera-dialog__actions button {
+    width: 100%;
+    padding-inline: 12px;
+  }
+
+  .camera-dialog__actions button:only-child {
+    grid-column: 1 / -1;
+  }
+
+  .camera-dialog__actions button:nth-last-child(3):first-child {
+    grid-column: 1 / -1;
   }
 
   .product-table,
@@ -2523,6 +2818,37 @@ select:focus-visible {
     stroke-linecap: round;
     stroke-linejoin: round;
     stroke-width: 1.7;
+  }
+
+  .image-source-actions,
+  .envelope-image-selection {
+    grid-template-columns: 1fr;
+  }
+
+  .image-source-button {
+    justify-content: flex-start;
+    padding-inline: 15px;
+  }
+
+  .envelope-image-selection img {
+    height: 160px;
+  }
+
+  .camera-dialog-backdrop {
+    padding: 0;
+  }
+
+  .camera-dialog {
+    min-height: 100dvh;
+    border-radius: 0;
+  }
+
+  .camera-viewport {
+    max-height: none;
+  }
+
+  .camera-dialog__actions {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { AppShell, type AppChurch } from '../components/app-shell';
 import type { Locale } from '../i18n/config';
@@ -38,6 +38,23 @@ function PaymentMethodIcon({ method }: { method: PaymentMethod }) {
   );
 }
 
+function CameraIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24">
+      <path d="M8.5 6.5 10 4.75h4L15.5 6.5H19A2.5 2.5 0 0 1 21.5 9v8A2.5 2.5 0 0 1 19 19.5H5A2.5 2.5 0 0 1 2.5 17V9A2.5 2.5 0 0 1 5 6.5h3.5Z" />
+      <circle cx="12" cy="13" r="3.5" />
+    </svg>
+  );
+}
+
+function UploadIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24">
+      <path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M4 14v4.5A2.5 2.5 0 0 0 6.5 21h11a2.5 2.5 0 0 0 2.5-2.5V14" />
+    </svg>
+  );
+}
+
 export function EnvelopeFormPage({ locale }: { locale: Locale }) {
   return (
     <AppShell active="launch" locale={locale}>
@@ -58,6 +75,19 @@ function EnvelopeForm({
   const [members, setMembers] = useState<MemberRecord[]>([]);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [selectedImageUrl, setSelectedImageUrl] = useState('');
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const [cameraStatus, setCameraStatus] = useState<
+    'starting' | 'live' | 'preview' | 'error'
+  >('starting');
+  const [cameraError, setCameraError] = useState('');
+  const [capturedImage, setCapturedImage] = useState<File | null>(null);
+  const [capturedImageUrl, setCapturedImageUrl] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const cameraSessionRef = useRef(0);
 
   useEffect(() => {
     apiRequest('/members?page=1&pageSize=200&status=active', {
@@ -72,10 +102,165 @@ function EnvelopeForm({
     });
   }, [church.id]);
 
+  useEffect(() => {
+    if (cameraStatus !== 'live' || !videoRef.current || !streamRef.current)
+      return;
+    videoRef.current.srcObject = streamRef.current;
+    void videoRef.current.play().catch(() => {
+      stopCamera();
+      setCameraError(copy.envelopes.cameraPermissionError);
+      setCameraStatus('error');
+    });
+  }, [cameraStatus, copy.envelopes.cameraPermissionError]);
+
+  useEffect(
+    () => () => {
+      if (selectedImageUrl) URL.revokeObjectURL(selectedImageUrl);
+    },
+    [selectedImageUrl],
+  );
+
+  useEffect(
+    () => () => {
+      if (capturedImageUrl) URL.revokeObjectURL(capturedImageUrl);
+    },
+    [capturedImageUrl],
+  );
+
+  useEffect(
+    () => () => {
+      cameraSessionRef.current += 1;
+      streamRef.current?.getTracks().forEach((track) => track.stop());
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!cameraOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeCamera();
+    };
+    document.addEventListener('keydown', closeOnEscape);
+    return () => document.removeEventListener('keydown', closeOnEscape);
+  });
+
+  function stopCamera() {
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    if (videoRef.current) videoRef.current.srcObject = null;
+  }
+
+  function clearCapturedImage() {
+    setCapturedImage(null);
+    setCapturedImageUrl('');
+  }
+
+  function closeCamera() {
+    cameraSessionRef.current += 1;
+    stopCamera();
+    clearCapturedImage();
+    setCameraOpen(false);
+    setCameraError('');
+  }
+
+  function selectImage(image: File | null) {
+    setSelectedImage(image);
+    setSelectedImageUrl(image ? URL.createObjectURL(image) : '');
+  }
+
+  async function openCamera() {
+    const cameraSession = cameraSessionRef.current + 1;
+    cameraSessionRef.current = cameraSession;
+    setCameraOpen(true);
+    setCameraStatus('starting');
+    setCameraError('');
+    clearCapturedImage();
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setCameraError(copy.envelopes.cameraUnavailable);
+      setCameraStatus('error');
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: {
+          facingMode: { ideal: 'environment' },
+          height: { ideal: 1440 },
+          width: { ideal: 1920 },
+        },
+      });
+      if (cameraSession !== cameraSessionRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+      streamRef.current = stream;
+      setCameraStatus('live');
+    } catch {
+      setCameraError(copy.envelopes.cameraPermissionError);
+      setCameraStatus('error');
+    }
+  }
+
+  function capturePhoto() {
+    const video = videoRef.current;
+    if (!video?.videoWidth || !video.videoHeight) {
+      setCameraError(copy.envelopes.cameraPermissionError);
+      setCameraStatus('error');
+      return;
+    }
+
+    const maximumEdge = 2000;
+    const scale = Math.min(
+      1,
+      maximumEdge / Math.max(video.videoWidth, video.videoHeight),
+    );
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(video.videoWidth * scale);
+    canvas.height = Math.round(video.videoHeight * scale);
+    canvas
+      .getContext('2d')
+      ?.drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          setCameraError(copy.envelopes.cameraPermissionError);
+          setCameraStatus('error');
+          return;
+        }
+        const image = new File([blob], `envelope-${Date.now()}.jpg`, {
+          type: 'image/jpeg',
+        });
+        setCapturedImage(image);
+        setCapturedImageUrl(URL.createObjectURL(image));
+        setCameraStatus('preview');
+      },
+      'image/jpeg',
+      0.9,
+    );
+  }
+
+  function retakePhoto() {
+    clearCapturedImage();
+    setCameraStatus('live');
+  }
+
+  function confirmPhoto() {
+    if (!capturedImage) return;
+    selectImage(capturedImage);
+    cameraSessionRef.current += 1;
+    stopCamera();
+    clearCapturedImage();
+    setCameraOpen(false);
+  }
+
   async function save(formData: FormData) {
     setSaving(true);
     setMessage('');
-    const image = formData.get('image') as File;
+    const formImage = formData.get('image');
+    const image =
+      selectedImage ?? (formImage instanceof File ? formImage : null);
     const amount = Number(String(formData.get('amount')).replace(',', '.'));
     const response = await apiRequest('/donations', {
       body: JSON.stringify({
@@ -210,17 +395,67 @@ function EnvelopeForm({
                 ))}
               </select>
             </label>
-            <label className="form-field form-field--wide">
+            <div className="form-field form-field--wide envelope-image-capture">
               <span>
                 {copy.envelopes.image} · {copy.common.optional}
               </span>
               <input
-                className="file-input"
+                ref={fileInputRef}
+                aria-label={`${copy.envelopes.image} · ${copy.common.optional}`}
+                className="visually-hidden-input"
+                hidden
                 name="image"
                 type="file"
                 accept="image/jpeg,image/png"
+                onChange={(event) =>
+                  selectImage(event.currentTarget.files?.[0] ?? null)
+                }
               />
-            </label>
+              {selectedImageUrl ? (
+                <div className="envelope-image-selection">
+                  {/* Blob previews are local-only and cannot use Next image optimization. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img alt={copy.envelopes.previewAlt} src={selectedImageUrl} />
+                  <div>
+                    <strong>{copy.envelopes.imageReady}</strong>
+                    <p>{copy.envelopes.imageHint}</p>
+                    <button
+                      className="image-remove-button"
+                      type="button"
+                      onClick={() => {
+                        selectImage(null);
+                        if (fileInputRef.current)
+                          fileInputRef.current.value = '';
+                      }}
+                    >
+                      {copy.envelopes.removeImage}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="image-source-panel">
+                  <p>{copy.envelopes.imageHint}</p>
+                  <div className="image-source-actions">
+                    <button
+                      className="image-source-button image-source-button--primary"
+                      type="button"
+                      onClick={() => void openCamera()}
+                    >
+                      <CameraIcon />
+                      <span>{copy.envelopes.cameraAction}</span>
+                    </button>
+                    <button
+                      className="image-source-button"
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <UploadIcon />
+                      <span>{copy.envelopes.chooseImage}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
             <label className="form-field form-field--wide">
               <span>
                 {copy.envelopes.notes} · {copy.common.optional}
@@ -241,6 +476,84 @@ function EnvelopeForm({
           </button>
         </div>
       </form>
+      {cameraOpen ? (
+        <div className="camera-dialog-backdrop">
+          <section
+            aria-labelledby="camera-dialog-title"
+            aria-modal="true"
+            className="camera-dialog"
+            role="dialog"
+          >
+            <header className="camera-dialog__header">
+              <div>
+                <h3 id="camera-dialog-title">{copy.envelopes.cameraTitle}</h3>
+                <p>{copy.envelopes.cameraIntro}</p>
+              </div>
+              <button
+                aria-label={copy.envelopes.closeCamera}
+                className="camera-dialog__close"
+                type="button"
+                onClick={closeCamera}
+              >
+                ×
+              </button>
+            </header>
+            <div className="camera-viewport">
+              {cameraStatus === 'starting' ? (
+                <div className="camera-message" role="status">
+                  <span className="camera-spinner" />
+                  <p>{copy.envelopes.cameraStarting}</p>
+                </div>
+              ) : null}
+              {cameraStatus === 'live' ? (
+                <video ref={videoRef} autoPlay muted playsInline />
+              ) : null}
+              {cameraStatus === 'preview' && capturedImageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img alt={copy.envelopes.previewAlt} src={capturedImageUrl} />
+              ) : null}
+              {cameraStatus === 'error' ? (
+                <div
+                  className="camera-message camera-message--error"
+                  role="alert"
+                >
+                  <CameraIcon />
+                  <p>{cameraError}</p>
+                </div>
+              ) : null}
+            </div>
+            <footer className="camera-dialog__actions">
+              <button type="button" onClick={closeCamera}>
+                {copy.common.cancel}
+              </button>
+              {cameraStatus === 'live' ? (
+                <button
+                  className="camera-primary-action"
+                  type="button"
+                  onClick={capturePhoto}
+                >
+                  <CameraIcon />
+                  {copy.envelopes.takePhoto}
+                </button>
+              ) : null}
+              {cameraStatus === 'preview' ? (
+                <>
+                  <button type="button" onClick={retakePhoto}>
+                    {copy.envelopes.retakePhoto}
+                  </button>
+                  <button
+                    className="camera-primary-action"
+                    type="button"
+                    onClick={confirmPhoto}
+                  >
+                    {copy.envelopes.usePhoto}
+                  </button>
+                </>
+              ) : null}
+            </footer>
+          </section>
+        </div>
+      ) : null}
     </>
   );
 }

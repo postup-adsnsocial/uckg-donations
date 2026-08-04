@@ -44,9 +44,17 @@ export interface ProductCopy {
   envelopes: {
     allMembers: string;
     amount: string;
+    cameraAction: string;
+    cameraIntro: string;
+    cameraPermissionError: string;
+    cameraStarting: string;
+    cameraTitle: string;
+    cameraUnavailable: string;
     card: string;
     cash: string;
     check: string;
+    chooseImage: string;
+    closeCamera: string;
     count: string;
     date: string;
     details: string;
@@ -54,16 +62,23 @@ export interface ProductCopy {
     endDate: string;
     error: string;
     image: string;
+    imageHint: string;
+    imageReady: string;
     listIntro: string;
     member: string;
     new: string;
     notes: string;
     operator: string;
     paymentMethod: string;
+    previewAlt: string;
+    removeImage: string;
+    retakePhoto: string;
     saved: string;
     startDate: string;
     title: string;
+    takePhoto: string;
     total: string;
+    usePhoto: string;
     view: string;
   };
   dashboard: {
@@ -146,9 +161,19 @@ export const productCopies: Record<Locale, ProductCopy> = {
     envelopes: {
       allMembers: 'Todos os membros',
       amount: 'Valor',
+      cameraAction: 'Fotografar envelope',
+      cameraIntro: 'Posicione o envelope inteiro dentro da área da câmera.',
+      cameraPermissionError:
+        'Não foi possível acessar a câmera. Autorize o acesso e tente novamente.',
+      cameraStarting: 'Abrindo câmera…',
+      cameraTitle: 'Câmera do envelope',
+      cameraUnavailable:
+        'A câmera não está disponível neste dispositivo ou navegador.',
       card: 'Cartão',
       cash: 'Dinheiro',
       check: 'Cheque',
+      chooseImage: 'Selecionar imagem',
+      closeCamera: 'Fechar câmera',
       count: 'Envelopes',
       date: 'Data de recebimento',
       details: 'Detalhes do envelope',
@@ -156,16 +181,24 @@ export const productCopies: Record<Locale, ProductCopy> = {
       endDate: 'Data final',
       error: 'Não foi possível salvar o envelope.',
       image: 'Imagem do envelope',
+      imageHint:
+        'A imagem será enviada somente ao salvar o envelope e não será adicionada à galeria.',
+      imageReady: 'Imagem pronta para envio',
       listIntro: 'Consulte lançamentos e imagens da congregação ativa.',
       member: 'Membro relacionado',
       new: 'Lançar envelope',
       notes: 'Observação',
       operator: 'Operador',
       paymentMethod: 'Forma de pagamento',
+      previewAlt: 'Prévia da imagem do envelope',
+      removeImage: 'Remover imagem',
+      retakePhoto: 'Tirar novamente',
       saved: 'Envelope lançado com sucesso.',
       startDate: 'Data inicial',
       title: 'Envelopes',
+      takePhoto: 'Tirar foto',
       total: 'Total',
+      usePhoto: 'Usar esta foto',
       view: 'Ver detalhes',
     },
     dashboard: {
@@ -249,9 +282,19 @@ export const productCopies: Record<Locale, ProductCopy> = {
     envelopes: {
       allMembers: 'All members',
       amount: 'Amount',
+      cameraAction: 'Photograph envelope',
+      cameraIntro: 'Position the entire envelope inside the camera area.',
+      cameraPermissionError:
+        'The camera could not be accessed. Allow camera access and try again.',
+      cameraStarting: 'Opening camera…',
+      cameraTitle: 'Envelope camera',
+      cameraUnavailable:
+        'The camera is not available on this device or browser.',
       card: 'Card',
       cash: 'Cash',
       check: 'Check',
+      chooseImage: 'Select image',
+      closeCamera: 'Close camera',
       count: 'Envelopes',
       date: 'Date received',
       details: 'Envelope details',
@@ -259,16 +302,24 @@ export const productCopies: Record<Locale, ProductCopy> = {
       endDate: 'End date',
       error: 'Unable to save the envelope.',
       image: 'Envelope image',
+      imageHint:
+        'The image will only be uploaded when you save the envelope and will not be added to the photo gallery.',
+      imageReady: 'Image ready to upload',
       listIntro: 'Review entries and images for the active congregation.',
       member: 'Related member',
       new: 'Record envelope',
       notes: 'Note',
       operator: 'Operator',
       paymentMethod: 'Payment method',
+      previewAlt: 'Envelope image preview',
+      removeImage: 'Remove image',
+      retakePhoto: 'Retake photo',
       saved: 'Envelope recorded successfully.',
       startDate: 'Start date',
       title: 'Envelopes',
+      takePhoto: 'Take photo',
       total: 'Total',
+      usePhoto: 'Use this photo',
       view: 'View details',
     },
     dashboard: {
@@ -354,9 +405,19 @@ export const productCopies: Record<Locale, ProductCopy> = {
     envelopes: {
       allMembers: 'Todos los miembros',
       amount: 'Valor',
+      cameraAction: 'Fotografiar sobre',
+      cameraIntro: 'Coloca el sobre completo dentro del área de la cámara.',
+      cameraPermissionError:
+        'No fue posible acceder a la cámara. Autoriza el acceso e inténtalo de nuevo.',
+      cameraStarting: 'Abriendo cámara…',
+      cameraTitle: 'Cámara del sobre',
+      cameraUnavailable:
+        'La cámara no está disponible en este dispositivo o navegador.',
       card: 'Tarjeta',
       cash: 'Efectivo',
       check: 'Cheque',
+      chooseImage: 'Seleccionar imagen',
+      closeCamera: 'Cerrar cámara',
       count: 'Sobres',
       date: 'Fecha de recepción',
       details: 'Detalles del sobre',
@@ -364,16 +425,24 @@ export const productCopies: Record<Locale, ProductCopy> = {
       endDate: 'Fecha final',
       error: 'No fue posible guardar el sobre.',
       image: 'Imagen del sobre',
+      imageHint:
+        'La imagen se enviará únicamente al guardar el sobre y no se añadirá a la galería.',
+      imageReady: 'Imagen lista para enviar',
       listIntro: 'Consulta registros e imágenes de la congregación activa.',
       member: 'Miembro relacionado',
       new: 'Registrar sobre',
       notes: 'Observación',
       operator: 'Operador',
       paymentMethod: 'Forma de pago',
+      previewAlt: 'Vista previa de la imagen del sobre',
+      removeImage: 'Eliminar imagen',
+      retakePhoto: 'Tomar otra foto',
       saved: 'Sobre registrado correctamente.',
       startDate: 'Fecha inicial',
       title: 'Sobres',
+      takePhoto: 'Tomar foto',
       total: 'Total',
+      usePhoto: 'Usar esta foto',
       view: 'Ver detalles',
     },
     dashboard: {
