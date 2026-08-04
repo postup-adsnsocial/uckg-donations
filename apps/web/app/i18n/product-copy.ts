@@ -96,21 +96,40 @@ export interface ProductCopy {
   };
   reports: {
     archive: string;
+    contentDescription: string;
+    contentTitle: string;
     customPeriod: string;
     detailed: string;
+    detailedDescription: string;
     download: string;
     empty: string;
     generate: string;
+    imagesIntro: string;
+    imagesTitle: string;
+    includeImages: string;
+    includeImagesDescription: string;
     intro: string;
     last30Days: string;
     lastMonth: string;
     memberTotals: string;
+    memberTotalsDescription: string;
+    nextYear: string;
+    noResults: string;
     paymentMethods: string;
+    paymentMethodsDescription: string;
     period: string;
+    periodDescription: string;
+    periodTitle: string;
+    previewTitle: string;
+    previousYear: string;
     reportType: string;
+    savedReports: string;
+    selectionSummary: string;
     thisMonth: string;
     thisYear: string;
     title: string;
+    withImages: string;
+    withoutImages: string;
   };
 }
 
@@ -220,21 +239,44 @@ export const productCopies: Record<Locale, ProductCopy> = {
     },
     reports: {
       archive: 'Relatórios arquivados',
+      contentDescription: 'Escolha como os dados serão organizados.',
+      contentTitle: 'O que o relatório deve mostrar?',
       customPeriod: 'Período personalizado',
-      detailed: 'Lançamentos + imagens',
+      detailed: 'Todos os lançamentos',
+      detailedDescription:
+        'Data, membro, valor e forma de pagamento de cada envelope.',
       download: 'Baixar PDF',
-      empty: 'Escolha o período para gerar o relatório.',
-      generate: 'Gerar relatório',
-      intro: 'Totais e lançamentos consolidados em um PDF.',
+      empty: 'Escolha as opções acima para visualizar o relatório.',
+      generate: 'Visualizar relatório',
+      imagesIntro: 'Decida se o PDF também deve levar os comprovantes.',
+      imagesTitle: 'Incluir imagens?',
+      includeImages: 'Incluir imagens dos envelopes no PDF',
+      includeImagesDescription:
+        'As imagens serão adicionadas em um anexo organizado após o relatório.',
+      intro: 'Monte o relatório escolhendo o conteúdo, as imagens e o período.',
       last30Days: 'Últimos 30 dias',
       lastMonth: 'Mês anterior',
-      memberTotals: 'Totais por membro',
-      paymentMethods: 'Totais por pagamento',
+      memberTotals: 'Total por membro',
+      memberTotalsDescription:
+        'Quantidade de envelopes e valor total doado por cada membro.',
+      nextYear: 'Próximo ano',
+      noResults: 'Nenhum lançamento foi encontrado no período escolhido.',
+      paymentMethods: 'Total por forma de pagamento',
+      paymentMethodsDescription:
+        'Totais separados entre dinheiro, cartão e cheque.',
       period: 'Período',
+      periodDescription: 'Use um atalho, escolha um mês ou informe as datas.',
+      periodTitle: 'Qual período?',
+      previewTitle: 'RELATÓRIO SELECIONADO',
+      previousYear: 'Ano anterior',
       reportType: 'Tipo de relatório',
+      savedReports: 'relatórios salvos',
+      selectionSummary: 'Sua seleção',
       thisMonth: 'Este mês',
       thisYear: 'Este ano',
       title: 'Relatórios',
+      withImages: 'Com imagens',
+      withoutImages: 'Sem imagens',
     },
   },
   en: {
@@ -340,21 +382,43 @@ export const productCopies: Record<Locale, ProductCopy> = {
     },
     reports: {
       archive: 'Archived reports',
+      contentDescription: 'Choose how the data should be organized.',
+      contentTitle: 'What should the report show?',
       customPeriod: 'Custom period',
-      detailed: 'Entries + images',
+      detailed: 'All entries',
+      detailedDescription:
+        'Date, member, amount and payment method for every envelope.',
       download: 'Download PDF',
-      empty: 'Select a period to generate the report.',
-      generate: 'Generate report',
-      intro: 'Consolidated totals and entries in a PDF.',
+      empty: 'Choose the options above to preview the report.',
+      generate: 'Preview report',
+      imagesIntro: 'Choose whether the PDF should include the records.',
+      imagesTitle: 'Include images?',
+      includeImages: 'Include envelope images in the PDF',
+      includeImagesDescription:
+        'Images will be added in an organized appendix after the report.',
+      intro: 'Build a report by choosing its content, images and period.',
       last30Days: 'Last 30 days',
       lastMonth: 'Previous month',
-      memberTotals: 'Totals by member',
-      paymentMethods: 'Totals by payment',
+      memberTotals: 'Total by member',
+      memberTotalsDescription:
+        'Envelope count and total donated by each member.',
+      nextYear: 'Next year',
+      noResults: 'No entries were found in the selected period.',
+      paymentMethods: 'Total by payment method',
+      paymentMethodsDescription: 'Totals separated into cash, card and check.',
       period: 'Period',
+      periodDescription: 'Use a shortcut, choose a month or enter dates.',
+      periodTitle: 'Which period?',
+      previewTitle: 'SELECTED REPORT',
+      previousYear: 'Previous year',
       reportType: 'Report type',
+      savedReports: 'saved reports',
+      selectionSummary: 'Your selection',
       thisMonth: 'This month',
       thisYear: 'This year',
       title: 'Reports',
+      withImages: 'With images',
+      withoutImages: 'Without images',
     },
   },
   es: {
@@ -464,21 +528,46 @@ export const productCopies: Record<Locale, ProductCopy> = {
     },
     reports: {
       archive: 'Informes archivados',
+      contentDescription: 'Elige cómo se organizarán los datos.',
+      contentTitle: '¿Qué debe mostrar el informe?',
       customPeriod: 'Período personalizado',
-      detailed: 'Registros + imágenes',
+      detailed: 'Todos los registros',
+      detailedDescription:
+        'Fecha, miembro, valor y forma de pago de cada sobre.',
       download: 'Descargar PDF',
-      empty: 'Elige el período para generar el informe.',
-      generate: 'Generar informe',
-      intro: 'Totales y registros consolidados en un PDF.',
+      empty: 'Elige las opciones anteriores para visualizar el informe.',
+      generate: 'Visualizar informe',
+      imagesIntro: 'Decide si el PDF también debe incluir los comprobantes.',
+      imagesTitle: '¿Incluir imágenes?',
+      includeImages: 'Incluir imágenes de los sobres en el PDF',
+      includeImagesDescription:
+        'Las imágenes se añadirán en un anexo organizado después del informe.',
+      intro:
+        'Crea el informe eligiendo el contenido, las imágenes y el período.',
       last30Days: 'Últimos 30 días',
       lastMonth: 'Mes anterior',
-      memberTotals: 'Totales por miembro',
-      paymentMethods: 'Totales por pago',
+      memberTotals: 'Total por miembro',
+      memberTotalsDescription:
+        'Cantidad de sobres y valor total donado por cada miembro.',
+      nextYear: 'Año siguiente',
+      noResults: 'No se encontraron registros en el período seleccionado.',
+      paymentMethods: 'Total por forma de pago',
+      paymentMethodsDescription:
+        'Totales separados entre efectivo, tarjeta y cheque.',
       period: 'Período',
+      periodDescription:
+        'Usa un acceso rápido, elige un mes o indica las fechas.',
+      periodTitle: '¿Qué período?',
+      previewTitle: 'INFORME SELECCIONADO',
+      previousYear: 'Año anterior',
       reportType: 'Tipo de informe',
+      savedReports: 'informes guardados',
+      selectionSummary: 'Tu selección',
       thisMonth: 'Este mes',
       thisYear: 'Este año',
       title: 'Informes',
+      withImages: 'Con imágenes',
+      withoutImages: 'Sin imágenes',
     },
   },
 };

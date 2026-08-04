@@ -32,8 +32,8 @@ export class ReportsService {
     private readonly storage: PrivateObjectStorage,
   ) {}
 
-  list(context: TenantContext) {
-    return this.tenantUnitOfWork.run(context, (transaction) =>
+  async list(context: TenantContext) {
+    const reports = await this.tenantUnitOfWork.run(context, (transaction) =>
       transaction
         .select({
           createdAt: schema.reportFiles.createdAt,
@@ -42,6 +42,7 @@ export class ReportsService {
           id: schema.reportFiles.id,
           reportType: schema.reportFiles.reportType,
           startDate: schema.reportFiles.startDate,
+          storageKey: schema.reportFiles.storageKey,
           totalCents: schema.reportFiles.totalCents,
         })
         .from(schema.reportFiles)
@@ -49,6 +50,14 @@ export class ReportsService {
         .orderBy(desc(schema.reportFiles.createdAt))
         .limit(20),
     );
+    return reports.map(({ storageKey, ...report }) => ({
+      ...report,
+      includeImages: storageKey.includes('_with-images_')
+        ? true
+        : storageKey.includes('_without-images_')
+          ? false
+          : report.reportType === 'detailed',
+    }));
   }
 
   async get(context: TenantContext, reportId: string) {
@@ -89,6 +98,7 @@ export class ReportsService {
     startDate: string,
     endDate: string,
     reportType: ReportType,
+    includeImages: boolean,
   ) {
     const items = await this.donations.list(context, { endDate, startDate });
     const totalCents = items.reduce((sum, item) => sum + item.amountCents, 0);
@@ -98,9 +108,11 @@ export class ReportsService {
       startDate,
       endDate,
       reportType,
+      includeImages,
       items,
     );
-    const storageKey = `${context.churchId}/${reportType}_${startDate}_${endDate}_${randomUUID()}.pdf`;
+    const imageLabel = includeImages ? 'with-images' : 'without-images';
+    const storageKey = `${context.churchId}/${reportType}_${imageLabel}_${startDate}_${endDate}_${randomUUID()}.pdf`;
     await this.storage.upload(
       this.storageBucket,
       storageKey,
@@ -123,7 +135,7 @@ export class ReportsService {
 
     return {
       buffer,
-      filename: `uckg-donations-${reportType}-${startDate}-${endDate}.pdf`,
+      filename: `uckg-donations-${reportType}-${imageLabel}-${startDate}-${endDate}.pdf`,
     };
   }
 
@@ -133,6 +145,7 @@ export class ReportsService {
     startDate: string,
     endDate: string,
     reportType: ReportType,
+    includeImages: boolean,
     items: DonationItem[],
   ) {
     const document = await PDFDocument.create();
@@ -208,38 +221,6 @@ export class ReportsService {
             color: rgb(0.38, 0.44, 0.53),
           });
 
-        if (item.envelope) {
-          try {
-            const file = await this.donations.getEnvelope(context, item.id);
-            const image =
-              file.contentType === 'image/png'
-                ? await document.embedPng(file.buffer)
-                : await document.embedJpg(file.buffer);
-            const dimensions = image.scaleToFit(100, 70);
-            page.drawImage(image, {
-              x: 456,
-              y: y - 71,
-              width: dimensions.width,
-              height: dimensions.height,
-            });
-          } catch {
-            page.drawText('Image unavailable', {
-              x: 458,
-              y: y - 38,
-              font: regular,
-              size: 8,
-              color: rgb(0.55, 0.25, 0.25),
-            });
-          }
-        } else {
-          page.drawText('No image', {
-            x: 485,
-            y: y - 38,
-            font: regular,
-            size: 8,
-            color: rgb(0.5, 0.55, 0.62),
-          });
-        }
         y -= 104;
       }
     } else {
@@ -297,7 +278,124 @@ export class ReportsService {
       }
     }
 
+    if (includeImages) {
+      await this.appendEnvelopeImages(
+        document,
+        bold,
+        regular,
+        context,
+        churchName,
+        startDate,
+        endDate,
+        items,
+        total,
+      );
+    }
+
     return Buffer.from(await document.save());
+  }
+
+  private async appendEnvelopeImages(
+    document: PDFDocument,
+    bold: PDFFont,
+    regular: PDFFont,
+    context: TenantContext,
+    churchName: string,
+    startDate: string,
+    endDate: string,
+    items: DonationItem[],
+    totalCents: number,
+  ) {
+    const itemsWithImages = items.filter((item) => item.envelope);
+    let page = this.addPage(
+      document,
+      bold,
+      regular,
+      churchName,
+      startDate,
+      endDate,
+      items.length,
+      totalCents,
+    );
+    page.drawText('ENVELOPE IMAGES', {
+      x: 48,
+      y: 650,
+      font: bold,
+      size: 12,
+      color: rgb(0.02, 0.28, 0.5),
+    });
+    let y = 610;
+
+    if (!itemsWithImages.length) {
+      page.drawText('No envelope images in this period.', {
+        x: 48,
+        y,
+        font: regular,
+        size: 10,
+        color: rgb(0.38, 0.44, 0.53),
+      });
+      return;
+    }
+
+    for (const item of itemsWithImages) {
+      if (y < 290) {
+        page = this.addPage(
+          document,
+          bold,
+          regular,
+          churchName,
+          startDate,
+          endDate,
+          items.length,
+          totalCents,
+        );
+        page.drawText('ENVELOPE IMAGES', {
+          x: 48,
+          y: 650,
+          font: bold,
+          size: 12,
+          color: rgb(0.02, 0.28, 0.5),
+        });
+        y = 610;
+      }
+
+      page.drawText(
+        this.clean(
+          `${item.receivedOn} | ${item.member?.fullName ?? 'Anonymous'} | USD ${(item.amountCents / 100).toFixed(2)}`,
+        ).slice(0, 82),
+        {
+          x: 52,
+          y,
+          font: bold,
+          size: 9,
+          color: rgb(0.05, 0.12, 0.22),
+        },
+      );
+
+      try {
+        const file = await this.donations.getEnvelope(context, item.id);
+        const image =
+          file.contentType === 'image/png'
+            ? await document.embedPng(file.buffer)
+            : await document.embedJpg(file.buffer);
+        const dimensions = image.scaleToFit(490, 235);
+        page.drawImage(image, {
+          x: 52 + (490 - dimensions.width) / 2,
+          y: y - 253,
+          width: dimensions.width,
+          height: dimensions.height,
+        });
+      } catch {
+        page.drawText('Image unavailable', {
+          x: 52,
+          y: y - 34,
+          font: regular,
+          size: 9,
+          color: rgb(0.55, 0.25, 0.25),
+        });
+      }
+      y -= 285;
+    }
   }
 
   private addPage(

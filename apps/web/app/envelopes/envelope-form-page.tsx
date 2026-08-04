@@ -12,6 +12,10 @@ import type { MemberRecord } from '../members/types';
 
 type PaymentMethod = 'card' | 'cash' | 'check';
 
+function formatLocalDate(date: Date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
 function PaymentMethodIcon({ method }: { method: PaymentMethod }) {
   if (method === 'card') {
     return (
@@ -341,7 +345,7 @@ function EnvelopeForm({
                 name="receivedOn"
                 type="date"
                 required
-                defaultValue={new Date().toISOString().slice(0, 10)}
+                defaultValue={formatLocalDate(new Date())}
               />
             </label>
             <div className="form-field form-field--wide payment-method-field">

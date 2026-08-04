@@ -45,13 +45,20 @@ export class ReportsController {
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
     @Query('reportType') reportTypeValue: string,
+    @Query('includeImages') includeImagesValue: string | undefined,
     @Res() response: Response,
   ) {
     const reportType = reportTypeValue as ReportType;
+    const includeImages =
+      includeImagesValue === undefined
+        ? reportType === 'detailed'
+        : includeImagesValue === 'true';
     if (
       !/^\d{4}-\d{2}-\d{2}$/.test(startDate) ||
       !/^\d{4}-\d{2}-\d{2}$/.test(endDate) ||
       startDate > endDate ||
+      (includeImagesValue !== undefined &&
+        !['true', 'false'].includes(includeImagesValue)) ||
       !['detailed', 'member_totals', 'payment_methods'].includes(reportType)
     )
       throw new BadRequestException('Invalid report period.');
@@ -61,6 +68,7 @@ export class ReportsController {
       startDate,
       endDate,
       reportType,
+      includeImages,
     );
     response.setHeader('Content-Type', 'application/pdf');
     response.setHeader(

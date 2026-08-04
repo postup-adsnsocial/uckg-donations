@@ -165,17 +165,51 @@ try {
   await assertResponsive(page, 'envelope-detail');
 
   await page.goto('http://localhost:3000/pt-BR/reports');
-  await page.getByRole('button', { name: 'Gerar relatório' }).click();
-  await page.getByRole('button', { name: '↓ Baixar PDF' }).waitFor();
-  const [pdfDownload] = await Promise.all([
-    page.waitForEvent('download'),
-    page.getByRole('button', { name: '↓ Baixar PDF' }).click(),
+  await page.locator('.report-type-options').waitFor();
+  const reportTypes = page.locator('.report-type-options input[type="radio"]');
+  if ((await reportTypes.count()) !== 3)
+    throw new Error('Expected three visual report type options.');
+  if ((await page.locator('.report-month-grid button').count()) !== 12)
+    throw new Error('Expected all twelve months in the period picker.');
+  await page.getByLabel('Incluir imagens dos envelopes no PDF').check();
+  await assertResponsive(page, 'reports-builder');
+  const [reportDataResponse] = await Promise.all([
+    page.waitForResponse((response) => response.url().includes('/donations?')),
+    page.getByRole('button', { name: 'Visualizar relatório' }).click(),
   ]);
-  const pdfPath = await pdfDownload.path();
-  if (!pdfPath || (await stat(pdfPath)).size < 5_000) {
+  const reportData = await reportDataResponse.json();
+  if (!reportDataResponse.ok() || !Array.isArray(reportData))
+    throw new Error(
+      `Report data request failed (${reportDataResponse.status()}): ${JSON.stringify(reportData)}`,
+    );
+  if (!reportData.length)
+    throw new Error('The generated report did not include the saved envelope.');
+  const downloadReportButton = page.locator(
+    '.report-result .product-primary-link',
+  );
+  await downloadReportButton.waitFor();
+  const [pdfWithImagesDownload] = await Promise.all([
+    page.waitForEvent('download'),
+    downloadReportButton.click(),
+  ]);
+  const pdfWithImagesPath = await pdfWithImagesDownload.path();
+  if (!pdfWithImagesPath || (await stat(pdfWithImagesPath)).size < 5_000) {
     throw new Error('Detailed PDF was not generated with its envelope image.');
   }
-  await page.getByLabel('Tipo de relatório').selectOption('member_totals');
+  const pdfWithImagesSize = (await stat(pdfWithImagesPath)).size;
+  await page.getByLabel('Incluir imagens dos envelopes no PDF').uncheck();
+  const [pdfWithoutImagesDownload] = await Promise.all([
+    page.waitForEvent('download'),
+    downloadReportButton.click(),
+  ]);
+  const pdfWithoutImagesPath = await pdfWithoutImagesDownload.path();
+  if (
+    !pdfWithoutImagesPath ||
+    (await stat(pdfWithoutImagesPath)).size >= pdfWithImagesSize
+  ) {
+    throw new Error('PDF image option did not change the generated document.');
+  }
+  await page.locator('input[name="reportType"][value="member_totals"]').check();
   await page.getByText(memberName).waitFor();
   await assertResponsive(page, 'reports');
 
