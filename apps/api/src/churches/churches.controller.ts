@@ -2,13 +2,16 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   ForbiddenException,
   Get,
   Inject,
+  Param,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { createChurchRequestSchema } from '@uckg/contracts';
+import { churchIdSchema, createChurchRequestSchema } from '@uckg/contracts';
 
 import { CurrentUser } from '../auth/current-user.decorator.js';
 import { SessionAuthGuard } from '../auth/session-auth.guard.js';
@@ -46,6 +49,32 @@ export class ChurchesController {
     return this.churches.create(parsed.data);
   }
 
+  @Patch(':id')
+  @IdentityRoute()
+  @UseGuards(SessionAuthGuard)
+  update(
+    @CurrentUser() user: AuthenticatedAdmin,
+    @Param('id') id: string,
+    @Body() body: unknown,
+  ) {
+    this.assertPlatformAdmin(user);
+    const parsed = createChurchRequestSchema.safeParse(body);
+
+    if (!parsed.success) {
+      throw new BadRequestException('A valid church name is required.');
+    }
+
+    return this.churches.update(this.parseId(id), parsed.data);
+  }
+
+  @Delete(':id')
+  @IdentityRoute()
+  @UseGuards(SessionAuthGuard)
+  delete(@CurrentUser() user: AuthenticatedAdmin, @Param('id') id: string) {
+    this.assertPlatformAdmin(user);
+    return this.churches.delete(this.parseId(id));
+  }
+
   @Get('current')
   @DomainRoute('church:read')
   current(@CurrentTenant() tenant: TenantContext) {
@@ -67,5 +96,15 @@ export class ChurchesController {
         'Platform administrator access is required.',
       );
     }
+  }
+
+  private parseId(id: string): string {
+    const parsed = churchIdSchema.safeParse(id);
+
+    if (!parsed.success) {
+      throw new BadRequestException('A valid church id is required.');
+    }
+
+    return parsed.data;
   }
 }

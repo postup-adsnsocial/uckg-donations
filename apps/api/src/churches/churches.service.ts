@@ -1,9 +1,14 @@
 import { randomUUID } from 'node:crypto';
 
-import { ConflictException, Inject, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import type { CreateChurchRequest } from '@uckg/contracts';
 import { schema } from '@uckg/database';
-import { asc, eq } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
 
 import { DatabaseService } from '../database/database.service.js';
 
@@ -58,6 +63,56 @@ export class ChurchesService {
 
       throw error;
     }
+  }
+
+  async update(id: string, input: CreateChurchRequest) {
+    const [church] = await this.database.db
+      .update(schema.churches)
+      .set({ name: input.name, updatedAt: new Date() })
+      .where(
+        and(eq(schema.churches.id, id), eq(schema.churches.status, 'active')),
+      )
+      .returning(churchFields);
+
+    if (!church) {
+      throw new NotFoundException('Church not found.');
+    }
+
+    return church;
+  }
+
+  async delete(id: string) {
+    return this.database.db.transaction(async (transaction) => {
+      const activeChurches = await transaction
+        .select({ id: schema.churches.id })
+        .from(schema.churches)
+        .where(eq(schema.churches.status, 'active'))
+        .for('update');
+
+      if (!activeChurches.some((church) => church.id === id)) {
+        throw new NotFoundException('Church not found.');
+      }
+
+      if (activeChurches.length === 1) {
+        throw new ConflictException(
+          'The last active church cannot be deleted.',
+        );
+      }
+
+      const [church] = await transaction
+        .update(schema.churches)
+        .set({ status: 'archived', updatedAt: new Date() })
+        .where(
+          and(eq(schema.churches.id, id), eq(schema.churches.status, 'active')),
+        )
+        .returning({ id: schema.churches.id });
+
+      if (!church) {
+        throw new NotFoundException('Church not found.');
+      }
+
+      return { deleted: true, id: church.id };
+    });
   }
 
   private uniqueSlug(name: string): string {

@@ -1,6 +1,6 @@
 import { hashPassword } from '@uckg/authorization';
 import { createDatabase, schema } from '@uckg/database';
-import { inArray } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
 import { expect, test } from '@playwright/test';
 
@@ -109,6 +109,16 @@ test.describe('administrative authentication and tenant isolation', () => {
         })
       ).status(),
     ).toBe(401);
+    expect(
+      (
+        await request.patch(`${apiBaseUrl}/churches/${churchAId}`, {
+          data: { name: 'Unauthorized Update' },
+        })
+      ).status(),
+    ).toBe(401);
+    expect(
+      (await request.delete(`${apiBaseUrl}/churches/${churchAId}`)).status(),
+    ).toBe(401);
   });
 
   test('authenticates and denies cross-tenant and role escalation', async ({
@@ -136,6 +146,16 @@ test.describe('administrative authentication and tenant isolation', () => {
           data: { name: 'Forbidden Church' },
         })
       ).status(),
+    ).toBe(403);
+    expect(
+      (
+        await request.patch(`${apiBaseUrl}/churches/${churchBId}`, {
+          data: { name: 'Forbidden Update' },
+        })
+      ).status(),
+    ).toBe(403);
+    expect(
+      (await request.delete(`${apiBaseUrl}/churches/${churchBId}`)).status(),
     ).toBe(403);
 
     const ownChurch = await request.get(`${apiBaseUrl}/churches/current`, {
@@ -192,6 +212,18 @@ test.describe('administrative authentication and tenant isolation', () => {
       /^e2e-created-church-[a-z0-9]+-[0-9a-f-]{36}$/,
     );
 
+    const updatedChurchName = `E2E Updated Church ${suffix}`;
+    const updated = await request.patch(
+      `${apiBaseUrl}/churches/${createdChurchId}`,
+      { data: { name: updatedChurchName } },
+    );
+    expect(updated.status()).toBe(200);
+    await expect(updated.json()).resolves.toMatchObject({
+      id: createdChurchId,
+      name: updatedChurchName,
+      slug: createdChurch.slug,
+    });
+
     const listed = await request.get(`${apiBaseUrl}/churches`);
     expect(listed.status()).toBe(200);
     const churches = (await listed.json()) as Array<{
@@ -199,7 +231,7 @@ test.describe('administrative authentication and tenant isolation', () => {
       name: string;
     }>;
     expect(churches.find(({ id }) => id === createdChurchId)?.name).toBe(
-      churchName,
+      updatedChurchName,
     );
     expect(churches.find(({ id }) => id === inactiveChurchId)).toBeUndefined();
     const fixtureChurchNames = churches
@@ -230,6 +262,41 @@ test.describe('administrative authentication and tenant isolation', () => {
         })
       ).status(),
     ).toBe(200);
+
+    const deleted = await request.delete(
+      `${apiBaseUrl}/churches/${createdChurchId}`,
+    );
+    expect(deleted.status()).toBe(200);
+    await expect(deleted.json()).resolves.toEqual({
+      deleted: true,
+      id: createdChurchId,
+    });
+
+    const listedAfterDelete = await request.get(`${apiBaseUrl}/churches`);
+    const churchesAfterDelete = (await listedAfterDelete.json()) as Array<{
+      id: string;
+    }>;
+    expect(churchesAfterDelete.some(({ id }) => id === createdChurchId)).toBe(
+      false,
+    );
+    expect(
+      (
+        await request.get(`${apiBaseUrl}/churches/current`, {
+          headers: { 'x-church-id': createdChurchId },
+        })
+      ).status(),
+    ).toBe(403);
+
+    const [archivedChurch] = await connection.database
+      .select({ status: schema.churches.status })
+      .from(schema.churches)
+      .where(eq(schema.churches.id, createdChurchId));
+    const [preservedMember] = await connection.database
+      .select({ id: schema.members.id })
+      .from(schema.members)
+      .where(eq(schema.members.id, member.id));
+    expect(archivedChurch?.status).toBe('archived');
+    expect(preservedMember?.id).toBe(member.id);
   });
 
   test('signs in through the web interface and opens the tenant dashboard', async ({

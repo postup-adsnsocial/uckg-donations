@@ -1,4 +1,4 @@
-import { ConflictException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { DatabaseService } from '../database/database.service.js';
@@ -62,5 +62,112 @@ describe('ChurchesService', () => {
     await expect(service.create({ name: 'Alpha Church' })).rejects.toThrow(
       ConflictException,
     );
+  });
+
+  it('updates the name of an active church without changing its identity', async () => {
+    const church = {
+      id: 'church-a',
+      locale: 'en',
+      name: 'Updated Church',
+      slug: 'stable-church-slug',
+      timezone: 'America/New_York',
+    };
+    const returning = vi.fn().mockResolvedValue([church]);
+    const where = vi.fn().mockReturnValue({ returning });
+    const set = vi.fn().mockReturnValue({ where });
+    const database = {
+      db: { update: vi.fn().mockReturnValue({ set }) },
+    } as unknown as DatabaseService;
+    const service = new ChurchesService(database);
+
+    await expect(
+      service.update(church.id, { name: church.name }),
+    ).resolves.toBe(church);
+
+    expect(set).toHaveBeenCalledWith({
+      name: church.name,
+      updatedAt: expect.any(Date),
+    });
+  });
+
+  it('archives a church instead of deleting its data', async () => {
+    const lock = vi
+      .fn()
+      .mockResolvedValue([{ id: 'church-a' }, { id: 'church-b' }]);
+    const selectWhere = vi.fn().mockReturnValue({ for: lock });
+    const from = vi.fn().mockReturnValue({ where: selectWhere });
+    const returning = vi.fn().mockResolvedValue([{ id: 'church-b' }]);
+    const updateWhere = vi.fn().mockReturnValue({ returning });
+    const set = vi.fn().mockReturnValue({ where: updateWhere });
+    const transaction = {
+      select: vi.fn().mockReturnValue({ from }),
+      update: vi.fn().mockReturnValue({ set }),
+    };
+    const database = {
+      db: {
+        transaction: vi.fn(
+          async (callback: (value: typeof transaction) => unknown) =>
+            callback(transaction),
+        ),
+      },
+    } as unknown as DatabaseService;
+    const service = new ChurchesService(database);
+
+    await expect(service.delete('church-b')).resolves.toEqual({
+      deleted: true,
+      id: 'church-b',
+    });
+    expect(lock).toHaveBeenCalledWith('update');
+    expect(set).toHaveBeenCalledWith({
+      status: 'archived',
+      updatedAt: expect.any(Date),
+    });
+  });
+
+  it('does not archive the last active church', async () => {
+    const lock = vi.fn().mockResolvedValue([{ id: 'church-a' }]);
+    const selectWhere = vi.fn().mockReturnValue({ for: lock });
+    const from = vi.fn().mockReturnValue({ where: selectWhere });
+    const transaction = {
+      select: vi.fn().mockReturnValue({ from }),
+      update: vi.fn(),
+    };
+    const database = {
+      db: {
+        transaction: vi.fn(
+          async (callback: (value: typeof transaction) => unknown) =>
+            callback(transaction),
+        ),
+      },
+    } as unknown as DatabaseService;
+    const service = new ChurchesService(database);
+
+    await expect(service.delete('church-a')).rejects.toThrow(ConflictException);
+    expect(transaction.update).not.toHaveBeenCalled();
+  });
+
+  it('does not update or archive an unavailable church', async () => {
+    const updateReturning = vi.fn().mockResolvedValue([]);
+    const updateWhere = vi.fn().mockReturnValue({ returning: updateReturning });
+    const set = vi.fn().mockReturnValue({ where: updateWhere });
+    const lock = vi.fn().mockResolvedValue([{ id: 'church-a' }]);
+    const selectWhere = vi.fn().mockReturnValue({ for: lock });
+    const from = vi.fn().mockReturnValue({ where: selectWhere });
+    const transaction = { select: vi.fn().mockReturnValue({ from }) };
+    const database = {
+      db: {
+        transaction: vi.fn(
+          async (callback: (value: typeof transaction) => unknown) =>
+            callback(transaction),
+        ),
+        update: vi.fn().mockReturnValue({ set }),
+      },
+    } as unknown as DatabaseService;
+    const service = new ChurchesService(database);
+
+    await expect(
+      service.update('missing', { name: 'Missing Church' }),
+    ).rejects.toThrow(NotFoundException);
+    await expect(service.delete('missing')).rejects.toThrow(NotFoundException);
   });
 });
