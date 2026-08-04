@@ -134,13 +134,16 @@ function MemberForm({
           </div>
         </fieldset>
         <fieldset>
-          <legend>{copy.members.address1}</legend>
+          <legend>
+            {copy.members.address1} · {copy.common.optional}
+          </legend>
           <div className="form-grid">
             <label className="form-field form-field--wide">
-              <span>{copy.members.address1}</span>
+              <span>
+                {copy.members.address1} · {copy.common.optional}
+              </span>
               <input
                 name="addressLine1"
-                required
                 defaultValue={member?.addressLine1 ?? ''}
               />
             </label>
@@ -154,16 +157,16 @@ function MemberForm({
               />
             </label>
             <label className="form-field">
-              <span>{copy.members.city}</span>
-              <input name="city" required defaultValue={member?.city ?? ''} />
+              <span>
+                {copy.members.city} · {copy.common.optional}
+              </span>
+              <input name="city" defaultValue={member?.city ?? ''} />
             </label>
             <label className="form-field">
-              <span>{copy.members.region}</span>
-              <select
-                name="region"
-                required
-                defaultValue={member?.region ?? ''}
-              >
+              <span>
+                {copy.members.region} · {copy.common.optional}
+              </span>
+              <select name="region" defaultValue={member?.region ?? ''}>
                 <option value="" disabled>
                   —
                 </option>
@@ -175,10 +178,11 @@ function MemberForm({
               </select>
             </label>
             <label className="form-field">
-              <span>{copy.members.postalCode}</span>
+              <span>
+                {copy.members.postalCode} · {copy.common.optional}
+              </span>
               <input
                 name="postalCode"
-                required
                 inputMode="numeric"
                 placeholder="10001"
                 defaultValue={member?.postalCode ?? ''}

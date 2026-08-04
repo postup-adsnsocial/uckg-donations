@@ -114,14 +114,15 @@ try {
     .getByLabel('E-mail · Opcional')
     .fill(`member-${suffix}@example.com`);
   await page.getByLabel('Telefone · Opcional').fill('+12125550100');
-  await page.getByLabel('Endereço', { exact: true }).fill('350 Fifth Avenue');
-  await page.getByLabel('Cidade').fill('New York');
-  await page.getByLabel('Estado').selectOption('NY');
-  await page.getByLabel('ZIP Code').fill('10118');
   await assertResponsive(page, 'member-new');
   await page.getByRole('button', { name: 'Salvar' }).click();
   await page.waitForURL(/\/pt-BR\/members\/[0-9a-f-]+\?saved=1$/);
   await page.getByRole('heading', { level: 2, name: memberName }).waitFor();
+  const addressCard = page
+    .locator('.detail-card')
+    .filter({ hasText: 'Endereço' });
+  await addressCard.getByText('—', { exact: true }).waitFor();
+  await assertResponsive(page, 'member-detail-no-address');
 
   await page.goto('http://localhost:3000/pt-BR/envelopes/new');
   const launchFieldOrder = await page.locator('.form-grid').evaluate((grid) =>

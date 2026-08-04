@@ -62,6 +62,22 @@ function MemberDetail({
   const date = new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(
     new Date(member.createdAt),
   );
+  const hasAddress = Boolean(
+    member.addressLine1 ||
+      member.addressLine2 ||
+      member.city ||
+      member.region ||
+      member.postalCode,
+  );
+  const locality = [member.city, member.region].filter(Boolean).join(', ');
+  const addressLines = hasAddress
+    ? [
+        member.addressLine1,
+        member.addressLine2,
+        [locality, member.postalCode].filter(Boolean).join(' '),
+        member.country === 'US' ? 'United States' : member.country,
+      ].filter(Boolean)
+    : [];
   return (
     <>
       <header className="product-heading">
@@ -132,17 +148,14 @@ function MemberDetail({
         <article className="product-panel detail-card">
           <h3>{copy.members.address1}</h3>
           <address>
-            {member.addressLine1 ?? '—'}
-            {member.addressLine2 ? (
-              <>
-                <br />
-                {member.addressLine2}
-              </>
-            ) : null}
-            <br />
-            {member.city}, {member.region} {member.postalCode}
-            <br />
-            United States
+            {addressLines.length
+              ? addressLines.map((line, index) => (
+                  <span key={line}>
+                    {index ? <br /> : null}
+                    {line}
+                  </span>
+                ))
+              : '—'}
           </address>
           {member.notes ? (
             <div className="detail-notes">

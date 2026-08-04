@@ -180,16 +180,16 @@ export class MembersService {
 
   private values(input: CreateMemberRequest) {
     return {
-      addressLine1: input.addressLine1,
+      addressLine1: input.addressLine1 ?? null,
       addressLine2: input.addressLine2 ?? null,
-      city: input.city,
+      city: input.city ?? null,
       country: input.country,
       email: input.email ?? null,
       fullName: input.fullName,
       notes: input.notes ?? null,
       phone: input.phone ?? null,
-      postalCode: input.postalCode,
-      region: input.region,
+      postalCode: input.postalCode ?? null,
+      region: input.region ?? null,
       status: input.status,
     };
   }

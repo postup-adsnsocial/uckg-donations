@@ -35,13 +35,22 @@ const optionalPhoneSchema = z.preprocess(
     .optional(),
 );
 
+const emptyStringToUndefined = (value: unknown) =>
+  typeof value === 'string' && value.trim() === '' ? undefined : value;
+
+const optionalAddressTextSchema = (maxLength: number) =>
+  z.preprocess(
+    emptyStringToUndefined,
+    z.string().trim().min(2).max(maxLength).optional(),
+  );
+
 export const createMemberRequestSchema = z.object({
-  addressLine1: z.string().trim().min(2).max(200),
+  addressLine1: optionalAddressTextSchema(200),
   addressLine2: z.preprocess(
-    (value) => (value === '' ? undefined : value),
+    emptyStringToUndefined,
     z.string().trim().max(200).optional(),
   ),
-  city: z.string().trim().min(2).max(120),
+  city: optionalAddressTextSchema(120),
   country: z.string().trim().length(2).default('US'),
   email: optionalEmailSchema,
   fullName: z.string().trim().min(2).max(160),
@@ -50,11 +59,15 @@ export const createMemberRequestSchema = z.object({
     z.string().trim().max(1000).optional(),
   ),
   phone: optionalPhoneSchema,
-  postalCode: z
-    .string()
-    .trim()
-    .regex(/^\d{5}(?:-\d{4})?$/),
-  region: z.string().trim().min(2).max(50),
+  postalCode: z.preprocess(
+    emptyStringToUndefined,
+    z
+      .string()
+      .trim()
+      .regex(/^\d{5}(?:-\d{4})?$/)
+      .optional(),
+  ),
+  region: optionalAddressTextSchema(50),
   status: z.enum(['active', 'inactive']).default('active'),
 });
 
