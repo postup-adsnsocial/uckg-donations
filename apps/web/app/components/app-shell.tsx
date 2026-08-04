@@ -146,12 +146,6 @@ export function AppShell({ active, children, locale }: AppShellProps) {
       path: 'members',
     },
     {
-      icon: '◇',
-      id: 'envelopes' as const,
-      label: copy.navigation.donations,
-      path: 'envelopes',
-    },
-    {
       icon: '＋',
       id: 'launch' as const,
       label: copy.navigation.launch,

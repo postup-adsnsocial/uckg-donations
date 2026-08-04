@@ -94,10 +94,12 @@ try {
     );
   }
   const overviewCardCount = await overviewCards.count();
-  if (overviewCardCount !== 4)
+  if (overviewCardCount !== 3)
     throw new Error(
-      `Overview must display four module access cards; found ${overviewCardCount}.`,
+      `Overview must display three module access cards; found ${overviewCardCount}.`,
     );
+  if (await page.getByRole('link', { name: 'Doações', exact: true }).count())
+    throw new Error('Donations must not appear in the product navigation.');
   await page
     .locator('.dashboard-sidebar')
     .getByRole('link', { name: 'Lançar', exact: true })

@@ -7,7 +7,7 @@ import { AppShell, type AppChurch } from '../components/app-shell';
 import { type Locale, localeFromRoute } from '../i18n/config';
 import { productCopies } from '../i18n/product-copy';
 
-type ModuleId = 'donations' | 'launch' | 'members' | 'reports';
+type ModuleId = 'launch' | 'members' | 'reports';
 
 export default function DashboardPage() {
   const params = useParams<{ locale?: string }>();
@@ -26,14 +26,6 @@ function ModuleIcon({ id }: { id: ModuleId }) {
         <path d="M16 20v-1.7a3.3 3.3 0 0 0-3.3-3.3H6.3A3.3 3.3 0 0 0 3 18.3V20" />
         <circle cx="9.5" cy="7.5" r="3.5" />
         <path d="M16.5 4.2a3.5 3.5 0 0 1 0 6.6M21 20v-1.7a3.3 3.3 0 0 0-2.5-3.2" />
-      </svg>
-    );
-  }
-  if (id === 'donations') {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <rect x="3" y="5" width="18" height="14" rx="2" />
-        <path d="M3 9h18M7 15h4" />
       </svg>
     );
   }
@@ -65,12 +57,6 @@ function Dashboard({ church, locale }: { church: AppChurch; locale: Locale }) {
       href: `/${locale}/members`,
       id: 'members',
       title: copy.dashboard.members,
-    },
-    {
-      description: copy.dashboard.donationsDescription,
-      href: `/${locale}/envelopes`,
-      id: 'donations',
-      title: copy.dashboard.donations,
     },
     {
       description: copy.dashboard.launchDescription,
