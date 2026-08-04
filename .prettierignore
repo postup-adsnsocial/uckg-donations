@@ -1,4 +1,6 @@
 .next
+.planning
+.vercel
 apps/web/next-env.d.ts
 coverage
 dist

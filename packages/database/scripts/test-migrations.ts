@@ -1,6 +1,14 @@
-import { withPostgresTestHarness } from './postgres-test-harness.js';
+import { Pool } from 'pg';
 
-await withPostgresTestHarness(async ({ migratorPool }) => {
+import {
+  type PostgresTestHarness,
+  withPostgresTestHarness,
+} from './postgres-test-harness.js';
+
+async function testMigrations({
+  migratorPool,
+  runtimeUrl,
+}: PostgresTestHarness) {
   const result = await migratorPool.query<{ table_name: string }>(
     `select table_name
        from information_schema.tables
@@ -115,6 +123,9 @@ await withPostgresTestHarness(async ({ migratorPool }) => {
     admin_sessions_insert: boolean;
     admin_sessions_select: boolean;
     admin_sessions_update: boolean;
+    churches_delete: boolean;
+    churches_insert: boolean;
+    churches_update: boolean;
     members_delete: boolean;
     members_insert: boolean;
     members_references: boolean;
@@ -133,6 +144,9 @@ await withPostgresTestHarness(async ({ migratorPool }) => {
        has_table_privilege('uckg_runtime', 'admin_sessions', 'INSERT') as admin_sessions_insert,
        has_table_privilege('uckg_runtime', 'admin_sessions', 'UPDATE') as admin_sessions_update,
        has_table_privilege('uckg_runtime', 'admin_sessions', 'DELETE') as admin_sessions_delete,
+       has_table_privilege('uckg_runtime', 'churches', 'INSERT') as churches_insert,
+       has_table_privilege('uckg_runtime', 'churches', 'UPDATE') as churches_update,
+       has_table_privilege('uckg_runtime', 'churches', 'DELETE') as churches_delete,
        has_table_privilege('uckg_runtime', 'members', 'SELECT') as members_select,
        has_table_privilege('uckg_runtime', 'members', 'INSERT') as members_insert,
        has_table_privilege('uckg_runtime', 'members', 'UPDATE') as members_update,
@@ -150,6 +164,9 @@ await withPostgresTestHarness(async ({ migratorPool }) => {
     !runtimePrivileges.admin_sessions_insert ||
     !runtimePrivileges.admin_sessions_update ||
     !runtimePrivileges.admin_sessions_delete ||
+    !runtimePrivileges.churches_insert ||
+    !runtimePrivileges.churches_update ||
+    runtimePrivileges.churches_delete ||
     !runtimePrivileges.members_select ||
     !runtimePrivileges.members_insert ||
     !runtimePrivileges.members_update ||
@@ -172,5 +189,30 @@ await withPostgresTestHarness(async ({ migratorPool }) => {
     throw new Error('uckg_runtime lacks minimum control-plane reads.');
   }
 
+  const testChurch = await migratorPool.query<{ id: string }>(
+    `insert into churches (name, slug)
+     values ('Runtime update test', 'runtime-update-test')
+     returning id`,
+  );
+  const runtimePool = new Pool({ connectionString: runtimeUrl, max: 1 });
+
+  try {
+    const updated = await runtimePool.query(
+      `update churches
+          set name = 'Runtime update confirmed'
+        where id = $1`,
+      [testChurch.rows[0]?.id],
+    );
+    if (updated.rowCount !== 1) {
+      throw new Error('uckg_runtime could not update a church.');
+    }
+  } finally {
+    await runtimePool.end();
+  }
+
   console.info(`Migration test passed with tables: ${tables.join(', ')}.`);
+}
+
+await withPostgresTestHarness(testMigrations, {
+  provisionRuntimeLogin: true,
 });
