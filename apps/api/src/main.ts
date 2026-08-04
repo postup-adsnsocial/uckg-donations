@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { json, urlencoded } from 'express';
-import {helmet} from 'helmet';
+import * as helmetModule from 'helmet';
 
 import { AppModule } from './app.module.js';
 import { ApiConfigService } from './config/api-config.service.js';
@@ -14,7 +14,7 @@ const app = await NestFactory.create<NestExpressApplication>(AppModule, {
 const config = app.get(ApiConfigService).values;
 
 app.set('trust proxy', config.trustProxy);
-app.use(helmet());
+app.use(helmetModule.default());
 app.use(json({ limit: config.bodyLimit }));
 app.use(urlencoded({ extended: true, limit: config.bodyLimit }));
 
