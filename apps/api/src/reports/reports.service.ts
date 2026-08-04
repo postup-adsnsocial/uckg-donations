@@ -159,7 +159,6 @@ export class ReportsService {
       churchName,
       startDate,
       endDate,
-      items.length,
       total,
     );
     let y = 655;
@@ -174,7 +173,6 @@ export class ReportsService {
             churchName,
             startDate,
             endDate,
-            items.length,
             total,
           );
           y = 655;
@@ -244,7 +242,6 @@ export class ReportsService {
             churchName,
             startDate,
             endDate,
-            items.length,
             total,
           );
           y = 655;
@@ -314,7 +311,6 @@ export class ReportsService {
       churchName,
       startDate,
       endDate,
-      items.length,
       totalCents,
     );
     page.drawText('ENVELOPE IMAGES', {
@@ -346,7 +342,6 @@ export class ReportsService {
           churchName,
           startDate,
           endDate,
-          items.length,
           totalCents,
         );
         page.drawText('ENVELOPE IMAGES', {
@@ -405,7 +400,6 @@ export class ReportsService {
     churchName: string,
     startDate: string,
     endDate: string,
-    count: number,
     totalCents: number,
   ): PDFPage {
     const page = document.addPage([612, 792]);
@@ -437,10 +431,13 @@ export class ReportsService {
       size: 11,
       color: rgb(0.05, 0.12, 0.22),
     });
-    page.drawText(
-      `${count} envelopes  |  USD ${(totalCents / 100).toFixed(2)}`,
-      { x: 365, y: 690, font: bold, size: 11, color: rgb(0.02, 0.36, 0.61) },
-    );
+    page.drawText(`USD ${(totalCents / 100).toFixed(2)}`, {
+      x: 470,
+      y: 690,
+      font: bold,
+      size: 11,
+      color: rgb(0.02, 0.36, 0.61),
+    });
     return page;
   }
 
