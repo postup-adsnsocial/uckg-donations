@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-08-03)
 Phase: 01 (tenant-and-production-safety-foundation) — EXECUTING
 Plan: 5 of 7
 Status: Ready to execute
-Last activity: 2026-08-04 - Completed quick task 260803-x57: member list actions and donation history
+Last activity: 2026-08-04 - Completed quick task 260804-0av: minimal church management and member church selection
 
 Progress: [██████░░░░] 57%
 
@@ -72,6 +72,7 @@ Decisions are logged in PROJECT.md Key Decisions table. Recent decisions affecti
 - [Phase 01]: Migration credentials remain script-only while ApiConfigService exposes only the runtime DATABASE_URL.
 - [Phase 01]: Use independent route-policy metadata keys so duplicate classifications remain detectable.
 - [Phase 01]: Build route inventory from the AppModule graph in a test-local DiscoveryService context.
+- [Quick 260804-0av]: Keep church registration name-only; generate technical identifiers internally and keep existing member church ownership immutable.
 
 ### Pending Todos
 
@@ -89,6 +90,7 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260803-x57 | Reorganizar lista de membros e adicionar histórico de lançamentos | 2026-08-04 | `0df1ba0` | [260803-x57](./quick/260803-x57-reorganizar-a-lista-de-membros-com-nome-/) |
+| 260804-0av | Criar cadastro mínimo de igrejas e seleção de igreja no novo membro | 2026-08-04 | `6fae162` | [260804-0av](./quick/260804-0av-criar-cadastro-m-nimo-de-igrejas-para-ad/) |
 
 ## Session Continuity
 
