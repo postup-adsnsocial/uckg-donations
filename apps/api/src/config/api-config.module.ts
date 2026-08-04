@@ -1,5 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { fileURLToPath } from 'node:url';
 
 import { validateApiEnvironment } from './api-config.js';
 import { ApiConfigService } from './api-config.service.js';
@@ -10,6 +11,7 @@ import { ApiConfigService } from './api-config.service.js';
   imports: [
     ConfigModule.forRoot({
       cache: true,
+      envFilePath: fileURLToPath(new URL('../../../../.env', import.meta.url)),
       isGlobal: true,
       validate: validateApiEnvironment,
     }),
