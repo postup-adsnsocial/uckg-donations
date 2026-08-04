@@ -4,7 +4,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { AppShell, type AppChurch } from '../components/app-shell';
+import {
+  AppShell,
+  type AppChurch,
+  type AppUser,
+} from '../components/app-shell';
 import type { Locale } from '../i18n/config';
 import { productCopies } from '../i18n/product-copy';
 import { apiRequest } from '../lib/api';
@@ -19,7 +23,9 @@ export function MemberFormPage({
 }) {
   return (
     <AppShell active="members" locale={locale}>
-      {({ church }) => <MemberForm church={church} id={id} locale={locale} />}
+      {({ church, user }) => (
+        <MemberForm church={church} id={id} locale={locale} user={user} />
+      )}
     </AppShell>
   );
 }
@@ -28,10 +34,12 @@ function MemberForm({
   church,
   id,
   locale,
+  user,
 }: {
   church: AppChurch;
   id?: string;
   locale: Locale;
+  user: AppUser;
 }) {
   const copy = productCopies[locale];
   const router = useRouter();
@@ -39,6 +47,32 @@ function MemberForm({
   const [loading, setLoading] = useState(Boolean(id));
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const [churches, setChurches] = useState<AppChurch[]>([church]);
+  const [selectedChurchId, setSelectedChurchId] = useState(church.id);
+
+  useEffect(() => {
+    if (id || !user.isPlatformAdmin) {
+      setChurches([church]);
+      setSelectedChurchId(church.id);
+      return;
+    }
+
+    let active = true;
+    apiRequest('/churches').then(async (response) => {
+      if (!active || !response.ok) return;
+      const available = (await response.json()) as AppChurch[];
+      setChurches(available);
+      setSelectedChurchId((current) =>
+        available.some((item) => item.id === current)
+          ? current
+          : (available[0]?.id ?? church.id),
+      );
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [church, id, user.isPlatformAdmin]);
 
   useEffect(() => {
     if (!id) return;
@@ -54,9 +88,10 @@ function MemberForm({
     setSaving(true);
     setMessage('');
     const payload = Object.fromEntries(formData.entries());
+    const targetChurchId = id ? church.id : selectedChurchId;
     const response = await apiRequest(id ? `/members/${id}` : '/members', {
       body: JSON.stringify(payload),
-      headers: { 'x-church-id': church.id },
+      headers: { 'x-church-id': targetChurchId },
       method: id ? 'PATCH' : 'POST',
     });
     setSaving(false);
@@ -65,6 +100,7 @@ function MemberForm({
       return;
     }
     const saved = (await response.json()) as MemberRecord;
+    localStorage.setItem('uckg_selected_church', targetChurchId);
     router.push(`/${locale}/members/${saved.id}?saved=1`);
   }
 
@@ -91,13 +127,33 @@ function MemberForm({
         className="product-form product-panel"
         action={(formData) => void save(formData)}
       >
-        <div className="church-assignment">
-          <span>✓</span>
-          <div>
-            <small>{copy.common.church}</small>
-            <strong>{church.name}</strong>
+        {!id && user.isPlatformAdmin ? (
+          <div className="church-assignment church-assignment--select">
+            <span>✓</span>
+            <label>
+              <small>{copy.common.church}</small>
+              <select
+                aria-label={copy.common.church}
+                onChange={(event) => setSelectedChurchId(event.target.value)}
+                value={selectedChurchId}
+              >
+                {churches.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
-        </div>
+        ) : (
+          <div className="church-assignment">
+            <span>✓</span>
+            <div>
+              <small>{copy.common.church}</small>
+              <strong>{church.name}</strong>
+            </div>
+          </div>
+        )}
         <fieldset>
           <legend>{copy.members.details}</legend>
           <div className="form-grid">

@@ -27,6 +27,7 @@ export interface Dictionary {
     membersTitle: string;
     modulesStateLabel: string;
     navigation: {
+      churches: string;
       donations: string;
       launch: string;
       members: string;
@@ -140,6 +141,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       membersTitle: 'Cadastro de membros',
       modulesStateLabel: 'Estado dos módulos',
       navigation: {
+        churches: 'Igrejas',
         donations: 'Doações',
         launch: 'Lançar',
         members: 'Membros',
@@ -254,6 +256,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       membersTitle: 'Member registration',
       modulesStateLabel: 'Module status',
       navigation: {
+        churches: 'Churches',
         donations: 'Donations',
         launch: 'Record',
         members: 'Members',
@@ -369,6 +372,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       membersTitle: 'Registro de miembros',
       modulesStateLabel: 'Estado de los módulos',
       navigation: {
+        churches: 'Iglesias',
         donations: 'Donaciones',
         launch: 'Registrar',
         members: 'Miembros',

@@ -33,7 +33,13 @@ interface Membership {
 }
 
 interface AppShellProps {
-  active: 'dashboard' | 'envelopes' | 'launch' | 'members' | 'reports';
+  active:
+    | 'churches'
+    | 'dashboard'
+    | 'envelopes'
+    | 'launch'
+    | 'members'
+    | 'reports';
   children: (context: { church: AppChurch; user: AppUser }) => ReactNode;
   locale: Locale;
 }
@@ -88,11 +94,26 @@ export function AppShell({ active, children, locale }: AppShellProps) {
         user: AppUser;
       };
       setUser(data.user);
-      setMemberships(data.memberships);
+      let availableMemberships = data.memberships;
+      if (data.user.isPlatformAdmin) {
+        const churchesResponse = await apiRequest('/churches');
+        if (churchesResponse.ok) {
+          const churches = (await churchesResponse.json()) as AppChurch[];
+          availableMemberships = churches.map((item) => ({
+            churchId: item.id,
+            churchName: item.name,
+            churchSlug: item.slug,
+            role: 'church_admin',
+          }));
+        }
+      }
+      setMemberships(availableMemberships);
       const stored = localStorage.getItem('uckg_selected_church');
-      const selected = data.memberships.some((item) => item.churchId === stored)
+      const selected = availableMemberships.some(
+        (item) => item.churchId === stored,
+      )
         ? stored
-        : data.memberships[0]?.churchId;
+        : availableMemberships[0]?.churchId;
       if (!selected) {
         setStatus('error');
         return;
@@ -139,6 +160,16 @@ export function AppShell({ active, children, locale }: AppShellProps) {
       label: copy.navigation.overview,
       path: 'dashboard',
     },
+    ...(user.isPlatformAdmin
+      ? [
+          {
+            icon: '▦',
+            id: 'churches' as const,
+            label: copy.navigation.churches,
+            path: 'churches',
+          },
+        ]
+      : []),
     {
       icon: '◇',
       id: 'members' as const,

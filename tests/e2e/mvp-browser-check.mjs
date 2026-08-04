@@ -13,6 +13,7 @@ const suffix = randomUUID().slice(0, 8);
 const email = `browser-mvp-${suffix}@example.com`;
 const password = `browser-password-${suffix}`;
 const memberName = `Member ${suffix}`;
+const managedChurchName = `UCKG Brooklyn ${suffix}`;
 const envelopeImage = fileURLToPath(
   new URL('../../apps/web/public/universal-logo.png', import.meta.url),
 );
@@ -20,6 +21,7 @@ const browserName =
   process.env.MVP_BROWSER === 'firefox' ? 'firefox' : 'chromium';
 const screenshotRoot = `/tmp/uckg-mvp-${browserName}`;
 let churchId;
+let managedChurchId;
 let userId;
 let browser;
 
@@ -63,6 +65,7 @@ try {
     .values({
       displayName: 'MVP Browser Check',
       email,
+      isPlatformAdmin: true,
       passwordHash: await hashPassword(password),
     })
     .returning({ id: schema.adminUsers.id });
@@ -110,7 +113,38 @@ try {
     .waitFor();
   await assertResponsive(page, 'dashboard');
 
+  await page
+    .locator('.mobile-product-nav')
+    .getByRole('link', { name: 'Igrejas', exact: true })
+    .click();
+  await page.waitForURL(/\/pt-BR\/churches$/);
+  await page.getByLabel('Nome da igreja').fill(managedChurchName);
+  const [createChurchResponse] = await Promise.all([
+    page.waitForResponse(
+      (response) =>
+        response.url().endsWith('/churches') &&
+        response.request().method() === 'POST',
+    ),
+    page.getByRole('button', { name: 'Criar igreja' }).click(),
+  ]);
+  const createdChurch = await createChurchResponse.json();
+  if (!createChurchResponse.ok() || !createdChurch.id)
+    throw new Error(
+      `Church creation failed (${createChurchResponse.status()}): ${JSON.stringify(createdChurch)}`,
+    );
+  managedChurchId = createdChurch.id;
+  await page.getByText('Igreja criada com sucesso.').waitFor();
+  await page
+    .locator('.church-list')
+    .getByText(managedChurchName, { exact: true })
+    .waitFor();
+  await assertResponsive(page, 'churches');
+
   await page.goto('http://localhost:3000/pt-BR/members/new');
+  const memberChurchSelect = page.locator('.church-assignment--select select');
+  await memberChurchSelect.selectOption(managedChurchId);
+  if ((await memberChurchSelect.inputValue()) !== managedChurchId)
+    throw new Error('The new member church selector did not retain its value.');
   await page.getByLabel('Nome completo').fill(memberName);
   await page
     .getByLabel('E-mail · Opcional')
@@ -120,6 +154,10 @@ try {
   await page.getByRole('button', { name: 'Salvar' }).click();
   await page.waitForURL(/\/pt-BR\/members\/[0-9a-f-]+\?saved=1$/);
   await page.getByRole('heading', { level: 2, name: memberName }).waitFor();
+  await page
+    .locator('.detail-card dl')
+    .getByText(managedChurchName, { exact: true })
+    .waitFor();
   const addressCard = page
     .locator('.detail-card')
     .filter({ hasText: 'Endereço' });
@@ -291,7 +329,13 @@ try {
   await page.getByText('Membro excluído com sucesso.').waitFor();
 
   for (const locale of ['en', 'es']) {
-    for (const path of ['dashboard', 'members', 'envelopes', 'reports']) {
+    for (const path of [
+      'dashboard',
+      'churches',
+      'members',
+      'envelopes',
+      'reports',
+    ]) {
       await page.goto(`http://localhost:3000/${locale}/${path}`);
       await assertResponsive(page, `${locale}-${path}`);
     }
@@ -301,12 +345,15 @@ try {
   );
 } finally {
   await browser?.close();
-  if (churchId) {
-    await connection.pool.query('delete from churches where id = $1', [
-      churchId,
+  if (churchId || managedChurchId) {
+    const churchIds = [churchId, managedChurchId].filter(Boolean);
+    await connection.pool.query('delete from churches where id = any($1)', [
+      churchIds,
     ]);
-    await rm(`.data/envelopes/${churchId}`, { force: true, recursive: true });
-    await rm(`.data/reports/${churchId}`, { force: true, recursive: true });
+    for (const id of churchIds) {
+      await rm(`.data/envelopes/${id}`, { force: true, recursive: true });
+      await rm(`.data/reports/${id}`, { force: true, recursive: true });
+    }
   }
   if (userId)
     await connection.pool.query('delete from admin_users where id = $1', [

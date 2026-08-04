@@ -18,6 +18,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { AppModule } from '../app.module.js';
 import { AuthService } from '../auth/auth.service.js';
+import { ChurchesService } from '../churches/churches.service.js';
 import { MembersService } from '../members/members.service.js';
 import { DonationsService } from '../donations/donations.service.js';
 import { ReportsService } from '../reports/reports.service.js';
@@ -68,6 +69,7 @@ const registeredControllers = collectControllers(AppModule);
   imports: [DiscoveryModule],
   providers: [
     { provide: AuthService, useValue: {} },
+    { provide: ChurchesService, useValue: {} },
     { provide: MembersService, useValue: {} },
     { provide: DonationsService, useValue: {} },
     { provide: ReportsService, useValue: {} },
@@ -141,7 +143,9 @@ describe('route policy inventory', () => {
       'AuthController.login',
       'AuthController.logout',
       'AuthController.me',
+      'ChurchesController.create',
       'ChurchesController.current',
+      'ChurchesController.list',
       'ChurchesController.settings',
       'DonationsController.attachEnvelope',
       'DonationsController.create',

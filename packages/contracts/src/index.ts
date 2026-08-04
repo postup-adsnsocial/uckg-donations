@@ -16,6 +16,24 @@ export type LoginRequest = z.infer<typeof loginRequestSchema>;
 
 export const churchIdSchema = z.string().uuid();
 
+export const createChurchRequestSchema = z
+  .object({
+    name: z.string().trim().min(2).max(160),
+  })
+  .strict();
+
+export type CreateChurchRequest = z.infer<typeof createChurchRequestSchema>;
+
+export const churchSchema = z.object({
+  id: churchIdSchema,
+  locale: z.string(),
+  name: z.string(),
+  slug: z.string(),
+  timezone: z.string(),
+});
+
+export type ChurchResponse = z.infer<typeof churchSchema>;
+
 const optionalEmailSchema = z.preprocess(
   (value) => (value === '' ? undefined : value),
   z.string().trim().toLowerCase().email().max(320).optional(),

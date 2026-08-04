@@ -13,6 +13,19 @@ export interface ProductCopy {
     save: string;
     saving: string;
   };
+  churches: {
+    create: string;
+    created: string;
+    creating: string;
+    empty: string;
+    error: string;
+    intro: string;
+    listTitle: string;
+    name: string;
+    namePlaceholder: string;
+    restricted: string;
+    title: string;
+  };
   members: {
     actions: string;
     address1: string;
@@ -153,6 +166,21 @@ export const productCopies: Record<Locale, ProductCopy> = {
       save: 'Salvar',
       saving: 'Salvando…',
     },
+    churches: {
+      create: 'Criar igreja',
+      created: 'Igreja criada com sucesso.',
+      creating: 'Criando…',
+      empty: 'Nenhuma igreja cadastrada.',
+      error:
+        'Não foi possível criar a igreja. Revise o nome e tente novamente.',
+      intro:
+        'Cadastre apenas o nome necessário para separar membros, lançamentos e relatórios.',
+      listTitle: 'Igrejas disponíveis',
+      name: 'Nome da igreja',
+      namePlaceholder: 'Ex.: UCKG New York',
+      restricted: 'Esta área é exclusiva do administrador da plataforma.',
+      title: 'Igrejas',
+    },
     members: {
       actions: 'Ações',
       address1: 'Endereço',
@@ -172,7 +200,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       empty: 'Nenhum membro encontrado.',
       error:
         'Não foi possível salvar o membro. Revise os dados e tente novamente.',
-      formIntro: 'Dados pessoais, endereço e vínculo com a congregação ativa.',
+      formIntro: 'Dados pessoais, endereço e vínculo com a igreja selecionada.',
       historyEmpty: 'Nenhum lançamento foi feito no nome deste membro.',
       historyIntro:
         'Doações registradas para este membro, da mais recente para a mais antiga.',
@@ -305,6 +333,20 @@ export const productCopies: Record<Locale, ProductCopy> = {
       save: 'Save',
       saving: 'Saving…',
     },
+    churches: {
+      create: 'Create church',
+      created: 'Church created successfully.',
+      creating: 'Creating…',
+      empty: 'No churches have been created.',
+      error: 'The church could not be created. Review the name and try again.',
+      intro:
+        'Add only the name needed to separate members, entries and reports.',
+      listTitle: 'Available churches',
+      name: 'Church name',
+      namePlaceholder: 'Example: UCKG New York',
+      restricted: 'This area is restricted to the platform administrator.',
+      title: 'Churches',
+    },
     members: {
       actions: 'Actions',
       address1: 'Address',
@@ -322,8 +364,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       email: 'Email',
       empty: 'No members found.',
       error: 'Unable to save the member. Review the details and try again.',
-      formIntro:
-        'Personal details, address and active congregation assignment.',
+      formIntro: 'Personal details, address and selected church assignment.',
       historyEmpty: 'No entries have been recorded for this member.',
       historyIntro:
         'Donations recorded for this member, from newest to oldest.',
@@ -454,6 +495,21 @@ export const productCopies: Record<Locale, ProductCopy> = {
       save: 'Guardar',
       saving: 'Guardando…',
     },
+    churches: {
+      create: 'Crear iglesia',
+      created: 'Iglesia creada correctamente.',
+      creating: 'Creando…',
+      empty: 'No hay iglesias registradas.',
+      error:
+        'No fue posible crear la iglesia. Revisa el nombre e inténtalo de nuevo.',
+      intro:
+        'Registra únicamente el nombre necesario para separar miembros, registros e informes.',
+      listTitle: 'Iglesias disponibles',
+      name: 'Nombre de la iglesia',
+      namePlaceholder: 'Ej.: UCKG New York',
+      restricted: 'Esta área es exclusiva del administrador de la plataforma.',
+      title: 'Iglesias',
+    },
     members: {
       actions: 'Acciones',
       address1: 'Dirección',
@@ -474,7 +530,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       error:
         'No fue posible guardar el miembro. Revisa los datos e inténtalo de nuevo.',
       formIntro:
-        'Datos personales, dirección y vínculo con la congregación activa.',
+        'Datos personales, dirección y vínculo con la iglesia seleccionada.',
       historyEmpty: 'No se registraron movimientos para este miembro.',
       historyIntro:
         'Donaciones registradas para este miembro, de la más reciente a la más antigua.',
