@@ -127,7 +127,7 @@ function MembersList({
               placeholder={copy.members.search}
             />
           </label>
-          <button type="submit">{copy.members.search.split(' ')[0]}</button>
+          <button type="submit">{copy.members.searchAction}</button>
         </form>
         <div className="product-table-wrap">
           {loading ? (
@@ -177,7 +177,7 @@ function MembersList({
                     <td>
                       <div className="member-actions">
                         <Link
-                          aria-label={copy.members.details}
+                          aria-label={`${copy.members.details}: ${member.fullName}`}
                           className="member-action"
                           href={`/${locale}/members/${member.id}`}
                           title={copy.members.details}
@@ -185,7 +185,7 @@ function MembersList({
                           <MemberActionIcon action="view" />
                         </Link>
                         <Link
-                          aria-label={copy.members.edit}
+                          aria-label={`${copy.members.edit}: ${member.fullName}`}
                           className="member-action"
                           href={`/${locale}/members/${member.id}/edit`}
                           title={copy.members.edit}
@@ -193,7 +193,7 @@ function MembersList({
                           <MemberActionIcon action="edit" />
                         </Link>
                         <button
-                          aria-label={copy.members.delete}
+                          aria-label={`${copy.members.delete}: ${member.fullName}`}
                           className="member-action member-action--danger"
                           disabled={deletingId === member.id}
                           title={copy.members.delete}

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { AppShell, type AppChurch } from '../components/app-shell';
+import { type EnvelopeRecord, formatMoney } from '../envelopes/types';
 import type { Locale } from '../i18n/config';
 import { productCopies } from '../i18n/product-copy';
 import { apiRequest } from '../lib/api';
@@ -37,13 +38,33 @@ function MemberDetail({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [member, setMember] = useState<MemberRecord | null>(null);
+  const [history, setHistory] = useState<EnvelopeRecord[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   useEffect(() => {
-    apiRequest(`/members/${id}`, {
-      headers: { 'x-church-id': church.id },
-    }).then(async (response) => {
-      if (response.ok) setMember((await response.json()) as MemberRecord);
-    });
+    let active = true;
+    const headers = { 'x-church-id': church.id };
+
+    async function load() {
+      setHistoryLoading(true);
+      const [memberResponse, historyResponse] = await Promise.all([
+        apiRequest(`/members/${id}`, { headers }),
+        apiRequest(`/donations?memberId=${encodeURIComponent(id)}`, {
+          headers,
+        }),
+      ]);
+      if (!active) return;
+      if (memberResponse.ok)
+        setMember((await memberResponse.json()) as MemberRecord);
+      if (historyResponse.ok)
+        setHistory((await historyResponse.json()) as EnvelopeRecord[]);
+      setHistoryLoading(false);
+    }
+
+    void load();
+    return () => {
+      active = false;
+    };
   }, [church.id, id]);
   if (!member) return <p className="product-empty">{copy.common.loading}</p>;
   async function deleteMember() {
@@ -164,6 +185,72 @@ function MemberDetail({
             </div>
           ) : null}
         </article>
+      </section>
+      <section className="product-panel member-history">
+        <header className="member-history__header">
+          <div>
+            <h3>{copy.members.historyTitle}</h3>
+            <p>{copy.members.historyIntro}</p>
+          </div>
+        </header>
+        {historyLoading ? (
+          <p className="product-empty">{copy.common.loading}</p>
+        ) : history.length ? (
+          <div className="product-table-wrap">
+            <table className="product-table member-history__table">
+              <thead>
+                <tr>
+                  <th>{copy.envelopes.date}</th>
+                  <th>{copy.envelopes.paymentMethod}</th>
+                  <th>{copy.envelopes.amount}</th>
+                  <th>{copy.envelopes.image}</th>
+                  <th>
+                    <span className="sr-only">{copy.envelopes.details}</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {history.map((item) => (
+                  <tr key={item.id}>
+                    <td data-label={copy.envelopes.date}>
+                      {new Intl.DateTimeFormat(locale, {
+                        dateStyle: 'medium',
+                      }).format(new Date(`${item.receivedOn}T12:00:00`))}
+                    </td>
+                    <td data-label={copy.envelopes.paymentMethod}>
+                      {copy.envelopes[item.paymentMethod]}
+                    </td>
+                    <td data-label={copy.envelopes.amount}>
+                      <strong>{formatMoney(item.amountCents, locale)}</strong>
+                    </td>
+                    <td data-label={copy.envelopes.image}>
+                      {item.envelope ? '✓' : '—'}
+                    </td>
+                    <td>
+                      <Link
+                        aria-label={`${copy.envelopes.view}: ${new Intl.DateTimeFormat(locale).format(new Date(`${item.receivedOn}T12:00:00`))}`}
+                        className="member-action"
+                        href={`/${locale}/envelopes/${item.id}`}
+                        title={copy.envelopes.view}
+                      >
+                        <svg
+                          aria-hidden="true"
+                          focusable="false"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M2.8 12s3.3-5.5 9.2-5.5 9.2 5.5 9.2 5.5-3.3 5.5-9.2 5.5S2.8 12 2.8 12Z" />
+                          <circle cx="12" cy="12" r="2.7" />
+                        </svg>
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="product-empty">{copy.members.historyEmpty}</p>
+        )}
       </section>
     </>
   );

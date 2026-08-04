@@ -241,16 +241,53 @@ try {
 
   await page.goto('http://localhost:3000/pt-BR/members');
   const memberTable = page.locator('.product-table');
-  await memberTable.getByText(memberName, { exact: true }).waitFor();
-  const memberDetailsLink = memberTable.getByRole('link', {
+  const memberRow = memberTable.locator('tbody tr').filter({
+    hasText: memberName,
+  });
+  const memberNameLink = memberRow.getByRole('link', {
+    name: memberName,
+    exact: true,
+  });
+  await memberNameLink.waitFor();
+  const memberDetailsLink = memberRow.getByRole('link', {
     name: 'Detalhes do membro',
   });
   if ((await memberDetailsLink.count()) !== 1)
-    throw new Error('Expected one member detail link.');
-  await memberDetailsLink.click();
+    throw new Error('Expected one member view action.');
+  if (
+    (await memberRow.getByRole('link', { name: 'Editar membro' }).count()) !== 1
+  )
+    throw new Error('Expected one member edit action.');
+  if (
+    (await memberRow
+      .getByRole('button', { name: 'Excluir membro' })
+      .count()) !== 1
+  )
+    throw new Error('Expected one member delete action.');
+  await assertResponsive(page, 'members-actions');
+  await memberNameLink.click();
+  await page
+    .getByRole('heading', { level: 3, name: 'Histórico de lançamentos' })
+    .waitFor();
+  const memberHistory = page.locator('.member-history');
+  await memberHistory.getByText(/125,50/).waitFor();
+  await memberHistory.getByText('Cheque', { exact: true }).waitFor();
+  if (
+    (await memberHistory
+      .getByRole('link', { name: /Ver detalhes/ })
+      .count()) !== 1
+  )
+    throw new Error('Expected the member history entry to be viewable.');
+  await assertResponsive(page, 'member-detail-history');
+  await page.getByRole('link', { name: 'Voltar', exact: true }).click();
+  await page.waitForURL(/\/pt-BR\/members$/);
+  const refreshedMemberRow = page.locator('.product-table tbody tr').filter({
+    hasText: memberName,
+  });
   page.once('dialog', (dialog) => dialog.accept());
-  await page.getByRole('button', { name: 'Excluir membro' }).click();
-  await page.waitForURL(/\/pt-BR\/members\?deleted=1$/);
+  await refreshedMemberRow
+    .getByRole('button', { name: 'Excluir membro' })
+    .click();
   await page.getByText('Membro excluído com sucesso.').waitFor();
 
   for (const locale of ['en', 'es']) {

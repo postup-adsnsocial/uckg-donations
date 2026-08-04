@@ -22,6 +22,9 @@ export interface ProductCopy {
     created: string;
     empty: string;
     formIntro: string;
+    historyEmpty: string;
+    historyIntro: string;
+    historyTitle: string;
     listIntro: string;
     name: string;
     new: string;
@@ -30,6 +33,7 @@ export interface ProductCopy {
     postalCode: string;
     region: string;
     search: string;
+    searchAction: string;
     status: string;
     title: string;
     email: string;
@@ -169,6 +173,10 @@ export const productCopies: Record<Locale, ProductCopy> = {
       error:
         'Não foi possível salvar o membro. Revise os dados e tente novamente.',
       formIntro: 'Dados pessoais, endereço e vínculo com a congregação ativa.',
+      historyEmpty: 'Nenhum lançamento foi feito no nome deste membro.',
+      historyIntro:
+        'Doações registradas para este membro, da mais recente para a mais antiga.',
+      historyTitle: 'Histórico de lançamentos',
       listIntro: 'Consulte, pesquise e mantenha os membros desta congregação.',
       name: 'Nome completo',
       new: 'Novo membro',
@@ -177,7 +185,8 @@ export const productCopies: Record<Locale, ProductCopy> = {
       postalCode: 'ZIP Code',
       region: 'Estado',
       saved: 'Membro salvo com sucesso.',
-      search: 'Buscar por nome, e-mail ou telefone',
+      search: 'Nome, e-mail ou telefone',
+      searchAction: 'Buscar',
       status: 'Status',
       title: 'Membros',
     },
@@ -315,6 +324,10 @@ export const productCopies: Record<Locale, ProductCopy> = {
       error: 'Unable to save the member. Review the details and try again.',
       formIntro:
         'Personal details, address and active congregation assignment.',
+      historyEmpty: 'No entries have been recorded for this member.',
+      historyIntro:
+        'Donations recorded for this member, from newest to oldest.',
+      historyTitle: 'Entry history',
       listIntro: 'Find, review and manage members in this congregation.',
       name: 'Full name',
       new: 'New member',
@@ -323,7 +336,8 @@ export const productCopies: Record<Locale, ProductCopy> = {
       postalCode: 'ZIP Code',
       region: 'State',
       saved: 'Member saved successfully.',
-      search: 'Search by name, email or phone',
+      search: 'Name, email or phone',
+      searchAction: 'Search',
       status: 'Status',
       title: 'Members',
     },
@@ -461,6 +475,10 @@ export const productCopies: Record<Locale, ProductCopy> = {
         'No fue posible guardar el miembro. Revisa los datos e inténtalo de nuevo.',
       formIntro:
         'Datos personales, dirección y vínculo con la congregación activa.',
+      historyEmpty: 'No se registraron movimientos para este miembro.',
+      historyIntro:
+        'Donaciones registradas para este miembro, de la más reciente a la más antigua.',
+      historyTitle: 'Historial de registros',
       listIntro:
         'Consulta, busca y administra los miembros de esta congregación.',
       name: 'Nombre completo',
@@ -470,7 +488,8 @@ export const productCopies: Record<Locale, ProductCopy> = {
       postalCode: 'ZIP Code',
       region: 'Estado',
       saved: 'Miembro guardado correctamente.',
-      search: 'Buscar por nombre, correo o teléfono',
+      search: 'Nombre, correo o teléfono',
+      searchAction: 'Buscar',
       status: 'Estado',
       title: 'Miembros',
     },

@@ -2061,6 +2061,39 @@ select:focus-visible {
   line-height: 1.6;
 }
 
+.member-history {
+  margin-top: 20px;
+  overflow: hidden;
+}
+
+.member-history__header {
+  padding: 24px 26px 20px;
+  border-bottom: 1px solid #e8ecf0;
+}
+
+.member-history__header h3 {
+  margin: 0;
+  color: var(--ink-950);
+  font-size: 1rem;
+}
+
+.member-history__header p {
+  margin: 7px 0 0;
+  color: var(--ink-500);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.member-history__table th:last-child,
+.member-history__table td:last-child {
+  width: 76px;
+  text-align: right;
+}
+
+.member-history__table td:last-child .member-action {
+  margin-left: auto;
+}
+
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -3248,7 +3281,16 @@ select:focus-visible {
 
   .heading-actions {
     width: 100%;
-    flex-direction: column-reverse;
+    flex-direction: column;
+  }
+
+  .search-bar {
+    flex-direction: column;
+    padding: 18px 16px;
+  }
+
+  .search-bar button {
+    width: 100%;
   }
 
   .form-grid {
@@ -3409,6 +3451,38 @@ select:focus-visible {
 
   .detail-card dl {
     grid-template-columns: 1fr;
+  }
+
+  .member-history__header {
+    padding: 20px 18px 17px;
+  }
+
+  .member-history__table td {
+    display: grid;
+    align-items: center;
+    grid-template-columns: minmax(110px, 0.8fr) minmax(0, 1fr);
+    gap: 12px;
+    text-align: right;
+  }
+
+  .member-history__table td::before {
+    content: attr(data-label);
+    color: var(--ink-500);
+    font-size: 0.64rem;
+    font-weight: 750;
+    letter-spacing: 0.04em;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  .member-history__table td:last-child {
+    display: flex;
+    width: auto;
+    justify-content: flex-end;
+  }
+
+  .member-history__table td:last-child::before {
+    content: none;
   }
 
   .summary-grid,
