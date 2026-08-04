@@ -130,7 +130,17 @@ test.describe('administrative authentication and tenant isolation', () => {
     await page.getByRole('button', { name: 'Entrar no painel' }).click();
 
     await expect(page).toHaveURL(/\/pt-BR\/dashboard$/);
-    await expect(page.getByText(`E2E Church A ${suffix}`)).toBeVisible();
-    await expect(page.getByText('Acesso configurado')).toBeVisible();
+    await expect(
+      page.getByRole('heading', {
+        level: 1,
+        name: `E2E Church A ${suffix}`,
+      }),
+    ).toBeVisible();
+    await expect(page.locator('.overview-grid').getByRole('link')).toHaveCount(
+      4,
+    );
+    await expect(
+      page.locator('.overview-grid').getByRole('link', { name: /Lançar/ }),
+    ).toBeVisible();
   });
 });

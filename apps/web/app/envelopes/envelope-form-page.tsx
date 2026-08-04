@@ -12,7 +12,7 @@ import type { MemberRecord } from '../members/types';
 
 export function EnvelopeFormPage({ locale }: { locale: Locale }) {
   return (
-    <AppShell active="envelopes" locale={locale}>
+    <AppShell active="launch" locale={locale}>
       {({ church }) => <EnvelopeForm church={church} locale={locale} />}
     </AppShell>
   );

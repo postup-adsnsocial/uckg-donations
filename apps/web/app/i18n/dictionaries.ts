@@ -28,6 +28,7 @@ export interface Dictionary {
     modulesStateLabel: string;
     navigation: {
       donations: string;
+      launch: string;
       members: string;
       overview: string;
       reports: string;
@@ -140,6 +141,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       modulesStateLabel: 'Estado dos módulos',
       navigation: {
         donations: 'Doações',
+        launch: 'Lançar',
         members: 'Membros',
         overview: 'Visão geral',
         reports: 'Relatórios',
@@ -253,6 +255,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       modulesStateLabel: 'Module status',
       navigation: {
         donations: 'Donations',
+        launch: 'Record',
         members: 'Members',
         overview: 'Overview',
         reports: 'Reports',
@@ -367,6 +370,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       modulesStateLabel: 'Estado de los módulos',
       navigation: {
         donations: 'Donaciones',
+        launch: 'Registrar',
         members: 'Miembros',
         overview: 'Vista general',
         reports: 'Informes',

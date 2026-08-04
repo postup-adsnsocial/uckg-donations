@@ -33,7 +33,7 @@ interface Membership {
 }
 
 interface AppShellProps {
-  active: 'dashboard' | 'envelopes' | 'members' | 'reports';
+  active: 'dashboard' | 'envelopes' | 'launch' | 'members' | 'reports';
   children: (context: { church: AppChurch; user: AppUser }) => ReactNode;
   locale: Locale;
 }
@@ -146,10 +146,16 @@ export function AppShell({ active, children, locale }: AppShellProps) {
       path: 'members',
     },
     {
-      icon: '＋',
+      icon: '◇',
       id: 'envelopes' as const,
       label: copy.navigation.donations,
       path: 'envelopes',
+    },
+    {
+      icon: '＋',
+      id: 'launch' as const,
+      label: copy.navigation.launch,
+      path: 'envelopes/new',
     },
     {
       icon: '▥',

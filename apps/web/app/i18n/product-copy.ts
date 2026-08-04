@@ -67,14 +67,17 @@ export interface ProductCopy {
     view: string;
   };
   dashboard: {
-    envelopes: string;
-    latest: string;
+    donations: string;
+    donationsDescription: string;
+    launch: string;
+    launchDescription: string;
     members: string;
-    newEnvelope: string;
-    newMember: string;
+    membersDescription: string;
+    open: string;
+    reports: string;
+    reportsDescription: string;
     subtitle: string;
     title: string;
-    total: string;
   };
   reports: {
     archive: string;
@@ -166,14 +169,21 @@ export const productCopies: Record<Locale, ProductCopy> = {
       view: 'Ver detalhes',
     },
     dashboard: {
-      envelopes: 'Envelopes no período',
-      latest: 'Últimos envelopes',
-      members: 'Membros ativos',
-      newEnvelope: 'Lançar envelope',
-      newMember: 'Cadastrar membro',
-      subtitle: 'Resumo atualizado da congregação selecionada.',
+      donations: 'Doações',
+      donationsDescription:
+        'Consulte os lançamentos e as imagens dos envelopes.',
+      launch: 'Lançar',
+      launchDescription:
+        'Registre uma nova doação, a forma de pagamento e a imagem do envelope.',
+      members: 'Membros',
+      membersDescription:
+        'Cadastre, consulte e atualize os membros da congregação.',
+      open: 'Acessar',
+      reports: 'Relatórios',
+      reportsDescription:
+        'Gere relatórios por período, membro e forma de pagamento.',
+      subtitle: 'Acesse as principais áreas de gestão da congregação.',
       title: 'Visão geral',
-      total: 'Total no período',
     },
     reports: {
       archive: 'Relatórios arquivados',
@@ -262,14 +272,20 @@ export const productCopies: Record<Locale, ProductCopy> = {
       view: 'View details',
     },
     dashboard: {
-      envelopes: 'Envelopes in period',
-      latest: 'Latest envelopes',
-      members: 'Active members',
-      newEnvelope: 'Record envelope',
-      newMember: 'Register member',
-      subtitle: 'Current summary for the selected congregation.',
+      donations: 'Donations',
+      donationsDescription: 'Review donation entries and envelope images.',
+      launch: 'Record',
+      launchDescription:
+        'Record a new donation, payment method and envelope image.',
+      members: 'Members',
+      membersDescription:
+        'Register, review and update members of the congregation.',
+      open: 'Open',
+      reports: 'Reports',
+      reportsDescription:
+        'Generate reports by period, member and payment method.',
+      subtitle: 'Open the main management areas for this congregation.',
       title: 'Overview',
-      total: 'Period total',
     },
     reports: {
       archive: 'Archived reports',
@@ -361,14 +377,21 @@ export const productCopies: Record<Locale, ProductCopy> = {
       view: 'Ver detalles',
     },
     dashboard: {
-      envelopes: 'Sobres en el período',
-      latest: 'Últimos sobres',
-      members: 'Miembros activos',
-      newEnvelope: 'Registrar sobre',
-      newMember: 'Registrar miembro',
-      subtitle: 'Resumen actualizado de la congregación seleccionada.',
+      donations: 'Donaciones',
+      donationsDescription:
+        'Consulta los registros y las imágenes de los sobres.',
+      launch: 'Registrar',
+      launchDescription:
+        'Registra una nueva donación, la forma de pago y la imagen del sobre.',
+      members: 'Miembros',
+      membersDescription:
+        'Registra, consulta y actualiza los miembros de la congregación.',
+      open: 'Acceder',
+      reports: 'Informes',
+      reportsDescription:
+        'Genera informes por período, miembro y forma de pago.',
+      subtitle: 'Accede a las principales áreas de gestión de la congregación.',
       title: 'Vista general',
-      total: 'Total del período',
     },
     reports: {
       archive: 'Informes archivados',

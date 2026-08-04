@@ -2,13 +2,12 @@
 
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
 
 import { AppShell, type AppChurch } from '../components/app-shell';
 import { type Locale, localeFromRoute } from '../i18n/config';
 import { productCopies } from '../i18n/product-copy';
-import { apiRequest } from '../lib/api';
-import { type EnvelopeRecord, formatMoney } from '../envelopes/types';
+
+type ModuleId = 'donations' | 'launch' | 'members' | 'reports';
 
 export default function DashboardPage() {
   const params = useParams<{ locale?: string }>();
@@ -20,38 +19,72 @@ export default function DashboardPage() {
   );
 }
 
+function ModuleIcon({ id }: { id: ModuleId }) {
+  if (id === 'members') {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M16 20v-1.7a3.3 3.3 0 0 0-3.3-3.3H6.3A3.3 3.3 0 0 0 3 18.3V20" />
+        <circle cx="9.5" cy="7.5" r="3.5" />
+        <path d="M16.5 4.2a3.5 3.5 0 0 1 0 6.6M21 20v-1.7a3.3 3.3 0 0 0-2.5-3.2" />
+      </svg>
+    );
+  }
+  if (id === 'donations') {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <path d="M3 9h18M7 15h4" />
+      </svg>
+    );
+  }
+  if (id === 'launch') {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+    );
+  }
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24">
+      <path d="M5 20V10M12 20V4M19 20v-7" />
+      <path d="M3 20h18" />
+    </svg>
+  );
+}
+
 function Dashboard({ church, locale }: { church: AppChurch; locale: Locale }) {
   const copy = productCopies[locale];
-  const [activeMembers, setActiveMembers] = useState(0);
-  const [items, setItems] = useState<EnvelopeRecord[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    const now = new Date();
-    const startDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
-    const endDate = now.toISOString().slice(0, 10);
-    const [membersResponse, envelopesResponse] = await Promise.all([
-      apiRequest('/members?page=1&status=active', {
-        headers: { 'x-church-id': church.id },
-      }),
-      apiRequest(`/donations?startDate=${startDate}&endDate=${endDate}`, {
-        headers: { 'x-church-id': church.id },
-      }),
-    ]);
-    if (membersResponse.ok)
-      setActiveMembers(
-        ((await membersResponse.json()) as { total: number }).total,
-      );
-    if (envelopesResponse.ok)
-      setItems((await envelopesResponse.json()) as EnvelopeRecord[]);
-    setLoading(false);
-  }, [church.id]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
-  const total = items.reduce((sum, item) => sum + item.amountCents, 0);
+  const modules: Array<{
+    description: string;
+    href: string;
+    id: ModuleId;
+    title: string;
+  }> = [
+    {
+      description: copy.dashboard.membersDescription,
+      href: `/${locale}/members`,
+      id: 'members',
+      title: copy.dashboard.members,
+    },
+    {
+      description: copy.dashboard.donationsDescription,
+      href: `/${locale}/envelopes`,
+      id: 'donations',
+      title: copy.dashboard.donations,
+    },
+    {
+      description: copy.dashboard.launchDescription,
+      href: `/${locale}/envelopes/new`,
+      id: 'launch',
+      title: copy.dashboard.launch,
+    },
+    {
+      description: copy.dashboard.reportsDescription,
+      href: `/${locale}/reports`,
+      id: 'reports',
+      title: copy.dashboard.reports,
+    },
+  ];
 
   return (
     <>
@@ -63,83 +96,27 @@ function Dashboard({ church, locale }: { church: AppChurch; locale: Locale }) {
           <h2>{copy.dashboard.title}</h2>
           <p>{copy.dashboard.subtitle}</p>
         </div>
-        <div className="heading-actions">
-          <Link
-            className="product-secondary-link"
-            href={`/${locale}/members/new`}
-          >
-            ＋ {copy.dashboard.newMember}
-          </Link>
-          <Link
-            className="product-primary-link"
-            href={`/${locale}/envelopes/new`}
-          >
-            ＋ {copy.dashboard.newEnvelope}
-          </Link>
-        </div>
       </header>
-      <div className="summary-grid">
-        <article>
-          <span>{copy.dashboard.members}</span>
-          <strong>{loading ? '—' : activeMembers}</strong>
-          <Link href={`/${locale}/members`}>{copy.members.title} →</Link>
-        </article>
-        <article>
-          <span>{copy.dashboard.envelopes}</span>
-          <strong>{loading ? '—' : items.length}</strong>
-          <Link href={`/${locale}/envelopes`}>{copy.envelopes.title} →</Link>
-        </article>
-        <article className="summary-card--accent">
-          <span>{copy.dashboard.total}</span>
-          <strong>{loading ? '—' : formatMoney(total, locale)}</strong>
-          <Link href={`/${locale}/reports`}>{copy.reports.title} →</Link>
-        </article>
-      </div>
-      <section className="product-panel">
-        <div className="panel-heading">
-          <h3>{copy.dashboard.latest}</h3>
-          <Link className="table-action" href={`/${locale}/envelopes`}>
-            {copy.envelopes.view}
+      <nav className="overview-grid" aria-label={copy.dashboard.title}>
+        {modules.map((module) => (
+          <Link
+            className={`overview-card overview-card--${module.id}`}
+            href={module.href}
+            key={module.id}
+          >
+            <span className="overview-card__icon">
+              <ModuleIcon id={module.id} />
+            </span>
+            <span className="overview-card__copy">
+              <strong>{module.title}</strong>
+              <small>{module.description}</small>
+            </span>
+            <span className="overview-card__action">
+              {copy.dashboard.open} <span aria-hidden="true">→</span>
+            </span>
           </Link>
-        </div>
-        <div className="product-table-wrap">
-          {loading ? (
-            <p className="product-empty">{copy.common.loading}</p>
-          ) : items.length ? (
-            <table className="product-table">
-              <thead>
-                <tr>
-                  <th>{copy.envelopes.date}</th>
-                  <th>{copy.envelopes.member}</th>
-                  <th>{copy.envelopes.amount}</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.slice(0, 5).map((item) => (
-                  <tr key={item.id}>
-                    <td>{item.receivedOn}</td>
-                    <td>{item.member?.fullName ?? copy.common.anonymous}</td>
-                    <td>
-                      <strong>{formatMoney(item.amountCents, locale)}</strong>
-                    </td>
-                    <td>
-                      <Link
-                        className="table-action"
-                        href={`/${locale}/envelopes/${item.id}`}
-                      >
-                        {copy.envelopes.view}
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p className="product-empty">{copy.envelopes.empty}</p>
-          )}
-        </div>
-      </section>
+        ))}
+      </nav>
     </>
   );
 }

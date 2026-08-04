@@ -83,6 +83,29 @@ try {
   await page.getByLabel('Senha', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Entrar no painel' }).click();
   await page.waitForURL(/\/pt-BR\/dashboard$/);
+  const overviewCards = page.locator('.overview-grid').getByRole('link');
+  try {
+    await overviewCards.first().waitFor();
+  } catch (error) {
+    const bodyText = (await page.locator('body').innerText()).slice(0, 1_000);
+    throw new Error(
+      `Overview cards did not render at ${page.url()}. Page content: ${bodyText}`,
+      { cause: error },
+    );
+  }
+  const overviewCardCount = await overviewCards.count();
+  if (overviewCardCount !== 4)
+    throw new Error(
+      `Overview must display four module access cards; found ${overviewCardCount}.`,
+    );
+  await page
+    .locator('.dashboard-sidebar')
+    .getByRole('link', { name: 'Lançar', exact: true })
+    .waitFor();
+  await page
+    .locator('.overview-grid')
+    .getByRole('link', { name: /Lançar/ })
+    .waitFor();
   await assertResponsive(page, 'dashboard');
 
   await page.goto('http://localhost:3000/pt-BR/members/new');
