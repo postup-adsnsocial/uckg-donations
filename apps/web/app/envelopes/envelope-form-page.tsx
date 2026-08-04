@@ -327,6 +327,28 @@ function EnvelopeForm({
         <fieldset>
           <legend>{copy.envelopes.details}</legend>
           <div className="form-grid">
+            <label className="form-field form-field--wide">
+              <span>
+                {copy.envelopes.member} · {copy.common.optional}
+              </span>
+              <select name="memberId" defaultValue="">
+                <option value="">{copy.common.anonymous}</option>
+                {members.map((member) => (
+                  <option key={member.id} value={member.id}>
+                    {member.fullName}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="form-field">
+              <span>{copy.envelopes.date}</span>
+              <input
+                name="receivedOn"
+                type="date"
+                required
+                defaultValue={formatLocalDate(new Date())}
+              />
+            </label>
             <label className="form-field">
               <span>{copy.envelopes.amount} (USD)</span>
               <input
@@ -337,15 +359,6 @@ function EnvelopeForm({
                 pattern="[0-9]+([.,][0-9]{1,2})?"
                 required
                 placeholder="0.00"
-              />
-            </label>
-            <label className="form-field">
-              <span>{copy.envelopes.date}</span>
-              <input
-                name="receivedOn"
-                type="date"
-                required
-                defaultValue={formatLocalDate(new Date())}
               />
             </label>
             <div className="form-field form-field--wide payment-method-field">
@@ -386,19 +399,6 @@ function EnvelopeForm({
                 ))}
               </div>
             </div>
-            <label className="form-field form-field--wide">
-              <span>
-                {copy.envelopes.member} · {copy.common.optional}
-              </span>
-              <select name="memberId" defaultValue="">
-                <option value="">{copy.common.anonymous}</option>
-                {members.map((member) => (
-                  <option key={member.id} value={member.id}>
-                    {member.fullName}
-                  </option>
-                ))}
-              </select>
-            </label>
             <div className="form-field form-field--wide envelope-image-capture">
               <span>
                 {copy.envelopes.image} · {copy.common.optional}

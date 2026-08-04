@@ -124,6 +124,23 @@ try {
   await page.getByRole('heading', { level: 2, name: memberName }).waitFor();
 
   await page.goto('http://localhost:3000/pt-BR/envelopes/new');
+  const launchFieldOrder = await page.locator('.form-grid').evaluate((grid) =>
+    [...grid.children].map((element) => {
+      if (element.querySelector('[name="memberId"]')) return 'member';
+      if (element.querySelector('[name="receivedOn"]')) return 'date';
+      if (element.querySelector('[name="amount"]')) return 'amount';
+      if (element.querySelector('[name="paymentMethod"]')) return 'payment';
+      if (element.querySelector('[name="image"]')) return 'image';
+      if (element.querySelector('[name="notes"]')) return 'notes';
+      return 'unknown';
+    }),
+  );
+  if (launchFieldOrder.join(',') !== 'member,date,amount,payment,image,notes')
+    throw new Error(`Unexpected launch field order: ${launchFieldOrder}`);
+  await page
+    .getByLabel(/Membro relacionado/)
+    .selectOption({ label: memberName });
+  await page.getByLabel('Data de recebimento').waitFor();
   await page.getByLabel('Valor (USD)').fill('125.50');
   const amountType = await page.getByLabel('Valor (USD)').getAttribute('type');
   if (amountType === 'number')
@@ -134,9 +151,6 @@ try {
   if ((await paymentMethods.getByRole('radio').count()) !== 3)
     throw new Error('Expected three visual payment method options.');
   await paymentMethods.getByRole('radio', { name: 'Cheque' }).check();
-  await page
-    .getByLabel(/Membro relacionado/)
-    .selectOption({ label: memberName });
   await page
     .getByRole('button', { name: 'Fotografar envelope', exact: true })
     .waitFor();
