@@ -138,7 +138,6 @@ export class AuthService {
       .where(
         and(
           eq(schema.churchMemberships.userId, userId),
-          eq(schema.churchMemberships.status, 'active'),
           eq(schema.churches.status, 'active'),
         ),
       );
