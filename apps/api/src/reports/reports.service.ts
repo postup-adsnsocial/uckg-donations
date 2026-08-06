@@ -8,6 +8,7 @@ import {
   rgb,
   StandardFonts,
   type PDFFont,
+  type PDFImage,
   type PDFPage,
 } from 'pdf-lib';
 
@@ -172,6 +173,7 @@ export class ReportsService {
     const document = await PDFDocument.create();
     const regular = await document.embedFont(StandardFonts.Helvetica);
     const bold = await document.embedFont(StandardFonts.HelveticaBold);
+    const logo = await this.loadUniversalLogo(document);
     const total = items.reduce((sum, item) => sum + item.amountCents, 0);
     if (reportType === 'annual_members') {
       return this.createAnnualMembersPdf(
@@ -182,6 +184,7 @@ export class ReportsService {
         startDate,
         endDate,
         items,
+        logo,
         total,
       );
     }
@@ -192,6 +195,7 @@ export class ReportsService {
       churchName,
       startDate,
       endDate,
+      logo,
       total,
     );
     let y = 655;
@@ -207,6 +211,7 @@ export class ReportsService {
             churchName,
             startDate,
             endDate,
+            logo,
             total,
           );
           y = 655;
@@ -228,7 +233,7 @@ export class ReportsService {
           color: rgb(0.05, 0.12, 0.22),
         });
         page.drawText(
-          `${item.receivedOn}  |  ${this.methodLabel(item.paymentMethod)}  |  USD ${(item.amountCents / 100).toFixed(2)}`,
+          `${this.formatDate(item.receivedOn)}  |  ${this.methodLabel(item.paymentMethod)}  |  USD ${(item.amountCents / 100).toFixed(2)}`,
           {
             x: 56,
             y: y - 31,
@@ -297,6 +302,7 @@ export class ReportsService {
             churchName,
             startDate,
             endDate,
+            logo,
             total,
           );
           y = 655;
@@ -340,6 +346,7 @@ export class ReportsService {
         startDate,
         endDate,
         items,
+        logo,
         total,
       );
     }
@@ -355,6 +362,7 @@ export class ReportsService {
     startDate: string,
     endDate: string,
     items: DonationItem[],
+    logo: PDFImage | null,
     totalCents: number,
   ) {
     const rows = this.annualMemberTotals(items);
@@ -387,6 +395,7 @@ export class ReportsService {
         height: 72,
         color: rgb(0.01, 0.19, 0.32),
       });
+      this.drawUniversalLogo(page, logo, 742, 558, 30);
       page.drawText('UNIVERSAL  |  ANNUAL DONOR REPORT', {
         x: 28,
         y: 578,
@@ -401,13 +410,16 @@ export class ReportsService {
         size: 10,
         color: rgb(0.78, 0.88, 0.94),
       });
-      page.drawText(`${startDate} to ${endDate}`, {
-        x: 28,
-        y: 520,
-        font: bold,
-        size: 9,
-        color: rgb(0.05, 0.12, 0.22),
-      });
+      page.drawText(
+        `${this.formatDate(startDate)} to ${this.formatDate(endDate)}`,
+        {
+          x: 28,
+          y: 520,
+          font: bold,
+          size: 9,
+          color: rgb(0.05, 0.12, 0.22),
+        },
+      );
       page.drawText(`USD ${(totalCents / 100).toFixed(2)}`, {
         x: 688,
         y: 520,
@@ -578,6 +590,7 @@ export class ReportsService {
     startDate: string,
     endDate: string,
     items: DonationItem[],
+    logo: PDFImage | null,
     totalCents: number,
   ) {
     const itemsWithImages = items.filter((item) => item.envelope);
@@ -588,6 +601,7 @@ export class ReportsService {
       churchName,
       startDate,
       endDate,
+      logo,
       totalCents,
     );
     page.drawText('ENVELOPE IMAGES', {
@@ -619,6 +633,7 @@ export class ReportsService {
           churchName,
           startDate,
           endDate,
+          logo,
           totalCents,
         );
         page.drawText('ENVELOPE IMAGES', {
@@ -633,7 +648,7 @@ export class ReportsService {
 
       page.drawText(
         this.clean(
-          `${item.receivedOn} | ${item.member?.fullName ?? 'Anonymous'} | USD ${(item.amountCents / 100).toFixed(2)}`,
+          `${this.formatDate(item.receivedOn)} | ${item.member?.fullName ?? 'Anonymous'} | USD ${(item.amountCents / 100).toFixed(2)}`,
         ).slice(0, 82),
         {
           x: 52,
@@ -677,6 +692,7 @@ export class ReportsService {
     churchName: string,
     startDate: string,
     endDate: string,
+    logo: PDFImage | null,
     totalCents: number,
   ): PDFPage {
     const page = document.addPage([612, 792]);
@@ -687,6 +703,7 @@ export class ReportsService {
       height: 72,
       color: rgb(0.01, 0.19, 0.32),
     });
+    this.drawUniversalLogo(page, logo, 558, 738, 30);
     page.drawText('UNIVERSAL  |  DONATIONS REPORT', {
       x: 44,
       y: 758,
@@ -701,13 +718,16 @@ export class ReportsService {
       size: 10,
       color: rgb(0.78, 0.88, 0.94),
     });
-    page.drawText(`${startDate} to ${endDate}`, {
-      x: 44,
-      y: 690,
-      font: bold,
-      size: 11,
-      color: rgb(0.05, 0.12, 0.22),
-    });
+    page.drawText(
+      `${this.formatDate(startDate)} to ${this.formatDate(endDate)}`,
+      {
+        x: 44,
+        y: 690,
+        font: bold,
+        size: 11,
+        color: rgb(0.05, 0.12, 0.22),
+      },
+    );
     page.drawText(`USD ${(totalCents / 100).toFixed(2)}`, {
       x: 470,
       y: 690,
@@ -716,6 +736,42 @@ export class ReportsService {
       color: rgb(0.02, 0.36, 0.61),
     });
     return page;
+  }
+
+  private async loadUniversalLogo(document: PDFDocument) {
+    try {
+      const response = await fetch(
+        process.env.UNIVERSAL_LOGO_URL ??
+          'https://uckg-donations-web.vercel.app/universal-logo.png',
+        { signal: AbortSignal.timeout(3000) },
+      );
+      if (!response.ok) return null;
+      return await document.embedPng(await response.arrayBuffer());
+    } catch {
+      return null;
+    }
+  }
+
+  private drawUniversalLogo(
+    page: PDFPage,
+    logo: PDFImage | null,
+    x: number,
+    y: number,
+    size: number,
+  ) {
+    if (!logo) return;
+    const dimensions = logo.scaleToFit(size, size);
+    page.drawImage(logo, {
+      x: x + (size - dimensions.width) / 2,
+      y: y + (size - dimensions.height) / 2,
+      width: dimensions.width,
+      height: dimensions.height,
+    });
+  }
+
+  private formatDate(date: string) {
+    const [year, month, day] = date.split('-');
+    return year && month && day ? `${month}/${day}/${year}` : date;
   }
 
   private memberTotals(items: DonationItem[]) {
