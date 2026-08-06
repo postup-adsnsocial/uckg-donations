@@ -206,7 +206,7 @@ export class ReportsService {
       logo,
       total,
     );
-    let y = 655;
+    let y = 625;
 
     if (reportType === 'detailed') {
       for (const item of items) {
@@ -222,7 +222,7 @@ export class ReportsService {
             logo,
             total,
           );
-          y = 655;
+          y = 625;
         }
         page.drawRectangle({
           x: 42,
@@ -313,7 +313,7 @@ export class ReportsService {
             logo,
             total,
           );
-          y = 655;
+          y = 625;
         }
         page.drawText(this.clean(row.label).slice(0, 55), {
           x: 52,
@@ -398,22 +398,29 @@ export class ReportsService {
       const page = document.addPage([792, 612]);
       page.drawRectangle({
         x: 0,
-        y: 540,
+        y: 570,
         width: 792,
-        height: 72,
+        height: 42,
+        color: rgb(1, 1, 1),
+      });
+      this.drawUniversalLogo(page, logo, 28, 576, 210, 28);
+      page.drawRectangle({
+        x: 0,
+        y: 520,
+        width: 792,
+        height: 50,
         color: rgb(0.01, 0.19, 0.32),
       });
-      this.drawUniversalLogo(page, logo, 742, 558, 30);
-      page.drawText('UNIVERSAL  |  ANNUAL DONOR REPORT', {
+      page.drawText('ANNUAL DONOR REPORT', {
         x: 28,
-        y: 578,
+        y: 547,
         font: bold,
         size: 15,
         color: rgb(1, 1, 1),
       });
       page.drawText(this.clean(churchName), {
         x: 28,
-        y: 557,
+        y: 530,
         font: regular,
         size: 10,
         color: rgb(0.78, 0.88, 0.94),
@@ -422,7 +429,7 @@ export class ReportsService {
         `${this.formatDate(startDate)} to ${this.formatDate(endDate)}`,
         {
           x: 28,
-          y: 520,
+          y: 500,
           font: bold,
           size: 9,
           color: rgb(0.05, 0.12, 0.22),
@@ -430,21 +437,21 @@ export class ReportsService {
       );
       page.drawText(`USD ${(totalCents / 100).toFixed(2)}`, {
         x: 688,
-        y: 520,
+        y: 500,
         font: bold,
         size: 9,
         color: rgb(0.02, 0.36, 0.61),
       });
       page.drawRectangle({
         x: startX,
-        y: 484,
+        y: 462,
         width: tableWidth,
         height: 24,
         color: rgb(0.9, 0.95, 0.98),
       });
       page.drawText('DONOR', {
         x: startX + 6,
-        y: 492,
+        y: 470,
         font: bold,
         size: 7,
         color: rgb(0.02, 0.28, 0.5),
@@ -452,7 +459,7 @@ export class ReportsService {
       monthLabels.forEach((label, index) => {
         page.drawText(label, {
           x: startX + nameWidth + index * monthWidth + 13,
-          y: 492,
+          y: 470,
           font: bold,
           size: 6.5,
           color: rgb(0.02, 0.28, 0.5),
@@ -460,7 +467,7 @@ export class ReportsService {
       });
       page.drawText('TOTAL', {
         x: startX + nameWidth + monthWidth * 12 + 22,
-        y: 492,
+        y: 470,
         font: bold,
         size: 7,
         color: rgb(0.02, 0.28, 0.5),
@@ -469,7 +476,7 @@ export class ReportsService {
     };
 
     let page = addAnnualPage();
-    let y = 466;
+    let y = 444;
     const monthlyGrandTotals = Array.from({ length: 12 }, () => 0);
     rows.forEach((row) =>
       row.months.forEach((amount, month) => {
@@ -489,7 +496,7 @@ export class ReportsService {
     displayRows.forEach((row, index) => {
       if (y < 34) {
         page = addAnnualPage();
-        y = 466;
+        y = 444;
       }
       if (row.totalRow || index % 2 === 0) {
         page.drawRectangle({
@@ -614,12 +621,12 @@ export class ReportsService {
     );
     page.drawText('ENVELOPE IMAGES', {
       x: 48,
-      y: 650,
+      y: 630,
       font: bold,
       size: 12,
       color: rgb(0.02, 0.28, 0.5),
     });
-    let y = 610;
+    let y = 590;
 
     if (!itemsWithImages.length) {
       page.drawText('No envelope images in this period.', {
@@ -646,12 +653,12 @@ export class ReportsService {
         );
         page.drawText('ENVELOPE IMAGES', {
           x: 48,
-          y: 650,
+          y: 630,
           font: bold,
           size: 12,
           color: rgb(0.02, 0.28, 0.5),
         });
-        y = 610;
+        y = 590;
       }
 
       page.drawText(
@@ -706,22 +713,29 @@ export class ReportsService {
     const page = document.addPage([612, 792]);
     page.drawRectangle({
       x: 0,
-      y: 720,
+      y: 742,
       width: 612,
-      height: 72,
+      height: 50,
+      color: rgb(1, 1, 1),
+    });
+    this.drawUniversalLogo(page, logo, 44, 750, 250, 32);
+    page.drawRectangle({
+      x: 0,
+      y: 682,
+      width: 612,
+      height: 60,
       color: rgb(0.01, 0.19, 0.32),
     });
-    this.drawUniversalLogo(page, logo, 558, 738, 30);
-    page.drawText('UNIVERSAL  |  DONATIONS REPORT', {
+    page.drawText('DONATIONS REPORT', {
       x: 44,
-      y: 758,
+      y: 710,
       font: bold,
       size: 15,
       color: rgb(1, 1, 1),
     });
     page.drawText(this.clean(churchName), {
       x: 44,
-      y: 737,
+      y: 692,
       font: regular,
       size: 10,
       color: rgb(0.78, 0.88, 0.94),
@@ -730,7 +744,7 @@ export class ReportsService {
       `${this.formatDate(startDate)} to ${this.formatDate(endDate)}`,
       {
         x: 44,
-        y: 690,
+        y: 662,
         font: bold,
         size: 11,
         color: rgb(0.05, 0.12, 0.22),
@@ -738,7 +752,7 @@ export class ReportsService {
     );
     page.drawText(`USD ${(totalCents / 100).toFixed(2)}`, {
       x: 470,
-      y: 690,
+      y: 662,
       font: bold,
       size: 11,
       color: rgb(0.02, 0.36, 0.61),
@@ -750,7 +764,7 @@ export class ReportsService {
     try {
       const response = await fetch(
         process.env.UNIVERSAL_LOGO_URL ??
-          'https://uckg-donations-web.vercel.app/universal-logo.png',
+          'https://uckg-donations-web.vercel.app/universal-report-logo.png',
         { signal: AbortSignal.timeout(3000) },
       );
       if (!response.ok) return null;
@@ -765,13 +779,14 @@ export class ReportsService {
     logo: PDFImage | null,
     x: number,
     y: number,
-    size: number,
+    maxWidth: number,
+    maxHeight: number,
   ) {
     if (!logo) return;
-    const dimensions = logo.scaleToFit(size, size);
+    const dimensions = logo.scaleToFit(maxWidth, maxHeight);
     page.drawImage(logo, {
-      x: x + (size - dimensions.width) / 2,
-      y: y + (size - dimensions.height) / 2,
+      x,
+      y,
       width: dimensions.width,
       height: dimensions.height,
     });
