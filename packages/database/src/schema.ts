@@ -110,7 +110,6 @@ export const churchMemberships = pgTable(
       .notNull()
       .references(() => adminUsers.id, { onDelete: 'cascade' }),
     role: churchRole('role').notNull(),
-    status: adminUserStatus('status').notNull().default('active'),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
       .defaultNow(),

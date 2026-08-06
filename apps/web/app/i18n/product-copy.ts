@@ -303,8 +303,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       disabled: 'Acesso suspenso',
       email: 'E-mail de acesso',
       empty: 'Nenhum usuário cadastrado nesta igreja.',
-      error:
-        'Não foi possível cadastrar o usuário. O e-mail pode já estar em uso.',
+      error: 'Não foi possível cadastrar o usuário. Tente novamente.',
       financialOperator: 'Operação financeira',
       intro:
         'Crie acessos e defina o que cada usuário pode fazer nesta igreja.',
@@ -560,7 +559,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       disabled: 'Access suspended',
       email: 'Login email',
       empty: 'No users have been created for this church.',
-      error: 'The user could not be created. The email may already be in use.',
+      error: 'The user could not be created. Please try again.',
       financialOperator: 'Financial operations',
       intro: 'Create access and define what each user can do in this church.',
       listTitle: 'Users in this church',
@@ -813,8 +812,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       disabled: 'Acceso suspendido',
       email: 'Correo de acceso',
       empty: 'No hay usuarios registrados en esta iglesia.',
-      error:
-        'No fue posible registrar el usuario. El correo puede estar en uso.',
+      error: 'No fue posible registrar el usuario. Inténtalo de nuevo.',
       financialOperator: 'Operación financiera',
       intro:
         'Crea accesos y define qué puede hacer cada usuario en esta iglesia.',

@@ -93,7 +93,7 @@ try {
       .insert(schema.churchMemberships)
       .values({ churchId: church.id, role, userId: user.id })
       .onConflictDoUpdate({
-        set: { role, status: 'active', updatedAt: new Date() },
+        set: { role, updatedAt: new Date() },
         target: [
           schema.churchMemberships.churchId,
           schema.churchMemberships.userId,
