@@ -210,7 +210,7 @@ export class ReportsService {
 
     if (reportType === 'detailed') {
       for (const item of items) {
-        const cardHeight = includeImages ? (item.envelope ? 280 : 110) : 92;
+        const cardHeight = includeImages ? (item.envelope ? 280 : 128) : 110;
         if (y - cardHeight < 70) {
           page = this.addPage(
             document,
@@ -250,9 +250,16 @@ export class ReportsService {
             color: rgb(0.24, 0.31, 0.42),
           },
         );
-        page.drawText(`Operator: ${this.clean(item.operatorName)}`, {
+        page.drawText(`Church: ${this.clean(churchName)}`, {
           x: 56,
           y: y - 49,
+          font: regular,
+          size: 8,
+          color: rgb(0.38, 0.44, 0.53),
+        });
+        page.drawText(`Operator: ${this.clean(item.operatorName)}`, {
+          x: 56,
+          y: y - 67,
           font: regular,
           size: 8,
           color: rgb(0.38, 0.44, 0.53),
@@ -260,7 +267,7 @@ export class ReportsService {
         if (item.notes)
           page.drawText(this.clean(item.notes).slice(0, 62), {
             x: 56,
-            y: y - 67,
+            y: y - 85,
             font: regular,
             size: 8,
             color: rgb(0.38, 0.44, 0.53),
@@ -301,6 +308,14 @@ export class ReportsService {
         { x: 48, y, font: bold, size: 12, color: rgb(0.02, 0.28, 0.5) },
       );
       y -= 30;
+      const isMemberTotals = reportType === 'member_totals';
+      if (isMemberTotals) {
+        page.drawText('MEMBER', { x: 52, y, font: bold, size: 8 });
+        page.drawText('CHURCH', { x: 250, y, font: bold, size: 8 });
+        page.drawText('COUNT', { x: 430, y, font: bold, size: 8 });
+        page.drawText('TOTAL', { x: 485, y, font: bold, size: 8 });
+        y -= 20;
+      }
       for (const row of rows) {
         if (y < 70) {
           page = this.addPage(
@@ -314,22 +329,41 @@ export class ReportsService {
             total,
           );
           y = 625;
+          if (isMemberTotals) {
+            page.drawText('MEMBER', { x: 52, y, font: bold, size: 8 });
+            page.drawText('CHURCH', { x: 250, y, font: bold, size: 8 });
+            page.drawText('COUNT', { x: 430, y, font: bold, size: 8 });
+            page.drawText('TOTAL', { x: 485, y, font: bold, size: 8 });
+            y -= 20;
+          }
         }
-        page.drawText(this.clean(row.label).slice(0, 55), {
-          x: 52,
-          y,
-          font: regular,
-          size: 10,
-          color: rgb(0.05, 0.12, 0.22),
-        });
+        page.drawText(
+          this.clean(row.label).slice(0, isMemberTotals ? 30 : 55),
+          {
+            x: 52,
+            y,
+            font: regular,
+            size: 10,
+            color: rgb(0.05, 0.12, 0.22),
+          },
+        );
+        if (isMemberTotals) {
+          page.drawText(this.clean(churchName).slice(0, 25), {
+            x: 250,
+            y,
+            font: regular,
+            size: 9,
+            color: rgb(0.05, 0.12, 0.22),
+          });
+        }
         page.drawText(String(row.count), {
-          x: 410,
+          x: isMemberTotals ? 430 : 410,
           y,
           font: regular,
           size: 10,
         });
         page.drawText(`USD ${(row.totalCents / 100).toFixed(2)}`, {
-          x: 470,
+          x: isMemberTotals ? 485 : 470,
           y,
           font: bold,
           size: 10,
@@ -389,10 +423,11 @@ export class ReportsService {
       'DEC',
     ];
     const startX = 24;
-    const nameWidth = 150;
-    const monthWidth = 43;
-    const totalWidth = 76;
-    const tableWidth = nameWidth + monthWidth * 12 + totalWidth;
+    const nameWidth = 120;
+    const churchWidth = 80;
+    const monthWidth = 39;
+    const totalWidth = 70;
+    const tableWidth = nameWidth + churchWidth + monthWidth * 12 + totalWidth;
 
     const addAnnualPage = () => {
       const page = document.addPage([792, 612]);
@@ -456,9 +491,16 @@ export class ReportsService {
         size: 7,
         color: rgb(0.02, 0.28, 0.5),
       });
+      page.drawText('CHURCH', {
+        x: startX + nameWidth + 6,
+        y: 470,
+        font: bold,
+        size: 6.5,
+        color: rgb(0.02, 0.28, 0.5),
+      });
       monthLabels.forEach((label, index) => {
         page.drawText(label, {
-          x: startX + nameWidth + index * monthWidth + 13,
+          x: startX + nameWidth + churchWidth + index * monthWidth + 11,
           y: 470,
           font: bold,
           size: 6.5,
@@ -466,7 +508,7 @@ export class ReportsService {
         });
       });
       page.drawText('TOTAL', {
-        x: startX + nameWidth + monthWidth * 12 + 22,
+        x: startX + nameWidth + churchWidth + monthWidth * 12 + 18,
         y: 470,
         font: bold,
         size: 7,
@@ -484,8 +526,9 @@ export class ReportsService {
       }),
     );
     const displayRows = [
-      ...rows.map((row) => ({ ...row, totalRow: false })),
+      ...rows.map((row) => ({ ...row, churchName, totalRow: false })),
       {
+        churchName: '',
         label: 'TOTAL',
         months: monthlyGrandTotals,
         totalCents,
@@ -508,11 +551,18 @@ export class ReportsService {
         });
       }
       const rowFont = row.totalRow ? bold : regular;
-      page.drawText(this.clean(row.label).slice(0, 29), {
+      page.drawText(this.clean(row.label).slice(0, 21), {
         x: startX + 6,
         y,
         font: rowFont,
         size: 7.2,
+        color: rgb(0.05, 0.12, 0.22),
+      });
+      page.drawText(this.clean(row.churchName).slice(0, 14), {
+        x: startX + nameWidth + 6,
+        y,
+        font: rowFont,
+        size: 6.3,
         color: rgb(0.05, 0.12, 0.22),
       });
       row.months.forEach((amount, month) => {
@@ -522,6 +572,7 @@ export class ReportsService {
           x:
             startX +
             nameWidth +
+            churchWidth +
             month * monthWidth +
             monthWidth -
             textWidth -
