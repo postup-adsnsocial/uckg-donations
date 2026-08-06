@@ -14,6 +14,58 @@ export const loginRequestSchema = z.object({
 
 export type LoginRequest = z.infer<typeof loginRequestSchema>;
 
+export const churchRoleSchema = z.enum([
+  'church_admin',
+  'financial_operator',
+  'auditor',
+]);
+
+export const createAdminUserRequestSchema = z
+  .object({
+    displayName: z.string().trim().min(2).max(160),
+    email: z.string().trim().toLowerCase().email().max(320),
+    password: z.string().min(6).max(128),
+    role: churchRoleSchema,
+  })
+  .strict();
+
+export type CreateAdminUserRequest = z.infer<
+  typeof createAdminUserRequestSchema
+>;
+
+export const updateAdminUserRequestSchema = z
+  .object({
+    role: churchRoleSchema,
+    status: z.enum(['active', 'disabled']),
+  })
+  .strict();
+
+export type UpdateAdminUserRequest = z.infer<
+  typeof updateAdminUserRequestSchema
+>;
+
+export const updateProfileRequestSchema = z
+  .object({
+    displayName: z.string().trim().min(2).max(160),
+    email: z.string().trim().toLowerCase().email().max(320),
+  })
+  .strict();
+
+export type UpdateProfileRequest = z.infer<typeof updateProfileRequestSchema>;
+
+export const changePasswordRequestSchema = z
+  .object({
+    currentPassword: z.string().min(1).max(128),
+    newPassword: z.string().min(6).max(128),
+  })
+  .strict()
+  .refine((input) => input.currentPassword !== input.newPassword, {
+    message: 'The new password must be different from the current password.',
+    path: ['newPassword'],
+  });
+
+export type ChangePasswordRequest = z.infer<typeof changePasswordRequestSchema>;
+
 export const churchIdSchema = z.string().uuid();
 
 export const createChurchRequestSchema = z

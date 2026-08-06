@@ -22,6 +22,7 @@ import { ChurchesService } from '../churches/churches.service.js';
 import { MembersService } from '../members/members.service.js';
 import { DonationsService } from '../donations/donations.service.js';
 import { ReportsService } from '../reports/reports.service.js';
+import { UsersService } from '../users/users.service.js';
 import { requiredPermissionsKey } from './permissions.decorator.js';
 import { churchPermissions } from './permissions.guard.js';
 import {
@@ -73,6 +74,7 @@ const registeredControllers = collectControllers(AppModule);
     { provide: MembersService, useValue: {} },
     { provide: DonationsService, useValue: {} },
     { provide: ReportsService, useValue: {} },
+    { provide: UsersService, useValue: {} },
     { provide: TenantService, useValue: {} },
   ],
 })
@@ -140,9 +142,11 @@ describe('route policy inventory', () => {
 
   it('discovers every registered HTTP handler', () => {
     expect(routes.map(({ label }) => label).sort()).toEqual([
+      'AuthController.changePassword',
       'AuthController.login',
       'AuthController.logout',
       'AuthController.me',
+      'AuthController.updateProfile',
       'ChurchesController.create',
       'ChurchesController.current',
       'ChurchesController.delete',
@@ -163,6 +167,9 @@ describe('route policy inventory', () => {
       'ReportsController.get',
       'ReportsController.list',
       'ReportsController.pdf',
+      'UsersController.create',
+      'UsersController.list',
+      'UsersController.update',
     ]);
   });
 

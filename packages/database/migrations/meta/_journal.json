@@ -71,6 +71,20 @@
       "when": 1785880800000,
       "tag": "0009_churches_runtime_update",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1785891600000,
+      "tag": "0010_annual_members_report",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1785978000000,
+      "tag": "0011_user_management",
+      "breakpoints": true
     }
   ]
 }

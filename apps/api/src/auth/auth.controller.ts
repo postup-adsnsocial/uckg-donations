@@ -4,11 +4,16 @@ import {
   Controller,
   Get,
   Inject,
+  Patch,
   Post,
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { loginRequestSchema } from '@uckg/contracts';
+import {
+  changePasswordRequestSchema,
+  loginRequestSchema,
+  updateProfileRequestSchema,
+} from '@uckg/contracts';
 import type { Response } from 'express';
 
 import { AuthService } from './auth.service.js';
@@ -84,5 +89,42 @@ export class AuthController {
       memberships: await this.authService.listMemberships(user.id),
       user,
     };
+  }
+
+  @Patch('me')
+  @IdentityRoute()
+  @UseGuards(SessionAuthGuard)
+  updateProfile(
+    @CurrentUser() user: AuthenticatedAdmin,
+    @Body() body: unknown,
+  ) {
+    const parsed = updateProfileRequestSchema.safeParse(body);
+    if (!parsed.success) {
+      throw new BadRequestException('Valid profile data is required.');
+    }
+    return this.authService.updateProfile(user.id, parsed.data);
+  }
+
+  @Patch('me/password')
+  @IdentityRoute()
+  @UseGuards(SessionAuthGuard)
+  async changePassword(
+    @CurrentUser() user: AuthenticatedAdmin,
+    @Body() body: unknown,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const parsed = changePasswordRequestSchema.safeParse(body);
+    if (!parsed.success) {
+      throw new BadRequestException('Valid password data is required.');
+    }
+
+    await this.authService.changePassword(user.id, parsed.data);
+    response.clearCookie(sessionCookieName, {
+      httpOnly: true,
+      path: '/',
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+    });
+    return { loginRequired: true };
   }
 }

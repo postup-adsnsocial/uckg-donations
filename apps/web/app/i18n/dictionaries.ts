@@ -32,8 +32,10 @@ export interface Dictionary {
       launch: string;
       members: string;
       overview: string;
+      profile: string;
       reports: string;
       soon: string;
+      users: string;
     };
     nextModule: string;
     plannedStatus: string;
@@ -146,8 +148,10 @@ export const dictionaries: Record<Locale, Dictionary> = {
         launch: 'Lançar',
         members: 'Membros',
         overview: 'Visão geral',
+        profile: 'Meu perfil',
         reports: 'Relatórios',
         soon: 'Em breve',
+        users: 'Usuários',
       },
       nextModule: 'Próximo módulo',
       plannedStatus: 'Planejado',
@@ -261,8 +265,10 @@ export const dictionaries: Record<Locale, Dictionary> = {
         launch: 'Record',
         members: 'Members',
         overview: 'Overview',
+        profile: 'My profile',
         reports: 'Reports',
         soon: 'Coming soon',
+        users: 'Users',
       },
       nextModule: 'Next module',
       plannedStatus: 'Planned',
@@ -377,8 +383,10 @@ export const dictionaries: Record<Locale, Dictionary> = {
         launch: 'Registrar',
         members: 'Miembros',
         overview: 'Vista general',
+        profile: 'Mi perfil',
         reports: 'Informes',
         soon: 'Próximamente',
+        users: 'Usuarios',
       },
       nextModule: 'Próximo módulo',
       plannedStatus: 'Planificado',

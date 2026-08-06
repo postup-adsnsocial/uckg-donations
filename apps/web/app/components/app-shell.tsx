@@ -40,8 +40,14 @@ interface AppShellProps {
     | 'envelopes'
     | 'launch'
     | 'members'
-    | 'reports';
-  children: (context: { church: AppChurch; user: AppUser }) => ReactNode;
+    | 'profile'
+    | 'reports'
+    | 'users';
+  children: (context: {
+    canManageUsers: boolean;
+    church: AppChurch;
+    user: AppUser;
+  }) => ReactNode;
   locale: Locale;
 }
 
@@ -163,6 +169,14 @@ export function AppShell({ active, children, locale }: AppShellProps) {
     };
   }, [refreshPlatformChurches, selectedChurchId, user?.isPlatformAdmin]);
 
+  useEffect(() => {
+    const updateUser = (event: Event) => {
+      setUser((event as CustomEvent<AppUser>).detail);
+    };
+    window.addEventListener('uckg:user-changed', updateUser);
+    return () => window.removeEventListener('uckg:user-changed', updateUser);
+  }, []);
+
   async function logout() {
     await apiRequest('/auth/logout', { method: 'POST' });
     localStorage.removeItem('uckg_selected_church');
@@ -223,6 +237,18 @@ export function AppShell({ active, children, locale }: AppShellProps) {
             id: 'churches' as const,
             label: copy.navigation.churches,
             path: 'churches',
+          },
+        ]
+      : []),
+    ...(user.isPlatformAdmin ||
+    memberships.find((item) => item.churchId === selectedChurchId)?.role ===
+      'church_admin'
+      ? [
+          {
+            icon: 'users' as const,
+            id: 'users' as const,
+            label: copy.navigation.users,
+            path: 'users',
           },
         ]
       : []),
@@ -303,13 +329,17 @@ export function AppShell({ active, children, locale }: AppShellProps) {
                 </select>
               </label>
             ) : null}
-            <div className="user-chip">
+            <Link
+              aria-label={copy.navigation.profile}
+              className={`user-chip ${active === 'profile' ? 'user-chip--active' : ''}`}
+              href={`/${locale}/profile`}
+            >
               <span>{initials}</span>
               <div>
                 <strong>{user.displayName}</strong>
                 <small>{user.email}</small>
               </div>
-            </div>
+            </Link>
           </div>
         </header>
         <nav className="mobile-product-nav" aria-label={copy.adminPanel}>
@@ -324,7 +354,16 @@ export function AppShell({ active, children, locale }: AppShellProps) {
             </Link>
           ))}
         </nav>
-        <div className="product-page">{children({ church, user })}</div>
+        <div className="product-page">
+          {children({
+            canManageUsers:
+              user.isPlatformAdmin ||
+              memberships.find((item) => item.churchId === selectedChurchId)
+                ?.role === 'church_admin',
+            church,
+            user,
+          })}
+        </div>
       </section>
     </main>
   );

@@ -9,6 +9,7 @@ import { HealthController } from './health/health.controller.js';
 import { MembersModule } from './members/members.module.js';
 import { ReportsModule } from './reports/reports.module.js';
 import { TenancyModule } from './tenancy/tenancy.module.js';
+import { UsersModule } from './users/users.module.js';
 
 @Module({
   controllers: [HealthController],
@@ -21,6 +22,7 @@ import { TenancyModule } from './tenancy/tenancy.module.js';
     MembersModule,
     DonationsModule,
     ReportsModule,
+    UsersModule,
   ],
 })
 export class AppModule {}

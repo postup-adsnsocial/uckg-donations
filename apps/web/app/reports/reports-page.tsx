@@ -1,12 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 
 import { AppShell, type AppChurch } from '../components/app-shell';
 import { type EnvelopeRecord, formatMoney } from '../envelopes/types';
 import type { Locale } from '../i18n/config';
 import { productCopies } from '../i18n/product-copy';
 import { apiRequest } from '../lib/api';
+import type { MemberRecord } from '../members/types';
 
 interface ReportRecord {
   createdAt: string;
@@ -24,22 +25,35 @@ interface ReportDownload {
   url: string;
 }
 
-type ReportType = 'detailed' | 'member_totals' | 'payment_methods';
+type ReportType =
+  | 'annual_members'
+  | 'detailed'
+  | 'member_totals'
+  | 'payment_methods';
 type PeriodPreset =
   | 'custom'
   | 'last30'
   | 'lastMonth'
   | 'month'
   | 'thisMonth'
-  | 'thisYear';
+  | 'thisYear'
+  | 'year';
+type PeriodMode = 'custom' | 'month' | 'year';
 
 const reportTypes: ReportType[] = [
   'detailed',
+  'annual_members',
   'member_totals',
-  'payment_methods',
 ];
 
 function ReportTypeIcon({ type }: { type: ReportType }) {
+  if (type === 'annual_members')
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <rect x="3" y="4" width="18" height="16" rx="2" />
+        <path d="M3 9h18M9 9v11M15 9v11M9 14h12M6 6.5h.01M10 6.5h.01" />
+      </svg>
+    );
   if (type === 'member_totals')
     return (
       <svg aria-hidden="true" viewBox="0 0 24 24">
@@ -69,6 +83,220 @@ function ImageIcon() {
       <circle cx="8.5" cy="9" r="1.5" />
       <path d="m5 18 4.7-4.7 3.1 3.1 2.4-2.4 3.8 4" />
     </svg>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24">
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="m15.5 15.5 5 5" />
+    </svg>
+  );
+}
+
+function ReportMemberCombobox({
+  churchId,
+  labels,
+  onChange,
+  selectedMember,
+}: {
+  churchId: string;
+  labels: {
+    all: string;
+    empty: string;
+    label: string;
+    loading: string;
+    search: string;
+  };
+  onChange: (member: MemberRecord | null) => void;
+  selectedMember: MemberRecord | null;
+}) {
+  const inputId = useId();
+  const listboxId = useId();
+  const [query, setQuery] = useState(selectedMember?.fullName ?? '');
+  const [members, setMembers] = useState<MemberRecord[]>([]);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const options: Array<MemberRecord | null> = [null, ...members];
+
+  useEffect(() => {
+    if (selectedMember) return;
+    const controller = new AbortController();
+    let active = true;
+    const timer = window.setTimeout(
+      () => {
+        const params = new URLSearchParams({
+          page: '1',
+          pageSize: '20',
+          status: 'active',
+        });
+        if (query.trim()) params.set('search', query.trim());
+        setLoading(true);
+        void apiRequest(`/members?${params}`, {
+          headers: { 'x-church-id': churchId },
+          signal: controller.signal,
+        })
+          .then(async (response) => {
+            if (!response.ok || !active) return;
+            const result = (await response.json()) as {
+              items: MemberRecord[];
+            };
+            if (!active) return;
+            setMembers(result.items);
+            setActiveIndex(0);
+          })
+          .catch(() => undefined)
+          .finally(() => {
+            if (active) setLoading(false);
+          });
+      },
+      query ? 220 : 0,
+    );
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [churchId, query, selectedMember]);
+
+  function choose(member: MemberRecord | null) {
+    onChange(member);
+    setQuery(member?.fullName ?? '');
+    setOpen(false);
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Escape') {
+      setOpen(false);
+      return;
+    }
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      setOpen(true);
+      setActiveIndex((current) => {
+        const direction = event.key === 'ArrowDown' ? 1 : -1;
+        return Math.min(
+          Math.max(current + direction, 0),
+          Math.max(options.length - 1, 0),
+        );
+      });
+      return;
+    }
+    if (event.key === 'Enter' && open) {
+      event.preventDefault();
+      choose(options[activeIndex] ?? null);
+    }
+  }
+
+  return (
+    <div className="report-member-combobox member-combobox">
+      <label id={`${inputId}-label`} htmlFor={inputId}>
+        {labels.label}
+      </label>
+      <div
+        className="member-combobox__control"
+        onBlur={(event) => {
+          if (event.currentTarget.contains(event.relatedTarget)) return;
+          setOpen(false);
+          if (!selectedMember) setQuery('');
+        }}
+      >
+        <span className="member-combobox__search-icon">
+          <SearchIcon />
+        </span>
+        <input
+          aria-activedescendant={
+            open ? `${listboxId}-option-${activeIndex}` : undefined
+          }
+          aria-autocomplete="list"
+          aria-controls={listboxId}
+          aria-expanded={open}
+          aria-labelledby={`${inputId}-label`}
+          autoComplete="off"
+          id={inputId}
+          placeholder={labels.search}
+          role="combobox"
+          type="search"
+          value={query}
+          onChange={(event) => {
+            onChange(null);
+            setQuery(event.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => setOpen(true)}
+          onKeyDown={handleKeyDown}
+        />
+        {selectedMember ? (
+          <button
+            aria-label={labels.all}
+            className="member-combobox__clear"
+            type="button"
+            onClick={() => choose(null)}
+          >
+            ×
+          </button>
+        ) : null}
+        {open ? (
+          <div
+            aria-label={labels.label}
+            className="member-combobox__options"
+            id={listboxId}
+            role="listbox"
+          >
+            <button
+              aria-selected={!selectedMember}
+              className={activeIndex === 0 ? 'is-active' : undefined}
+              id={`${listboxId}-option-0`}
+              role="option"
+              type="button"
+              onClick={() => choose(null)}
+              onMouseEnter={() => setActiveIndex(0)}
+            >
+              <span className="member-combobox__avatar">T</span>
+              <span>
+                <strong>{labels.all}</strong>
+              </span>
+              {!selectedMember ? <span aria-hidden="true">✓</span> : null}
+            </button>
+            {loading ? (
+              <p className="member-combobox__message">{labels.loading}</p>
+            ) : members.length ? (
+              members.map((member, index) => (
+                <button
+                  aria-selected={selectedMember?.id === member.id}
+                  className={
+                    activeIndex === index + 1 ? 'is-active' : undefined
+                  }
+                  id={`${listboxId}-option-${index + 1}`}
+                  key={member.id}
+                  role="option"
+                  type="button"
+                  onClick={() => choose(member)}
+                  onMouseEnter={() => setActiveIndex(index + 1)}
+                >
+                  <span className="member-combobox__avatar">
+                    {member.fullName.slice(0, 1).toLocaleUpperCase()}
+                  </span>
+                  <span>
+                    <strong>{member.fullName}</strong>
+                    {member.email || member.phone ? (
+                      <small>{member.email ?? member.phone}</small>
+                    ) : null}
+                  </span>
+                  {selectedMember?.id === member.id ? (
+                    <span aria-hidden="true">✓</span>
+                  ) : null}
+                </button>
+              ))
+            ) : query.trim() ? (
+              <p className="member-combobox__message">{labels.empty}</p>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+    </div>
   );
 }
 
@@ -123,8 +351,16 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
   const [endDate, setEndDate] = useState(formatDate(now));
   const [reportType, setReportType] = useState<ReportType>('detailed');
   const [includeImages, setIncludeImages] = useState(false);
-  const [periodPreset, setPeriodPreset] = useState<PeriodPreset>('thisMonth');
+  const [periodPreset, setPeriodPreset] = useState<PeriodPreset>('custom');
+  const [periodMode, setPeriodMode] = useState<PeriodMode>('custom');
   const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+  const [yearDraft, setYearDraft] = useState(String(now.getFullYear()));
+  const [monthDraft, setMonthDraft] = useState(
+    `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`,
+  );
+  const [selectedMember, setSelectedMember] = useState<MemberRecord | null>(
+    null,
+  );
   const [items, setItems] = useState<EnvelopeRecord[]>([]);
   const [hasGenerated, setHasGenerated] = useState(false);
   const [archive, setArchive] = useState<ReportRecord[]>([]);
@@ -154,14 +390,19 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
   }, [loadArchive]);
 
   useEffect(() => {
+    setSelectedMember(null);
+  }, [church.id]);
+
+  useEffect(() => {
     setItems([]);
     setHasGenerated(false);
-  }, [church.id, endDate, startDate]);
+  }, [church.id, endDate, selectedMember, startDate]);
 
   async function generate(event: React.FormEvent) {
     event.preventDefault();
     setLoading(true);
     const params = new URLSearchParams({ endDate, startDate });
+    if (selectedMember) params.set('memberId', selectedMember.id);
     const response = await apiRequest(`/donations?${params}`, {
       headers: { 'x-church-id': church.id },
     });
@@ -182,6 +423,7 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
       reportType,
       startDate,
     });
+    if (selectedMember) params.set('memberId', selectedMember.id);
     try {
       const response = await apiRequest(`/reports/pdf?${params}`, {
         headers: { 'x-church-id': church.id },
@@ -200,7 +442,10 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
 
   function choosePeriod(preset: PeriodPreset) {
     setPeriodPreset(preset);
-    if (preset === 'custom' || preset === 'month') return;
+    if (preset === 'custom' || preset === 'month') {
+      if (preset === 'custom') setPeriodMode('custom');
+      return;
+    }
     const today = new Date();
     let start = new Date(today.getFullYear(), today.getMonth(), 1);
     let end = today;
@@ -215,9 +460,49 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
       end = new Date(today.getFullYear(), today.getMonth(), 0);
     }
     if (preset === 'thisYear') start = new Date(today.getFullYear(), 0, 1);
+    if (preset === 'thisYear') setPeriodMode('year');
+    else if (preset === 'thisMonth' || preset === 'lastMonth')
+      setPeriodMode('month');
+    else setPeriodMode('custom');
     setSelectedYear(start.getFullYear());
+    setYearDraft(String(start.getFullYear()));
+    setMonthDraft(
+      `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}`,
+    );
     setStartDate(formatDate(start));
     setEndDate(formatDate(end));
+  }
+
+  function chooseReportType(type: ReportType) {
+    setReportType(type);
+    if (type === 'annual_members') {
+      setSelectedMember(null);
+      setIncludeImages(false);
+      applyYear(selectedYear);
+    }
+  }
+
+  function applyYear(year: number) {
+    const nextYear = Math.min(now.getFullYear(), Math.max(1900, year));
+    const start = new Date(nextYear, 0, 1);
+    const end =
+      nextYear === now.getFullYear() ? now : new Date(nextYear, 11, 31);
+    setPeriodMode('year');
+    setPeriodPreset('year');
+    setSelectedYear(nextYear);
+    setYearDraft(String(nextYear));
+    setMonthDraft(`${nextYear}-01`);
+    setStartDate(formatDate(start));
+    setEndDate(formatDate(end));
+  }
+
+  function applyYearDraft() {
+    const parsedYear = Number(yearDraft);
+    if (Number.isInteger(parsedYear) && parsedYear >= 1900) {
+      applyYear(parsedYear);
+    } else {
+      setYearDraft(String(selectedYear));
+    }
   }
 
   function chooseMonth(month: number) {
@@ -227,6 +512,29 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
       selectedYear === now.getFullYear() && month === now.getMonth()
         ? now
         : monthEnd;
+    setPeriodMode('month');
+    setPeriodPreset('month');
+    setMonthDraft(`${selectedYear}-${String(month + 1).padStart(2, '0')}`);
+    setStartDate(formatDate(start));
+    setEndDate(formatDate(end));
+  }
+
+  function chooseMonthValue(value: string) {
+    setMonthDraft(value);
+    const match = /^(\d{4})-(\d{2})$/.exec(value);
+    if (!match) return;
+    const year = Number(match[1]);
+    const month = Number(match[2]) - 1;
+    if (year > now.getFullYear() || year < 1900 || month < 0 || month > 11)
+      return;
+    setSelectedYear(year);
+    setYearDraft(String(year));
+    const start = new Date(year, month, 1);
+    const end =
+      year === now.getFullYear() && month === now.getMonth()
+        ? now
+        : new Date(year, month + 1, 0);
+    setPeriodMode('month');
     setPeriodPreset('month');
     setStartDate(formatDate(start));
     setEndDate(formatDate(end));
@@ -264,7 +572,46 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
     method,
     items: items.filter((item) => item.paymentMethod === method),
   }));
+  const annualMemberRows = [
+    ...items
+      .reduce((map, item) => {
+        const key = item.member?.id ?? 'anonymous';
+        const current = map.get(key) ?? {
+          months: Array.from({ length: 12 }, () => 0),
+          name: item.member?.fullName ?? copy.common.anonymous,
+          totalCents: 0,
+        };
+        const month = Number(item.receivedOn.slice(5, 7)) - 1;
+        if (month >= 0 && month < 12)
+          current.months[month] =
+            (current.months[month] ?? 0) + item.amountCents;
+        current.totalCents += item.amountCents;
+        map.set(key, current);
+        return map;
+      }, new Map<string, { months: number[]; name: string; totalCents: number }>())
+      .entries(),
+  ].sort(([, a], [, b]) => a.name.localeCompare(b.name, locale));
+  const annualMonthTotals = Array.from({ length: 12 }, (_, month) =>
+    annualMemberRows.reduce(
+      (sum, [, member]) => sum + (member.months[month] ?? 0),
+      0,
+    ),
+  );
+  const shortMonthNames = useMemo(
+    () =>
+      Array.from({ length: 12 }, (_, month) =>
+        new Intl.DateTimeFormat(locale, { month: 'short' })
+          .format(new Date(2026, month, 1))
+          .replace('.', '')
+          .replace(/^./, (letter) => letter.toLocaleUpperCase(locale)),
+      ),
+    [locale],
+  );
   const typeCopy = {
+    annual_members: {
+      description: copy.reports.annualMembersDescription,
+      label: copy.reports.annualMembers,
+    },
     detailed: {
       description: copy.reports.detailedDescription,
       label: copy.reports.detailed,
@@ -289,9 +636,11 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
   const selectedPeriodLabel =
     periodPreset === 'custom'
       ? `${startDate} — ${endDate}`
-      : periodPreset === 'month'
-        ? `${monthNames[selectedMonth]} ${selectedMonthYear}`
-        : presetLabels[periodPreset];
+      : periodPreset === 'year'
+        ? String(selectedMonthYear)
+        : periodPreset === 'month'
+          ? `${monthNames[selectedMonth]} ${selectedMonthYear}`
+          : presetLabels[periodPreset];
 
   return (
     <>
@@ -329,7 +678,7 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
                   name="reportType"
                   type="radio"
                   value={type}
-                  onChange={() => setReportType(type)}
+                  onChange={() => chooseReportType(type)}
                 />
                 <span className="report-type-option__icon">
                   <ReportTypeIcon type={type} />
@@ -350,6 +699,39 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
           <header className="report-builder__section-heading">
             <span>2</span>
             <div>
+              <h3>{copy.reports.memberFilterTitle}</h3>
+              <p>{copy.reports.memberFilterDescription}</p>
+            </div>
+          </header>
+          {reportType === 'annual_members' ? (
+            <div className="report-fixed-selection">
+              <span aria-hidden="true">✓</span>
+              <div>
+                <strong>{copy.reports.allMembers}</strong>
+                <small>{copy.reports.annualMembersFilterHint}</small>
+              </div>
+            </div>
+          ) : (
+            <ReportMemberCombobox
+              churchId={church.id}
+              key={church.id}
+              labels={{
+                all: copy.reports.allMembers,
+                empty: copy.reports.memberSearchEmpty,
+                label: copy.reports.memberFilterLabel,
+                loading: copy.common.loading,
+                search: copy.reports.memberSearchPlaceholder,
+              }}
+              selectedMember={selectedMember}
+              onChange={setSelectedMember}
+            />
+          )}
+        </section>
+
+        <section className="report-builder__section">
+          <header className="report-builder__section-heading">
+            <span>3</span>
+            <div>
               <h3>{copy.reports.imagesTitle}</h3>
               <p>{copy.reports.imagesIntro}</p>
             </div>
@@ -364,6 +746,7 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
             </span>
             <input
               checked={includeImages}
+              disabled={reportType === 'annual_members'}
               type="checkbox"
               onChange={(event) => setIncludeImages(event.target.checked)}
             />
@@ -373,7 +756,7 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
 
         <section className="report-builder__section">
           <header className="report-builder__section-heading">
-            <span>3</span>
+            <span>4</span>
             <div>
               <h3>{copy.reports.periodTitle}</h3>
               <p>{copy.reports.periodDescription}</p>
@@ -388,6 +771,9 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
                   className={
                     periodPreset === preset ? 'is-selected' : undefined
                   }
+                  disabled={
+                    reportType === 'annual_members' && preset !== 'thisYear'
+                  }
                   key={preset}
                   type="button"
                   onClick={() => choosePeriod(preset)}
@@ -398,60 +784,134 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
             )}
           </div>
 
-          <div className="report-month-picker">
-            <div className="report-year-selector">
-              <button
-                aria-label={copy.reports.previousYear}
-                type="button"
-                onClick={() => setSelectedYear((year) => year - 1)}
-              >
-                ‹
-              </button>
-              <strong>{selectedYear}</strong>
-              <button
-                aria-label={copy.reports.nextYear}
-                disabled={selectedYear >= now.getFullYear()}
-                type="button"
-                onClick={() => setSelectedYear((year) => year + 1)}
-              >
-                ›
-              </button>
-            </div>
-            <div className="report-month-grid">
-              {monthNames.map((monthName, month) => {
-                const isFuture =
-                  selectedYear > now.getFullYear() ||
-                  (selectedYear === now.getFullYear() &&
-                    month > now.getMonth());
-                const isSelected =
-                  periodPreset === 'month' &&
-                  selectedMonthYear === selectedYear &&
-                  selectedMonth === month;
-                return (
-                  <button
-                    aria-pressed={isSelected}
-                    className={isSelected ? 'is-selected' : undefined}
-                    disabled={isFuture}
-                    key={monthName}
-                    type="button"
-                    onClick={() => chooseMonth(month)}
-                  >
-                    {monthName}
-                  </button>
-                );
-              })}
-            </div>
+          <div className="report-period-modes" role="tablist">
+            <button
+              aria-selected={periodMode === 'year'}
+              className={periodMode === 'year' ? 'is-selected' : undefined}
+              role="tab"
+              type="button"
+              onClick={() => setPeriodMode('year')}
+            >
+              <strong>{copy.reports.yearMode}</strong>
+              <small>{copy.reports.yearModeHint}</small>
+            </button>
+            <button
+              aria-selected={periodMode === 'month'}
+              className={periodMode === 'month' ? 'is-selected' : undefined}
+              disabled={reportType === 'annual_members'}
+              role="tab"
+              type="button"
+              onClick={() => setPeriodMode('month')}
+            >
+              <strong>{copy.reports.monthMode}</strong>
+              <small>{copy.reports.monthModeHint}</small>
+            </button>
+            <button
+              aria-selected={periodMode === 'custom'}
+              className={periodMode === 'custom' ? 'is-selected' : undefined}
+              disabled={reportType === 'annual_members'}
+              role="tab"
+              type="button"
+              onClick={() => choosePeriod('custom')}
+            >
+              <strong>{copy.reports.customPeriod}</strong>
+              <small>{copy.reports.customPeriodHint}</small>
+            </button>
           </div>
 
-          <button
-            aria-expanded={periodPreset === 'custom'}
-            className="report-custom-period-toggle"
-            type="button"
-            onClick={() => choosePeriod('custom')}
-          >
-            <span>＋</span> {copy.reports.customPeriod}
-          </button>
-          {periodPreset === 'custom' ? (
+          {periodMode === 'year' ? (
+            <div className="report-period-panel" role="tabpanel">
+              <div className="report-year-input">
+                <button
+                  aria-label={copy.reports.previousYear}
+                  disabled={selectedYear <= 1900}
+                  type="button"
+                  onClick={() => applyYear(selectedYear - 1)}
+                >
+                  ‹
+                </button>
+                <label>
+                  <span>{copy.reports.yearLabel}</span>
+                  <input
+                    inputMode="numeric"
+                    max={now.getFullYear()}
+                    min="1900"
+                    type="number"
+                    value={yearDraft}
+                    onBlur={applyYearDraft}
+                    onChange={(event) => setYearDraft(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        event.preventDefault();
+                        applyYearDraft();
+                      }
+                    }}
+                  />
+                </label>
+                <button
+                  aria-label={copy.reports.nextYear}
+                  disabled={selectedYear >= now.getFullYear()}
+                  type="button"
+                  onClick={() => applyYear(selectedYear + 1)}
+                >
+                  ›
+                </button>
+              </div>
+              <button
+                className="report-apply-period"
+                type="button"
+                onClick={applyYearDraft}
+              >
+                {copy.reports.useEntireYear}
+              </button>
+            </div>
+          ) : null}
+
+          {periodMode === 'month' ? (
+            <div
+              className="report-period-panel report-month-picker"
+              role="tabpanel"
+            >
+              <label className="report-month-input">
+                <span>{copy.reports.monthLabel}</span>
+                <input
+                  max={`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`}
+                  min="1900-01"
+                  type="month"
+                  value={monthDraft}
+                  onInput={(event) =>
+                    chooseMonthValue(event.currentTarget.value)
+                  }
+                />
+              </label>
+              <div className="report-month-grid">
+                {monthNames.map((monthName, month) => {
+                  const isFuture =
+                    selectedYear > now.getFullYear() ||
+                    (selectedYear === now.getFullYear() &&
+                      month > now.getMonth());
+                  const isSelected =
+                    periodPreset === 'month' &&
+                    selectedMonthYear === selectedYear &&
+                    selectedMonth === month;
+                  return (
+                    <button
+                      aria-pressed={isSelected}
+                      className={isSelected ? 'is-selected' : undefined}
+                      disabled={isFuture}
+                      key={monthName}
+                      type="button"
+                      onClick={() => chooseMonth(month)}
+                    >
+                      {monthName}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
+
+          {periodMode === 'custom' ? (
             <div className="report-custom-dates">
               <label>
                 <span>{copy.envelopes.startDate}</span>
@@ -481,6 +941,7 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
             <strong>{typeCopy[reportType].label}</strong>
             <span>
               {selectedPeriodLabel} ·{' '}
+              {selectedMember?.fullName ?? copy.reports.allMembers} ·{' '}
               {includeImages
                 ? copy.reports.withImages
                 : copy.reports.withoutImages}
@@ -517,6 +978,7 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
                 <h3>{selectedPeriodLabel}</h3>
                 <p>
                   {typeCopy[reportType].label} ·{' '}
+                  {selectedMember?.fullName ?? copy.reports.allMembers} ·{' '}
                   {includeImages
                     ? copy.reports.withImages
                     : copy.reports.withoutImages}
@@ -532,7 +994,49 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
               </button>
             </div>
             <div className="product-table-wrap">
-              {reportType === 'member_totals' ? (
+              {reportType === 'annual_members' ? (
+                <table className="product-table annual-members-table">
+                  <thead>
+                    <tr>
+                      <th>{copy.reports.donor}</th>
+                      {shortMonthNames.map((month) => (
+                        <th key={month}>{month}</th>
+                      ))}
+                      <th>{copy.envelopes.total}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {annualMemberRows.map(([key, member]) => (
+                      <tr key={key}>
+                        <td>
+                          <strong>{member.name}</strong>
+                        </td>
+                        {member.months.map((amount, month) => (
+                          <td key={`${key}-${month}`}>
+                            {amount ? formatMoney(amount, locale) : '—'}
+                          </td>
+                        ))}
+                        <td>
+                          <strong>
+                            {formatMoney(member.totalCents, locale)}
+                          </strong>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <th>{copy.envelopes.total}</th>
+                      {annualMonthTotals.map((amount, month) => (
+                        <th key={`total-${month}`}>
+                          {formatMoney(amount, locale)}
+                        </th>
+                      ))}
+                      <th>{formatMoney(total, locale)}</th>
+                    </tr>
+                  </tfoot>
+                </table>
+              ) : reportType === 'member_totals' ? (
                 <table className="product-table">
                   <thead>
                     <tr>

@@ -4,7 +4,9 @@ export type ProductIconName =
   | 'logout'
   | 'members'
   | 'overview'
-  | 'reports';
+  | 'profile'
+  | 'reports'
+  | 'users';
 
 interface ProductIconProps {
   className?: string;
@@ -34,6 +36,25 @@ export function ProductIcon({ className = '', name }: ProductIconProps) {
         <circle cx="9" cy="7.5" r="3.5" />
         <path d="M3 21v-2.2A4.8 4.8 0 0 1 7.8 14h2.4a4.8 4.8 0 0 1 4.8 4.8V21" />
         <path d="M15.5 4.5a3.4 3.4 0 0 1 0 6.1M21 21v-2.2a4.8 4.8 0 0 0-3.2-4.5" />
+      </svg>
+    );
+  }
+
+  if (name === 'users') {
+    return (
+      <svg {...sharedProps}>
+        <circle cx="8" cy="8" r="3" />
+        <path d="M2.5 20v-1.6A4.4 4.4 0 0 1 6.9 14h2.2a4.4 4.4 0 0 1 4.4 4.4V20" />
+        <path d="M16 8h6M19 5v6M15.5 14.5a4 4 0 0 1 6 3.5v2" />
+      </svg>
+    );
+  }
+
+  if (name === 'profile') {
+    return (
+      <svg {...sharedProps}>
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 21a8 8 0 0 1 16 0" />
       </svg>
     );
   }

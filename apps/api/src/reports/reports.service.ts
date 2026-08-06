@@ -16,7 +16,11 @@ import { TenantUnitOfWork } from '../database/tenant-unit-of-work.js';
 import { DonationsService } from '../donations/donations.service.js';
 import { PrivateObjectStorage } from '../storage/private-object-storage.js';
 
-export type ReportType = 'detailed' | 'member_totals' | 'payment_methods';
+export type ReportType =
+  | 'annual_members'
+  | 'detailed'
+  | 'member_totals'
+  | 'payment_methods';
 type DonationItem = Awaited<ReturnType<DonationsService['list']>>[number];
 
 @Injectable()
@@ -103,8 +107,15 @@ export class ReportsService {
     endDate: string,
     reportType: ReportType,
     includeImages: boolean,
+    memberId?: string,
   ) {
-    const items = await this.donations.list(context, { endDate, startDate });
+    const effectiveIncludeImages =
+      reportType === 'annual_members' ? false : includeImages;
+    const items = await this.donations.list(context, {
+      endDate,
+      memberId,
+      startDate,
+    });
     const totalCents = items.reduce((sum, item) => sum + item.amountCents, 0);
     const buffer = await this.createPdf(
       context,
@@ -112,10 +123,12 @@ export class ReportsService {
       startDate,
       endDate,
       reportType,
-      includeImages,
+      effectiveIncludeImages,
       items,
     );
-    const imageLabel = includeImages ? 'with-images' : 'without-images';
+    const imageLabel = effectiveIncludeImages
+      ? 'with-images'
+      : 'without-images';
     const storageKey = `${context.churchId}/${reportType}_${imageLabel}_${startDate}_${endDate}_${randomUUID()}.pdf`;
     await this.storage.upload(
       this.storageBucket,
@@ -160,6 +173,18 @@ export class ReportsService {
     const regular = await document.embedFont(StandardFonts.Helvetica);
     const bold = await document.embedFont(StandardFonts.HelveticaBold);
     const total = items.reduce((sum, item) => sum + item.amountCents, 0);
+    if (reportType === 'annual_members') {
+      return this.createAnnualMembersPdf(
+        document,
+        bold,
+        regular,
+        churchName,
+        startDate,
+        endDate,
+        items,
+        total,
+      );
+    }
     let page = this.addPage(
       document,
       bold,
@@ -318,6 +343,185 @@ export class ReportsService {
         total,
       );
     }
+
+    return Buffer.from(await document.save());
+  }
+
+  private async createAnnualMembersPdf(
+    document: PDFDocument,
+    bold: PDFFont,
+    regular: PDFFont,
+    churchName: string,
+    startDate: string,
+    endDate: string,
+    items: DonationItem[],
+    totalCents: number,
+  ) {
+    const rows = this.annualMemberTotals(items);
+    const monthLabels = [
+      'JAN',
+      'FEB',
+      'MAR',
+      'APR',
+      'MAY',
+      'JUN',
+      'JUL',
+      'AUG',
+      'SEP',
+      'OCT',
+      'NOV',
+      'DEC',
+    ];
+    const startX = 24;
+    const nameWidth = 150;
+    const monthWidth = 43;
+    const totalWidth = 76;
+    const tableWidth = nameWidth + monthWidth * 12 + totalWidth;
+
+    const addAnnualPage = () => {
+      const page = document.addPage([792, 612]);
+      page.drawRectangle({
+        x: 0,
+        y: 540,
+        width: 792,
+        height: 72,
+        color: rgb(0.01, 0.19, 0.32),
+      });
+      page.drawText('UNIVERSAL  |  ANNUAL DONOR REPORT', {
+        x: 28,
+        y: 578,
+        font: bold,
+        size: 15,
+        color: rgb(1, 1, 1),
+      });
+      page.drawText(this.clean(churchName), {
+        x: 28,
+        y: 557,
+        font: regular,
+        size: 10,
+        color: rgb(0.78, 0.88, 0.94),
+      });
+      page.drawText(`${startDate} to ${endDate}`, {
+        x: 28,
+        y: 520,
+        font: bold,
+        size: 9,
+        color: rgb(0.05, 0.12, 0.22),
+      });
+      page.drawText(`USD ${(totalCents / 100).toFixed(2)}`, {
+        x: 688,
+        y: 520,
+        font: bold,
+        size: 9,
+        color: rgb(0.02, 0.36, 0.61),
+      });
+      page.drawRectangle({
+        x: startX,
+        y: 484,
+        width: tableWidth,
+        height: 24,
+        color: rgb(0.9, 0.95, 0.98),
+      });
+      page.drawText('DONOR', {
+        x: startX + 6,
+        y: 492,
+        font: bold,
+        size: 7,
+        color: rgb(0.02, 0.28, 0.5),
+      });
+      monthLabels.forEach((label, index) => {
+        page.drawText(label, {
+          x: startX + nameWidth + index * monthWidth + 13,
+          y: 492,
+          font: bold,
+          size: 6.5,
+          color: rgb(0.02, 0.28, 0.5),
+        });
+      });
+      page.drawText('TOTAL', {
+        x: startX + nameWidth + monthWidth * 12 + 22,
+        y: 492,
+        font: bold,
+        size: 7,
+        color: rgb(0.02, 0.28, 0.5),
+      });
+      return page;
+    };
+
+    let page = addAnnualPage();
+    let y = 466;
+    const monthlyGrandTotals = Array.from({ length: 12 }, () => 0);
+    rows.forEach((row) =>
+      row.months.forEach((amount, month) => {
+        monthlyGrandTotals[month] = (monthlyGrandTotals[month] ?? 0) + amount;
+      }),
+    );
+    const displayRows = [
+      ...rows.map((row) => ({ ...row, totalRow: false })),
+      {
+        label: 'TOTAL',
+        months: monthlyGrandTotals,
+        totalCents,
+        totalRow: true,
+      },
+    ];
+
+    displayRows.forEach((row, index) => {
+      if (y < 34) {
+        page = addAnnualPage();
+        y = 466;
+      }
+      if (row.totalRow || index % 2 === 0) {
+        page.drawRectangle({
+          x: startX,
+          y: y - 7,
+          width: tableWidth,
+          height: 21,
+          color: row.totalRow ? rgb(0.88, 0.94, 0.97) : rgb(0.98, 0.985, 0.99),
+        });
+      }
+      const rowFont = row.totalRow ? bold : regular;
+      page.drawText(this.clean(row.label).slice(0, 29), {
+        x: startX + 6,
+        y,
+        font: rowFont,
+        size: 7.2,
+        color: rgb(0.05, 0.12, 0.22),
+      });
+      row.months.forEach((amount, month) => {
+        const text = this.compactAmount(amount);
+        const textWidth = rowFont.widthOfTextAtSize(text, 6.3);
+        page.drawText(text, {
+          x:
+            startX +
+            nameWidth +
+            month * monthWidth +
+            monthWidth -
+            textWidth -
+            4,
+          y,
+          font: rowFont,
+          size: 6.3,
+          color: rgb(0.05, 0.12, 0.22),
+        });
+      });
+      const totalText = this.compactAmount(row.totalCents);
+      const totalTextWidth = rowFont.widthOfTextAtSize(totalText, 6.7);
+      page.drawText(totalText, {
+        x: startX + tableWidth - totalTextWidth - 6,
+        y,
+        font: rowFont,
+        size: 6.7,
+        color: row.totalRow ? rgb(0.02, 0.28, 0.5) : rgb(0.05, 0.12, 0.22),
+      });
+      page.drawLine({
+        start: { x: startX, y: y - 7 },
+        end: { x: startX + tableWidth, y: y - 7 },
+        thickness: 0.35,
+        color: rgb(0.86, 0.89, 0.92),
+      });
+      y -= 21;
+    });
 
     return Buffer.from(await document.save());
   }
@@ -526,6 +730,33 @@ export class ReportsService {
     return [...totals.entries()]
       .map(([label, value]) => ({ label, ...value }))
       .sort((a, b) => b.totalCents - a.totalCents);
+  }
+
+  private annualMemberTotals(items: DonationItem[]) {
+    const totals = new Map<
+      string,
+      { label: string; months: number[]; totalCents: number }
+    >();
+    for (const item of items) {
+      const key = item.member?.id ?? 'anonymous';
+      const current = totals.get(key) ?? {
+        label: item.member?.fullName ?? 'Anonymous',
+        months: Array.from({ length: 12 }, () => 0),
+        totalCents: 0,
+      };
+      const month = Number(item.receivedOn.slice(5, 7)) - 1;
+      if (month >= 0 && month < 12)
+        current.months[month] = (current.months[month] ?? 0) + item.amountCents;
+      current.totalCents += item.amountCents;
+      totals.set(key, current);
+    }
+    return [...totals.values()].sort((a, b) => a.label.localeCompare(b.label));
+  }
+
+  private compactAmount(amountCents: number) {
+    if (!amountCents) return '-';
+    const amount = amountCents / 100;
+    return Number.isInteger(amount) ? amount.toFixed(0) : amount.toFixed(2);
   }
 
   private paymentTotals(items: DonationItem[]) {

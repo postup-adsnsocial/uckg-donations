@@ -48,6 +48,7 @@ export class ReportsController {
     @Query('includeImages') includeImagesValue: string | undefined,
     @Query('delivery') delivery: string | undefined,
     @Res() response: Response,
+    @Query('memberId') memberId?: string,
   ) {
     const reportType = reportTypeValue as ReportType;
     const includeImages =
@@ -61,7 +62,13 @@ export class ReportsController {
       (includeImagesValue !== undefined &&
         !['true', 'false'].includes(includeImagesValue)) ||
       (delivery !== undefined && delivery !== 'url') ||
-      !['detailed', 'member_totals', 'payment_methods'].includes(reportType)
+      (memberId !== undefined && !churchIdSchema.safeParse(memberId).success) ||
+      ![
+        'annual_members',
+        'detailed',
+        'member_totals',
+        'payment_methods',
+      ].includes(reportType)
     )
       throw new BadRequestException('Invalid report period.');
     const report = await this.reports.generate(
@@ -71,6 +78,7 @@ export class ReportsController {
       endDate,
       reportType,
       includeImages,
+      memberId,
     );
     this.sendReport(response, report, delivery);
   }

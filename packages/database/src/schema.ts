@@ -110,6 +110,7 @@ export const churchMemberships = pgTable(
       .notNull()
       .references(() => adminUsers.id, { onDelete: 'cascade' }),
     role: churchRole('role').notNull(),
+    status: adminUserStatus('status').notNull().default('active'),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -302,7 +303,7 @@ export const reportFiles = pgTable(
     check('report_files_total_valid', sql`${table.totalCents} >= 0`),
     check(
       'report_files_type_valid',
-      sql`${table.reportType} in ('detailed', 'member_totals', 'payment_methods')`,
+      sql`${table.reportType} in ('detailed', 'member_totals', 'payment_methods', 'annual_members')`,
     ),
   ],
 );

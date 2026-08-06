@@ -34,6 +34,53 @@ export interface ProductCopy {
     updateError: string;
     updated: string;
   };
+  profile: {
+    changePassword: string;
+    changed: string;
+    changing: string;
+    confirmPassword: string;
+    currentPassword: string;
+    email: string;
+    error: string;
+    intro: string;
+    invalidCurrent: string;
+    loginAgain: string;
+    mismatch: string;
+    name: string;
+    newPassword: string;
+    passwordHint: string;
+    personalTitle: string;
+    save: string;
+    saved: string;
+    securityTitle: string;
+    title: string;
+  };
+  users: {
+    active: string;
+    auditor: string;
+    create: string;
+    created: string;
+    createTitle: string;
+    disabled: string;
+    email: string;
+    empty: string;
+    error: string;
+    financialOperator: string;
+    intro: string;
+    listTitle: string;
+    name: string;
+    password: string;
+    passwordHint: string;
+    restricted: string;
+    role: string;
+    saveAccess: string;
+    saving: string;
+    status: string;
+    title: string;
+    updateError: string;
+    updated: string;
+    churchAdmin: string;
+  };
   members: {
     actions: string;
     address1: string;
@@ -130,11 +177,16 @@ export interface ProductCopy {
   };
   reports: {
     archive: string;
+    allMembers: string;
+    annualMembers: string;
+    annualMembersDescription: string;
+    annualMembersFilterHint: string;
     contentDescription: string;
     contentTitle: string;
     customPeriod: string;
     detailed: string;
     detailedDescription: string;
+    donor: string;
     download: string;
     downloadError: string;
     empty: string;
@@ -148,6 +200,14 @@ export interface ProductCopy {
     lastMonth: string;
     memberTotals: string;
     memberTotalsDescription: string;
+    memberFilterDescription: string;
+    memberFilterLabel: string;
+    memberFilterTitle: string;
+    memberSearchEmpty: string;
+    memberSearchPlaceholder: string;
+    monthLabel: string;
+    monthMode: string;
+    monthModeHint: string;
     nextYear: string;
     noResults: string;
     paymentMethods: string;
@@ -163,8 +223,13 @@ export interface ProductCopy {
     thisMonth: string;
     thisYear: string;
     title: string;
+    customPeriodHint: string;
+    useEntireYear: string;
     withImages: string;
     withoutImages: string;
+    yearLabel: string;
+    yearMode: string;
+    yearModeHint: string;
   };
 }
 
@@ -206,6 +271,56 @@ export const productCopies: Record<Locale, ProductCopy> = {
       updateError:
         'Não foi possível salvar o novo nome da igreja. Tente novamente.',
       updated: 'Nome da igreja atualizado com sucesso.',
+    },
+    profile: {
+      changePassword: 'Alterar senha',
+      changed: 'Senha alterada com sucesso.',
+      changing: 'Alterando…',
+      confirmPassword: 'Confirme a nova senha',
+      currentPassword: 'Senha atual',
+      email: 'E-mail de acesso',
+      error: 'Não foi possível salvar seu perfil. Verifique os dados.',
+      intro: 'Atualize seus dados de acesso e mantenha sua conta protegida.',
+      invalidCurrent: 'A senha atual está incorreta.',
+      loginAgain: 'Entre novamente usando sua nova senha.',
+      mismatch: 'As novas senhas não coincidem.',
+      name: 'Nome de exibição',
+      newPassword: 'Nova senha',
+      passwordHint: 'Use entre 6 e 128 caracteres.',
+      personalTitle: 'Dados pessoais',
+      save: 'Salvar perfil',
+      saved: 'Perfil atualizado com sucesso.',
+      securityTitle: 'Segurança da conta',
+      title: 'Meu perfil',
+    },
+    users: {
+      active: 'Ativo',
+      auditor: 'Auditoria',
+      churchAdmin: 'Administrador local',
+      create: 'Cadastrar usuário',
+      created: 'Usuário cadastrado com sucesso.',
+      createTitle: 'Novo acesso',
+      disabled: 'Acesso suspenso',
+      email: 'E-mail de acesso',
+      empty: 'Nenhum usuário cadastrado nesta igreja.',
+      error:
+        'Não foi possível cadastrar o usuário. O e-mail pode já estar em uso.',
+      financialOperator: 'Operação financeira',
+      intro:
+        'Crie acessos e defina o que cada usuário pode fazer nesta igreja.',
+      listTitle: 'Usuários desta igreja',
+      name: 'Nome de exibição',
+      password: 'Senha inicial',
+      passwordHint: 'Entre 6 e 128 caracteres.',
+      restricted: 'Esta área é exclusiva dos administradores da igreja.',
+      role: 'Perfil de acesso',
+      saveAccess: 'Salvar acesso',
+      saving: 'Salvando…',
+      status: 'Situação',
+      title: 'Usuários',
+      updateError:
+        'Não foi possível alterar o acesso. Mantenha ao menos um administrador ativo.',
+      updated: 'Acesso atualizado com sucesso.',
     },
     members: {
       actions: 'Ações',
@@ -316,12 +431,19 @@ export const productCopies: Record<Locale, ProductCopy> = {
     },
     reports: {
       archive: 'Relatórios arquivados',
+      allMembers: 'Todos os membros',
+      annualMembers: 'Resumo anual por doador',
+      annualMembersDescription:
+        'Todos os doadores em linhas, com janeiro a dezembro e total anual.',
+      annualMembersFilterHint:
+        'Este formato sempre reúne todos os doadores do ano escolhido.',
       contentDescription: 'Escolha como os dados serão organizados.',
       contentTitle: 'O que o relatório deve mostrar?',
       customPeriod: 'Período personalizado',
       detailed: 'Todos os lançamentos',
       detailedDescription:
         'Data, membro, valor e forma de pagamento de cada envelope.',
+      donor: 'Doador',
       download: 'Baixar PDF',
       downloadError: 'Não foi possível baixar o PDF. Tente novamente.',
       empty: 'Escolha as opções acima para visualizar o relatório.',
@@ -337,6 +459,15 @@ export const productCopies: Record<Locale, ProductCopy> = {
       memberTotals: 'Total por membro',
       memberTotalsDescription:
         'Quantidade de envelopes e valor total doado por cada membro.',
+      memberFilterDescription:
+        'Busque no cadastro ou mantenha todos os membros no relatório.',
+      memberFilterLabel: 'Membro do relatório',
+      memberFilterTitle: 'Para quem é o relatório?',
+      memberSearchEmpty: 'Nenhum membro encontrado com essa busca.',
+      memberSearchPlaceholder: 'Digite o nome, e-mail ou telefone',
+      monthLabel: 'Selecione ou digite o mês',
+      monthMode: 'Mês',
+      monthModeHint: 'Escolha um mês específico',
       nextYear: 'Próximo ano',
       noResults: 'Nenhum lançamento foi encontrado no período escolhido.',
       paymentMethods: 'Total por forma de pagamento',
@@ -353,8 +484,13 @@ export const productCopies: Record<Locale, ProductCopy> = {
       thisMonth: 'Este mês',
       thisYear: 'Este ano',
       title: 'Relatórios',
+      customPeriodHint: 'Defina duas datas',
+      useEntireYear: 'Usar o ano inteiro',
       withImages: 'Com imagens',
       withoutImages: 'Sem imagens',
+      yearLabel: 'Selecione ou digite o ano',
+      yearMode: 'Ano inteiro',
+      yearModeHint: 'De janeiro a dezembro',
     },
   },
   en: {
@@ -392,6 +528,54 @@ export const productCopies: Record<Locale, ProductCopy> = {
       title: 'Churches',
       updateError: 'The new church name could not be saved. Try again.',
       updated: 'Church name updated successfully.',
+    },
+    profile: {
+      changePassword: 'Change password',
+      changed: 'Password changed successfully.',
+      changing: 'Changing…',
+      confirmPassword: 'Confirm new password',
+      currentPassword: 'Current password',
+      email: 'Login email',
+      error: 'Your profile could not be saved. Review the details.',
+      intro: 'Update your login details and keep your account protected.',
+      invalidCurrent: 'The current password is incorrect.',
+      loginAgain: 'Sign in again using your new password.',
+      mismatch: 'The new passwords do not match.',
+      name: 'Display name',
+      newPassword: 'New password',
+      passwordHint: 'Use between 6 and 128 characters.',
+      personalTitle: 'Personal details',
+      save: 'Save profile',
+      saved: 'Profile updated successfully.',
+      securityTitle: 'Account security',
+      title: 'My profile',
+    },
+    users: {
+      active: 'Active',
+      auditor: 'Audit',
+      churchAdmin: 'Local administrator',
+      create: 'Create user',
+      created: 'User created successfully.',
+      createTitle: 'New access',
+      disabled: 'Access suspended',
+      email: 'Login email',
+      empty: 'No users have been created for this church.',
+      error: 'The user could not be created. The email may already be in use.',
+      financialOperator: 'Financial operations',
+      intro: 'Create access and define what each user can do in this church.',
+      listTitle: 'Users in this church',
+      name: 'Display name',
+      password: 'Initial password',
+      passwordHint: 'Between 6 and 128 characters.',
+      restricted: 'This area is restricted to church administrators.',
+      role: 'Access role',
+      saveAccess: 'Save access',
+      saving: 'Saving…',
+      status: 'Status',
+      title: 'Users',
+      updateError:
+        'Access could not be changed. Keep at least one active administrator.',
+      updated: 'Access updated successfully.',
     },
     members: {
       actions: 'Actions',
@@ -499,12 +683,19 @@ export const productCopies: Record<Locale, ProductCopy> = {
     },
     reports: {
       archive: 'Archived reports',
+      allMembers: 'All members',
+      annualMembers: 'Annual donor summary',
+      annualMembersDescription:
+        'All donors in rows, with January through December and an annual total.',
+      annualMembersFilterHint:
+        'This format always includes every donor in the selected year.',
       contentDescription: 'Choose how the data should be organized.',
       contentTitle: 'What should the report show?',
       customPeriod: 'Custom period',
       detailed: 'All entries',
       detailedDescription:
         'Date, member, amount and payment method for every envelope.',
+      donor: 'Donor',
       download: 'Download PDF',
       downloadError: 'The PDF could not be downloaded. Try again.',
       empty: 'Choose the options above to preview the report.',
@@ -520,6 +711,15 @@ export const productCopies: Record<Locale, ProductCopy> = {
       memberTotals: 'Total by member',
       memberTotalsDescription:
         'Envelope count and total donated by each member.',
+      memberFilterDescription:
+        'Search the member registry or keep everyone in the report.',
+      memberFilterLabel: 'Report member',
+      memberFilterTitle: 'Who is this report for?',
+      memberSearchEmpty: 'No members matched this search.',
+      memberSearchPlaceholder: 'Type a name, email or phone',
+      monthLabel: 'Select or type the month',
+      monthMode: 'Month',
+      monthModeHint: 'Choose a specific month',
       nextYear: 'Next year',
       noResults: 'No entries were found in the selected period.',
       paymentMethods: 'Total by payment method',
@@ -535,8 +735,13 @@ export const productCopies: Record<Locale, ProductCopy> = {
       thisMonth: 'This month',
       thisYear: 'This year',
       title: 'Reports',
+      customPeriodHint: 'Set two dates',
+      useEntireYear: 'Use the entire year',
       withImages: 'With images',
       withoutImages: 'Without images',
+      yearLabel: 'Select or type the year',
+      yearMode: 'Entire year',
+      yearModeHint: 'January through December',
     },
   },
   es: {
@@ -576,6 +781,57 @@ export const productCopies: Record<Locale, ProductCopy> = {
       updateError:
         'No fue posible guardar el nuevo nombre de la iglesia. Inténtalo de nuevo.',
       updated: 'Nombre de la iglesia actualizado correctamente.',
+    },
+    profile: {
+      changePassword: 'Cambiar contraseña',
+      changed: 'Contraseña cambiada correctamente.',
+      changing: 'Cambiando…',
+      confirmPassword: 'Confirma la nueva contraseña',
+      currentPassword: 'Contraseña actual',
+      email: 'Correo de acceso',
+      error: 'No fue posible guardar tu perfil. Revisa los datos.',
+      intro: 'Actualiza tus datos de acceso y mantén tu cuenta protegida.',
+      invalidCurrent: 'La contraseña actual es incorrecta.',
+      loginAgain: 'Inicia sesión nuevamente con tu nueva contraseña.',
+      mismatch: 'Las nuevas contraseñas no coinciden.',
+      name: 'Nombre visible',
+      newPassword: 'Nueva contraseña',
+      passwordHint: 'Usa entre 6 y 128 caracteres.',
+      personalTitle: 'Datos personales',
+      save: 'Guardar perfil',
+      saved: 'Perfil actualizado correctamente.',
+      securityTitle: 'Seguridad de la cuenta',
+      title: 'Mi perfil',
+    },
+    users: {
+      active: 'Activo',
+      auditor: 'Auditoría',
+      churchAdmin: 'Administrador local',
+      create: 'Registrar usuario',
+      created: 'Usuario registrado correctamente.',
+      createTitle: 'Nuevo acceso',
+      disabled: 'Acceso suspendido',
+      email: 'Correo de acceso',
+      empty: 'No hay usuarios registrados en esta iglesia.',
+      error:
+        'No fue posible registrar el usuario. El correo puede estar en uso.',
+      financialOperator: 'Operación financiera',
+      intro:
+        'Crea accesos y define qué puede hacer cada usuario en esta iglesia.',
+      listTitle: 'Usuarios de esta iglesia',
+      name: 'Nombre visible',
+      password: 'Contraseña inicial',
+      passwordHint: 'Entre 6 y 128 caracteres.',
+      restricted:
+        'Esta área es exclusiva de los administradores de la iglesia.',
+      role: 'Perfil de acceso',
+      saveAccess: 'Guardar acceso',
+      saving: 'Guardando…',
+      status: 'Estado',
+      title: 'Usuarios',
+      updateError:
+        'No fue posible cambiar el acceso. Mantén al menos un administrador activo.',
+      updated: 'Acceso actualizado correctamente.',
     },
     members: {
       actions: 'Acciones',
@@ -688,12 +944,19 @@ export const productCopies: Record<Locale, ProductCopy> = {
     },
     reports: {
       archive: 'Informes archivados',
+      allMembers: 'Todos los miembros',
+      annualMembers: 'Resumen anual por donante',
+      annualMembersDescription:
+        'Todos los donantes en filas, con enero a diciembre y total anual.',
+      annualMembersFilterHint:
+        'Este formato siempre incluye todos los donantes del año elegido.',
       contentDescription: 'Elige cómo se organizarán los datos.',
       contentTitle: '¿Qué debe mostrar el informe?',
       customPeriod: 'Período personalizado',
       detailed: 'Todos los registros',
       detailedDescription:
         'Fecha, miembro, valor y forma de pago de cada sobre.',
+      donor: 'Donante',
       download: 'Descargar PDF',
       downloadError: 'No fue posible descargar el PDF. Inténtalo de nuevo.',
       empty: 'Elige las opciones anteriores para visualizar el informe.',
@@ -710,6 +973,15 @@ export const productCopies: Record<Locale, ProductCopy> = {
       memberTotals: 'Total por miembro',
       memberTotalsDescription:
         'Cantidad de sobres y valor total donado por cada miembro.',
+      memberFilterDescription:
+        'Busca en el registro o mantén todos los miembros en el informe.',
+      memberFilterLabel: 'Miembro del informe',
+      memberFilterTitle: '¿Para quién es el informe?',
+      memberSearchEmpty: 'No se encontraron miembros con esta búsqueda.',
+      memberSearchPlaceholder: 'Escribe el nombre, correo o teléfono',
+      monthLabel: 'Selecciona o escribe el mes',
+      monthMode: 'Mes',
+      monthModeHint: 'Elige un mes específico',
       nextYear: 'Año siguiente',
       noResults: 'No se encontraron registros en el período seleccionado.',
       paymentMethods: 'Total por forma de pago',
@@ -727,8 +999,13 @@ export const productCopies: Record<Locale, ProductCopy> = {
       thisMonth: 'Este mes',
       thisYear: 'Este año',
       title: 'Informes',
+      customPeriodHint: 'Define dos fechas',
+      useEntireYear: 'Usar el año completo',
       withImages: 'Con imágenes',
       withoutImages: 'Sin imágenes',
+      yearLabel: 'Selecciona o escribe el año',
+      yearMode: 'Año completo',
+      yearModeHint: 'De enero a diciembre',
     },
   },
 };
