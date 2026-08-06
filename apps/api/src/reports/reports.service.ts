@@ -55,14 +55,20 @@ export class ReportsService {
         .orderBy(desc(schema.reportFiles.createdAt))
         .limit(20),
     );
-    return reports.map(({ storageKey, ...report }) => ({
-      ...report,
-      includeImages: storageKey.includes('_with-images_')
-        ? true
-        : storageKey.includes('_without-images_')
-          ? false
-          : report.reportType === 'detailed',
-    }));
+    return reports.map(({ storageKey, ...report }) => {
+      const reportType = storageKey.includes('/annual_members_')
+        ? 'annual_members'
+        : report.reportType;
+      return {
+        ...report,
+        reportType,
+        includeImages: storageKey.includes('_with-images_')
+          ? true
+          : storageKey.includes('_without-images_')
+            ? false
+            : reportType === 'detailed',
+      };
+    });
   }
 
   async get(context: TenantContext, reportId: string) {
@@ -130,6 +136,8 @@ export class ReportsService {
     const imageLabel = effectiveIncludeImages
       ? 'with-images'
       : 'without-images';
+    const storedReportType =
+      reportType === 'annual_members' ? 'member_totals' : reportType;
     const storageKey = `${context.churchId}/${reportType}_${imageLabel}_${startDate}_${endDate}_${randomUUID()}.pdf`;
     await this.storage.upload(
       this.storageBucket,
@@ -144,7 +152,7 @@ export class ReportsService {
         createdBy: context.actorId,
         endDate,
         envelopeCount: items.length,
-        reportType,
+        reportType: storedReportType,
         startDate,
         storageKey,
         totalCents,
