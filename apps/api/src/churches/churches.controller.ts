@@ -119,7 +119,14 @@ export class ChurchesController {
     churchId: string | undefined,
     targetChurchId?: string,
   ) {
-    const tenant = await this.tenants.resolve(user, churchId ?? '');
+    const parsedChurchId = churchIdSchema.safeParse(churchId);
+    if (!parsedChurchId.success) {
+      throw new ForbiddenException(
+        'A valid church context is required for church administration.',
+      );
+    }
+
+    const tenant = await this.tenants.resolve(user, parsedChurchId.data);
     if (!tenant || tenant.role !== 'church_admin') {
       throw new ForbiddenException('Church administrator access is required.');
     }
