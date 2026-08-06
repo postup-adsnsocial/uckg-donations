@@ -428,6 +428,17 @@ export class ReportsService {
     const monthWidth = 39;
     const totalWidth = 70;
     const tableWidth = nameWidth + churchWidth + monthWidth * 12 + totalWidth;
+    const columnBoundaries = [
+      startX,
+      startX + nameWidth,
+      startX + nameWidth + churchWidth,
+      ...Array.from(
+        { length: 12 },
+        (_, index) =>
+          startX + nameWidth + churchWidth + (index + 1) * monthWidth,
+      ),
+      startX + tableWidth,
+    ];
 
     const addAnnualPage = () => {
       const page = document.addPage([792, 612]);
@@ -484,35 +495,35 @@ export class ReportsService {
         height: 24,
         color: rgb(0.9, 0.95, 0.98),
       });
-      page.drawText('DONOR', {
-        x: startX + 6,
-        y: 470,
-        font: bold,
-        size: 7,
-        color: rgb(0.02, 0.28, 0.5),
-      });
-      page.drawText('CHURCH', {
-        x: startX + nameWidth + 6,
-        y: 470,
-        font: bold,
-        size: 6.5,
-        color: rgb(0.02, 0.28, 0.5),
-      });
-      monthLabels.forEach((label, index) => {
+      const drawHeaderLabel = (label: string, x: number, width: number) => {
+        const labelWidth = bold.widthOfTextAtSize(label, 6.5);
         page.drawText(label, {
-          x: startX + nameWidth + churchWidth + index * monthWidth + 11,
+          x: x + (width - labelWidth) / 2,
           y: 470,
           font: bold,
           size: 6.5,
           color: rgb(0.02, 0.28, 0.5),
         });
+      };
+
+      drawHeaderLabel('DONOR', startX, nameWidth);
+      drawHeaderLabel('CHURCH', startX + nameWidth, churchWidth);
+      monthLabels.forEach((label, index) => {
+        drawHeaderLabel(
+          label,
+          startX + nameWidth + churchWidth + index * monthWidth,
+          monthWidth,
+        );
       });
-      page.drawText('TOTAL', {
-        x: startX + nameWidth + churchWidth + monthWidth * 12 + 18,
-        y: 470,
-        font: bold,
-        size: 7,
-        color: rgb(0.02, 0.28, 0.5),
+      drawHeaderLabel('TOTAL', startX + tableWidth - totalWidth, totalWidth);
+
+      columnBoundaries.forEach((x) => {
+        page.drawLine({
+          start: { x, y: 462 },
+          end: { x, y: 486 },
+          thickness: 0.35,
+          color: rgb(0.76, 0.84, 0.89),
+        });
       });
       return page;
     };
@@ -591,6 +602,14 @@ export class ReportsService {
         font: rowFont,
         size: 6.7,
         color: row.totalRow ? rgb(0.02, 0.28, 0.5) : rgb(0.05, 0.12, 0.22),
+      });
+      columnBoundaries.forEach((x) => {
+        page.drawLine({
+          start: { x, y: y - 7 },
+          end: { x, y: y + 14 },
+          thickness: 0.3,
+          color: rgb(0.84, 0.89, 0.92),
+        });
       });
       page.drawLine({
         start: { x: startX, y: y - 7 },
