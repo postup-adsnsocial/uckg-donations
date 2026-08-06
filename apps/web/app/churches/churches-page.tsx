@@ -24,12 +24,22 @@ type ChurchMessage =
 export function ChurchesPage({ locale }: { locale: Locale }) {
   return (
     <AppShell active="churches" locale={locale}>
-      {({ user }) => <ChurchesContent locale={locale} user={user} />}
+      {({ church, user }) => (
+        <ChurchesContent church={church} locale={locale} user={user} />
+      )}
     </AppShell>
   );
 }
 
-function ChurchesContent({ locale, user }: { locale: Locale; user: AppUser }) {
+function ChurchesContent({
+  church,
+  locale,
+  user,
+}: {
+  church: AppChurch;
+  locale: Locale;
+  user: AppUser;
+}) {
   const copy = productCopies[locale];
   const [items, setItems] = useState<AppChurch[]>([]);
   const [editingId, setEditingId] = useState('');
@@ -44,25 +54,31 @@ function ChurchesContent({ locale, user }: { locale: Locale; user: AppUser }) {
     let active = true;
 
     async function load() {
-      const response = await apiRequest('/churches');
+      const response = await apiRequest('/churches', {
+        headers: { 'x-church-id': church.id },
+      });
       if (!active) return;
       if (response.ok) setItems((await response.json()) as AppChurch[]);
       setLoading(false);
     }
 
     if (user.isPlatformAdmin) void load();
-    else setLoading(false);
+    else {
+      setItems([church]);
+      setLoading(false);
+    }
 
     return () => {
       active = false;
     };
-  }, [user.isPlatformAdmin]);
+  }, [church, user.isPlatformAdmin]);
 
   async function createChurch(formData: FormData) {
     setSaving(true);
     setMessage('');
     const response = await apiRequest('/churches', {
       body: JSON.stringify({ name: formData.get('name') }),
+      headers: { 'x-church-id': church.id },
       method: 'POST',
     });
     setSaving(false);
@@ -78,6 +94,10 @@ function ChurchesContent({ locale, user }: { locale: Locale; user: AppUser }) {
     );
     setMessage('created');
     formRef.current?.reset();
+    if (!user.isPlatformAdmin) {
+      localStorage.setItem('uckg_selected_church', created.id);
+      window.location.reload();
+    }
     window.dispatchEvent(new Event('uckg:churches-changed'));
   }
 
@@ -97,6 +117,7 @@ function ChurchesContent({ locale, user }: { locale: Locale; user: AppUser }) {
     setMessage('');
     const response = await apiRequest(`/churches/${id}`, {
       body: JSON.stringify({ name }),
+      headers: { 'x-church-id': church.id },
       method: 'PATCH',
     });
     setPendingId('');
@@ -143,10 +164,6 @@ function ChurchesContent({ locale, user }: { locale: Locale; user: AppUser }) {
     }
     setMessage('deleted');
     window.dispatchEvent(new Event('uckg:churches-changed'));
-  }
-
-  if (!user.isPlatformAdmin) {
-    return <p className="product-empty">{copy.churches.restricted}</p>;
   }
 
   return (
@@ -268,18 +285,20 @@ function ChurchesContent({ locale, user }: { locale: Locale; user: AppUser }) {
                             <path d="m14.5 6.5 3 3" />
                           </svg>
                         </button>
-                        <button
-                          aria-label={`${copy.churches.delete}: ${item.name}`}
-                          className="church-action church-action--danger"
-                          disabled={pendingId === item.id}
-                          onClick={() => void deleteChurch(item)}
-                          title={copy.churches.delete}
-                          type="button"
-                        >
-                          <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v5m4-5v5" />
-                          </svg>
-                        </button>
+                        {user.isPlatformAdmin ? (
+                          <button
+                            aria-label={`${copy.churches.delete}: ${item.name}`}
+                            className="church-action church-action--danger"
+                            disabled={pendingId === item.id}
+                            onClick={() => void deleteChurch(item)}
+                            title={copy.churches.delete}
+                            type="button"
+                          >
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                              <path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v5m4-5v5" />
+                            </svg>
+                          </button>
+                        ) : null}
                       </div>
                     </>
                   )}

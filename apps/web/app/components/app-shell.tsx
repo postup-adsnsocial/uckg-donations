@@ -230,7 +230,9 @@ export function AppShell({ active, children, locale }: AppShellProps) {
       label: copy.navigation.overview,
       path: 'dashboard',
     },
-    ...(user.isPlatformAdmin
+    ...(user.isPlatformAdmin ||
+    memberships.find((item) => item.churchId === selectedChurchId)?.role ===
+      'church_admin'
       ? [
           {
             icon: 'churches' as const,

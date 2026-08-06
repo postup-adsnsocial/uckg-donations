@@ -34,23 +34,52 @@ export class ChurchesService {
       .orderBy(asc(schema.churches.name), asc(schema.churches.id));
   }
 
-  async create(input: CreateChurchRequest) {
-    try {
-      const [church] = await this.database.db
-        .insert(schema.churches)
-        .values({
-          locale: 'en',
-          name: input.name,
-          slug: this.uniqueSlug(input.name),
-          timezone: 'America/New_York',
-        })
-        .returning(churchFields);
+  listById(id: string) {
+    return this.database.db
+      .select(churchFields)
+      .from(schema.churches)
+      .where(
+        and(eq(schema.churches.id, id), eq(schema.churches.status, 'active')),
+      )
+      .limit(1);
+  }
 
-      if (!church) {
-        throw new Error('The church could not be created.');
+  async create(input: CreateChurchRequest, creatorUserId?: string) {
+    try {
+      if (!creatorUserId) {
+        const [church] = await this.database.db
+          .insert(schema.churches)
+          .values({
+            locale: 'en',
+            name: input.name,
+            slug: this.uniqueSlug(input.name),
+            timezone: 'America/New_York',
+          })
+          .returning(churchFields);
+        if (!church) throw new Error('The church could not be created.');
+        return church;
       }
 
-      return church;
+      return await this.database.db.transaction(async (transaction) => {
+        const [church] = await transaction
+          .insert(schema.churches)
+          .values({
+            locale: 'en',
+            name: input.name,
+            slug: this.uniqueSlug(input.name),
+            timezone: 'America/New_York',
+          })
+          .returning(churchFields);
+        if (!church) throw new Error('The church could not be created.');
+        if (creatorUserId) {
+          await transaction.insert(schema.churchMemberships).values({
+            churchId: church.id,
+            role: 'church_admin',
+            userId: creatorUserId,
+          });
+        }
+        return church;
+      });
     } catch (error) {
       if (
         typeof error === 'object' &&
