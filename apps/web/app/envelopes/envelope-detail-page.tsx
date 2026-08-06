@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { AppShell, type AppChurch } from '../components/app-shell';
 import type { Locale } from '../i18n/config';
 import { productCopies } from '../i18n/product-copy';
 import { apiRequest } from '../lib/api';
+import { prepareEnvelopeImage } from './prepare-envelope-image';
 import { type EnvelopeRecord, formatMoney } from './types';
 
 export function EnvelopeDetailPage({
@@ -38,6 +39,12 @@ function EnvelopeDetail({
   const copy = productCopies[locale];
   const [item, setItem] = useState<EnvelopeRecord | null>(null);
   const [imageUrl, setImageUrl] = useState('');
+  const [imageMessage, setImageMessage] = useState('');
+  const [imageMessageTone, setImageMessageTone] = useState<'error' | 'success'>(
+    'error',
+  );
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     apiRequest(`/donations/${id}`, {
@@ -46,6 +53,14 @@ function EnvelopeDetail({
       if (response.ok) setItem((await response.json()) as EnvelopeRecord);
     });
   }, [church.id, id]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('imageUploadError') === '1') {
+      setImageMessageTone('error');
+      setImageMessage(copy.envelopes.imageUploadError);
+    }
+  }, [copy.envelopes.imageUploadError]);
 
   useEffect(
     () => () => {
@@ -58,6 +73,48 @@ function EnvelopeDetail({
       headers: { 'x-church-id': church.id },
     });
     if (response.ok) setImageUrl(URL.createObjectURL(await response.blob()));
+  }
+
+  async function uploadImage(file: File | undefined) {
+    if (!file) return;
+    setUploadingImage(true);
+    setImageMessage('');
+    try {
+      const image = await prepareEnvelopeImage(file);
+      const upload = new FormData();
+      upload.set('file', image);
+      const response = await apiRequest(`/donations/${id}/envelope`, {
+        body: upload,
+        headers: { 'x-church-id': church.id },
+        method: 'POST',
+      });
+      if (!response.ok) {
+        setImageMessageTone('error');
+        setImageMessage(copy.envelopes.imageUploadError);
+        return;
+      }
+      setItem((current) =>
+        current
+          ? {
+              ...current,
+              envelope: {
+                contentType: image.type,
+                originalName: image.name,
+                sizeBytes: image.size,
+              },
+            }
+          : current,
+      );
+      setImageMessageTone('success');
+      setImageMessage(copy.envelopes.imageSaved);
+      window.history.replaceState({}, '', window.location.pathname);
+    } catch {
+      setImageMessageTone('error');
+      setImageMessage(copy.envelopes.imageError);
+    } finally {
+      setUploadingImage(false);
+      if (imageInputRef.current) imageInputRef.current.value = '';
+    }
   }
 
   if (!item) return <p className="product-empty">{copy.common.loading}</p>;
@@ -125,6 +182,36 @@ function EnvelopeDetail({
           >
             {copy.envelopes.view}
           </button>
+        ) : (
+          <>
+            <input
+              ref={imageInputRef}
+              accept="image/jpeg,image/png"
+              hidden
+              type="file"
+              onChange={(event) =>
+                void uploadImage(event.currentTarget.files?.[0])
+              }
+            />
+            <button
+              className="product-primary-link"
+              disabled={uploadingImage}
+              type="button"
+              onClick={() => imageInputRef.current?.click()}
+            >
+              {uploadingImage
+                ? copy.envelopes.imageUploading
+                : copy.envelopes.addImage}
+            </button>
+          </>
+        )}
+        {imageMessage ? (
+          <p
+            className={`form-feedback form-feedback--${imageMessageTone}`}
+            role="status"
+          >
+            {imageMessage}
+          </p>
         ) : null}
         {imageUrl ? (
           <Image

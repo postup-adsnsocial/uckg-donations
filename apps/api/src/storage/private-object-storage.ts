@@ -58,6 +58,47 @@ export class PrivateObjectStorage {
     return readFile(resolve('.data', bucket, key));
   }
 
+  async createSignedDownloadUrl(
+    bucket: string,
+    key: string,
+    expiresInSeconds = 300,
+  ): Promise<string | null> {
+    if (!this.supabaseUrl || !this.serviceKey) return null;
+
+    const response = await fetch(
+      `${this.supabaseUrl}/storage/v1/object/sign/${bucket}/${this.path(key)}`,
+      {
+        body: JSON.stringify({ expiresIn: expiresInSeconds }),
+        headers: {
+          apikey: this.serviceKey,
+          Authorization: `Bearer ${this.serviceKey}`,
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+      },
+    );
+    if (!response.ok) {
+      throw new Error(
+        `Private storage signed URL creation failed (${response.status}).`,
+      );
+    }
+
+    const result = (await response.json()) as {
+      signedURL?: string;
+      signedUrl?: string;
+    };
+    const signedPath = result.signedURL ?? result.signedUrl;
+    if (!signedPath) {
+      throw new Error('Private storage returned an invalid signed URL.');
+    }
+    if (/^https?:\/\//.test(signedPath)) return signedPath;
+
+    const storagePath = signedPath.startsWith('/storage/v1/')
+      ? signedPath
+      : `/storage/v1/${signedPath.replace(/^\/+/, '')}`;
+    return new URL(storagePath, this.supabaseUrl).toString();
+  }
+
   async remove(bucket: string, key: string) {
     if (this.supabaseUrl && this.serviceKey) {
       await fetch(

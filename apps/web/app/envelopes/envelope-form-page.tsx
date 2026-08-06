@@ -9,6 +9,7 @@ import type { Locale } from '../i18n/config';
 import { productCopies } from '../i18n/product-copy';
 import { apiRequest } from '../lib/api';
 import type { MemberRecord } from '../members/types';
+import { prepareEnvelopeImage } from './prepare-envelope-image';
 
 type PaymentMethod = 'card' | 'cash' | 'check';
 
@@ -464,8 +465,16 @@ function EnvelopeForm({
     setSaving(true);
     setMessage('');
     const formImage = formData.get('image');
-    const image =
-      selectedImage ?? (formImage instanceof File ? formImage : null);
+    let image = selectedImage ?? (formImage instanceof File ? formImage : null);
+    if (image?.size) {
+      try {
+        image = await prepareEnvelopeImage(image);
+      } catch {
+        setSaving(false);
+        setMessage(copy.envelopes.imageError);
+        return;
+      }
+    }
     const amount = Number(String(formData.get('amount')).replace(',', '.'));
     const response = await apiRequest('/donations', {
       body: JSON.stringify({
@@ -492,8 +501,7 @@ function EnvelopeForm({
         { body: upload, headers: { 'x-church-id': church.id }, method: 'POST' },
       );
       if (!uploadResponse.ok) {
-        setSaving(false);
-        setMessage(copy.envelopes.error);
+        router.push(`/${locale}/envelopes/${donation.id}?imageUploadError=1`);
         return;
       }
     }

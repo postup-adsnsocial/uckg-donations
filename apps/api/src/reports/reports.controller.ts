@@ -46,6 +46,7 @@ export class ReportsController {
     @Query('endDate') endDate: string,
     @Query('reportType') reportTypeValue: string,
     @Query('includeImages') includeImagesValue: string | undefined,
+    @Query('delivery') delivery: string | undefined,
     @Res() response: Response,
   ) {
     const reportType = reportTypeValue as ReportType;
@@ -59,6 +60,7 @@ export class ReportsController {
       startDate > endDate ||
       (includeImagesValue !== undefined &&
         !['true', 'false'].includes(includeImagesValue)) ||
+      (delivery !== undefined && delivery !== 'url') ||
       !['detailed', 'member_totals', 'payment_methods'].includes(reportType)
     )
       throw new BadRequestException('Invalid report period.');
@@ -70,12 +72,7 @@ export class ReportsController {
       reportType,
       includeImages,
     );
-    response.setHeader('Content-Type', 'application/pdf');
-    response.setHeader(
-      'Content-Disposition',
-      `attachment; filename="${report.filename}"`,
-    );
-    response.send(report.buffer);
+    this.sendReport(response, report, delivery);
   }
 
   @Get(':reportId')
@@ -84,8 +81,11 @@ export class ReportsController {
     @CurrentTenant() tenant: ResolvedTenantContext,
     @CurrentUser() user: AuthenticatedAdmin,
     @Param('reportId') reportId: string,
+    @Query('delivery') delivery: string | undefined,
     @Res() response: Response,
   ) {
+    if (delivery !== undefined && delivery !== 'url')
+      throw new BadRequestException('Invalid report delivery mode.');
     const parsedId = churchIdSchema.safeParse(reportId);
     if (!parsedId.success)
       throw new BadRequestException('Invalid report identifier.');
@@ -93,6 +93,31 @@ export class ReportsController {
       this.context(tenant, user),
       parsedId.data,
     );
+    this.sendReport(response, report, delivery);
+  }
+
+  private sendReport(
+    response: Response,
+    report: {
+      buffer: Buffer | null;
+      filename: string;
+      signedUrl: string | null;
+    },
+    delivery: string | undefined,
+  ) {
+    if (report.signedUrl) {
+      if (delivery === 'url') {
+        const downloadUrl = new URL(report.signedUrl);
+        downloadUrl.searchParams.set('download', report.filename);
+        response.json({
+          filename: report.filename,
+          url: downloadUrl.toString(),
+        });
+        return;
+      }
+      response.redirect(302, report.signedUrl);
+      return;
+    }
     response.setHeader('Content-Type', 'application/pdf');
     response.setHeader(
       'Content-Disposition',

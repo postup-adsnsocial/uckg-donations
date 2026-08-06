@@ -83,12 +83,16 @@ export class ReportsService {
     );
 
     if (!report) throw new NotFoundException('Report not found.');
+    const signedUrl = await this.storage.createSignedDownloadUrl(
+      this.storageBucket,
+      report.storageKey,
+    );
     return {
-      buffer: await this.storage.download(
-        this.storageBucket,
-        report.storageKey,
-      ),
+      buffer: signedUrl
+        ? null
+        : await this.storage.download(this.storageBucket, report.storageKey),
       filename: `uckg-donations-${report.startDate}-${report.endDate}.pdf`,
+      signedUrl,
     };
   }
 
@@ -136,6 +140,10 @@ export class ReportsService {
     return {
       buffer,
       filename: `uckg-donations-${reportType}-${imageLabel}-${startDate}-${endDate}.pdf`,
+      signedUrl: await this.storage.createSignedDownloadUrl(
+        this.storageBucket,
+        storageKey,
+      ),
     };
   }
 
@@ -165,7 +173,8 @@ export class ReportsService {
 
     if (reportType === 'detailed') {
       for (const item of items) {
-        if (y < 135) {
+        const cardHeight = includeImages ? (item.envelope ? 280 : 110) : 92;
+        if (y - cardHeight < 70) {
           page = this.addPage(
             document,
             bold,
@@ -179,9 +188,9 @@ export class ReportsService {
         }
         page.drawRectangle({
           x: 42,
-          y: y - 82,
+          y: y - cardHeight + 10,
           width: 528,
-          height: 92,
+          height: cardHeight,
           color: rgb(0.97, 0.98, 0.99),
           borderColor: rgb(0.87, 0.9, 0.93),
           borderWidth: 1,
@@ -219,7 +228,28 @@ export class ReportsService {
             color: rgb(0.38, 0.44, 0.53),
           });
 
-        y -= 104;
+        if (includeImages) {
+          if (item.envelope) {
+            await this.drawEnvelopeImage(
+              document,
+              page,
+              regular,
+              context,
+              item,
+              y,
+            );
+          } else {
+            page.drawText('No envelope image', {
+              x: 56,
+              y: y - 88,
+              font: regular,
+              size: 8,
+              color: rgb(0.5, 0.55, 0.62),
+            });
+          }
+        }
+
+        y -= cardHeight + 12;
       }
     } else {
       const rows =
@@ -275,7 +305,7 @@ export class ReportsService {
       }
     }
 
-    if (includeImages) {
+    if (includeImages && reportType !== 'detailed') {
       await this.appendEnvelopeImages(
         document,
         bold,
@@ -290,6 +320,49 @@ export class ReportsService {
     }
 
     return Buffer.from(await document.save());
+  }
+
+  private async drawEnvelopeImage(
+    document: PDFDocument,
+    page: PDFPage,
+    regular: PDFFont,
+    context: TenantContext,
+    item: DonationItem,
+    y: number,
+  ) {
+    const imageArea = { height: 180, width: 500, x: 56, y: y - 260 };
+    page.drawRectangle({
+      ...imageArea,
+      color: rgb(1, 1, 1),
+      borderColor: rgb(0.87, 0.9, 0.93),
+      borderWidth: 1,
+    });
+
+    try {
+      const file = await this.donations.getEnvelope(context, item.id);
+      const image =
+        file.contentType === 'image/png'
+          ? await document.embedPng(file.buffer)
+          : await document.embedJpg(file.buffer);
+      const dimensions = image.scaleToFit(
+        imageArea.width - 12,
+        imageArea.height - 12,
+      );
+      page.drawImage(image, {
+        x: imageArea.x + (imageArea.width - dimensions.width) / 2,
+        y: imageArea.y + (imageArea.height - dimensions.height) / 2,
+        width: dimensions.width,
+        height: dimensions.height,
+      });
+    } catch {
+      page.drawText('Image unavailable', {
+        x: imageArea.x + 12,
+        y: imageArea.y + imageArea.height - 24,
+        font: regular,
+        size: 9,
+        color: rgb(0.55, 0.25, 0.25),
+      });
+    }
   }
 
   private async appendEnvelopeImages(

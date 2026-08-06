@@ -19,6 +19,11 @@ interface ReportRecord {
   totalCents: number;
 }
 
+interface ReportDownload {
+  filename: string;
+  url: string;
+}
+
 type ReportType = 'detailed' | 'member_totals' | 'payment_methods';
 type PeriodPreset =
   | 'custom'
@@ -71,6 +76,36 @@ function formatDate(date: Date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
+async function saveReportResponse(
+  response: Response,
+  fallbackFilename: string,
+) {
+  if (!response.ok) throw new Error('Report download failed.');
+
+  const contentType = response.headers.get('content-type') ?? '';
+  let url: string;
+  let filename = fallbackFilename;
+  let objectUrl = false;
+
+  if (contentType.includes('application/json')) {
+    const report = (await response.json()) as Partial<ReportDownload>;
+    if (!report.url) throw new Error('Report download URL is missing.');
+    url = report.url;
+    filename = report.filename ?? filename;
+  } else {
+    url = URL.createObjectURL(await response.blob());
+    objectUrl = true;
+  }
+
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.append(anchor);
+  anchor.click();
+  anchor.remove();
+  if (objectUrl) URL.revokeObjectURL(url);
+}
+
 export function ReportsPage({ locale }: { locale: Locale }) {
   return (
     <AppShell active="reports" locale={locale}>
@@ -94,6 +129,7 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
   const [hasGenerated, setHasGenerated] = useState(false);
   const [archive, setArchive] = useState<ReportRecord[]>([]);
   const [loading, setLoading] = useState(false);
+  const [downloadError, setDownloadError] = useState('');
 
   const monthNames = useMemo(
     () =>
@@ -138,25 +174,28 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
 
   async function download() {
     setLoading(true);
+    setDownloadError('');
     const params = new URLSearchParams({
+      delivery: 'url',
       endDate,
       includeImages: String(includeImages),
       reportType,
       startDate,
     });
-    const response = await apiRequest(`/reports/pdf?${params}`, {
-      headers: { 'x-church-id': church.id },
-    });
-    if (response.ok) {
-      const url = URL.createObjectURL(await response.blob());
-      const anchor = document.createElement('a');
-      anchor.href = url;
-      anchor.download = `uckg-donations-${startDate}-${endDate}.pdf`;
-      anchor.click();
-      URL.revokeObjectURL(url);
-      await loadArchive();
+    try {
+      const response = await apiRequest(`/reports/pdf?${params}`, {
+        headers: { 'x-church-id': church.id },
+      });
+      await saveReportResponse(
+        response,
+        `uckg-donations-${startDate}-${endDate}.pdf`,
+      );
+      await loadArchive().catch(() => undefined);
+    } catch {
+      setDownloadError(copy.reports.downloadError);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   function choosePeriod(preset: PeriodPreset) {
@@ -194,16 +233,18 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
   }
 
   async function downloadArchived(report: ReportRecord) {
-    const response = await apiRequest(`/reports/${report.id}`, {
-      headers: { 'x-church-id': church.id },
-    });
-    if (!response.ok) return;
-    const url = URL.createObjectURL(await response.blob());
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = `uckg-donations-${report.startDate}-${report.endDate}.pdf`;
-    anchor.click();
-    URL.revokeObjectURL(url);
+    setDownloadError('');
+    try {
+      const response = await apiRequest(`/reports/${report.id}?delivery=url`, {
+        headers: { 'x-church-id': church.id },
+      });
+      await saveReportResponse(
+        response,
+        `uckg-donations-${report.startDate}-${report.endDate}.pdf`,
+      );
+    } catch {
+      setDownloadError(copy.reports.downloadError);
+    }
   }
 
   const total = items.reduce((sum, item) => sum + item.amountCents, 0);
@@ -450,6 +491,12 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
           </button>
         </footer>
       </form>
+
+      {downloadError ? (
+        <p className="form-feedback form-feedback--error" role="alert">
+          {downloadError}
+        </p>
+      ) : null}
 
       {hasGenerated && items.length ? (
         <>

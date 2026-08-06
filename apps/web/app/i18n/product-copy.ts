@@ -69,6 +69,7 @@ export interface ProductCopy {
     error: string;
   };
   envelopes: {
+    addImage: string;
     allMembers: string;
     amount: string;
     cameraAction: string;
@@ -89,8 +90,12 @@ export interface ProductCopy {
     endDate: string;
     error: string;
     image: string;
+    imageError: string;
     imageHint: string;
     imageReady: string;
+    imageSaved: string;
+    imageUploadError: string;
+    imageUploading: string;
     listIntro: string;
     member: string;
     new: string;
@@ -131,6 +136,7 @@ export interface ProductCopy {
     detailed: string;
     detailedDescription: string;
     download: string;
+    downloadError: string;
     empty: string;
     generate: string;
     imagesIntro: string;
@@ -239,6 +245,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       title: 'Membros',
     },
     envelopes: {
+      addImage: 'Adicionar imagem',
       allMembers: 'Todos os membros',
       amount: 'Valor',
       cameraAction: 'Fotografar envelope',
@@ -261,9 +268,15 @@ export const productCopies: Record<Locale, ProductCopy> = {
       endDate: 'Data final',
       error: 'Não foi possível salvar o envelope.',
       image: 'Imagem do envelope',
+      imageError:
+        'Não foi possível preparar a imagem. Use uma foto JPEG ou PNG e tente novamente.',
       imageHint:
         'A imagem será enviada somente ao salvar o envelope e não será adicionada à galeria.',
       imageReady: 'Imagem pronta para envio',
+      imageSaved: 'Imagem adicionada ao lançamento com sucesso.',
+      imageUploadError:
+        'O lançamento foi salvo, mas a imagem não foi enviada. Selecione-a novamente para tentar outra vez.',
+      imageUploading: 'Enviando imagem…',
       listIntro: 'Consulte lançamentos e imagens da congregação ativa.',
       member: 'Membro relacionado',
       new: 'Lançar envelope',
@@ -310,13 +323,14 @@ export const productCopies: Record<Locale, ProductCopy> = {
       detailedDescription:
         'Data, membro, valor e forma de pagamento de cada envelope.',
       download: 'Baixar PDF',
+      downloadError: 'Não foi possível baixar o PDF. Tente novamente.',
       empty: 'Escolha as opções acima para visualizar o relatório.',
       generate: 'Visualizar relatório',
       imagesIntro: 'Decida se o PDF também deve levar os comprovantes.',
       imagesTitle: 'Incluir imagens?',
       includeImages: 'Incluir imagens dos envelopes no PDF',
       includeImagesDescription:
-        'As imagens serão adicionadas em um anexo organizado após o relatório.',
+        'Cada imagem ficará junto aos dados do lançamento correspondente.',
       intro: 'Monte o relatório escolhendo o conteúdo, as imagens e o período.',
       last30Days: 'Últimos 30 dias',
       lastMonth: 'Mês anterior',
@@ -415,6 +429,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       title: 'Members',
     },
     envelopes: {
+      addImage: 'Add image',
       allMembers: 'All members',
       amount: 'Amount',
       cameraAction: 'Photograph envelope',
@@ -437,9 +452,15 @@ export const productCopies: Record<Locale, ProductCopy> = {
       endDate: 'End date',
       error: 'Unable to save the envelope.',
       image: 'Envelope image',
+      imageError:
+        'The image could not be prepared. Use a JPEG or PNG photo and try again.',
       imageHint:
         'The image will only be uploaded when you save the envelope and will not be added to the photo gallery.',
       imageReady: 'Image ready to upload',
+      imageSaved: 'Image successfully added to the entry.',
+      imageUploadError:
+        'The entry was saved, but the image was not uploaded. Select it again to retry.',
+      imageUploading: 'Uploading image…',
       listIntro: 'Review entries and images for the active congregation.',
       member: 'Related member',
       new: 'Record envelope',
@@ -485,13 +506,14 @@ export const productCopies: Record<Locale, ProductCopy> = {
       detailedDescription:
         'Date, member, amount and payment method for every envelope.',
       download: 'Download PDF',
+      downloadError: 'The PDF could not be downloaded. Try again.',
       empty: 'Choose the options above to preview the report.',
       generate: 'Preview report',
       imagesIntro: 'Choose whether the PDF should include the records.',
       imagesTitle: 'Include images?',
       includeImages: 'Include envelope images in the PDF',
       includeImagesDescription:
-        'Images will be added in an organized appendix after the report.',
+        'Each image will stay with the corresponding entry details.',
       intro: 'Build a report by choosing its content, images and period.',
       last30Days: 'Last 30 days',
       lastMonth: 'Previous month',
@@ -595,6 +617,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       title: 'Miembros',
     },
     envelopes: {
+      addImage: 'Añadir imagen',
       allMembers: 'Todos los miembros',
       amount: 'Valor',
       cameraAction: 'Fotografiar sobre',
@@ -617,9 +640,15 @@ export const productCopies: Record<Locale, ProductCopy> = {
       endDate: 'Fecha final',
       error: 'No fue posible guardar el sobre.',
       image: 'Imagen del sobre',
+      imageError:
+        'No fue posible preparar la imagen. Usa una foto JPEG o PNG e inténtalo de nuevo.',
       imageHint:
         'La imagen se enviará únicamente al guardar el sobre y no se añadirá a la galería.',
       imageReady: 'Imagen lista para enviar',
+      imageSaved: 'Imagen añadida correctamente al registro.',
+      imageUploadError:
+        'El registro se guardó, pero la imagen no se envió. Selecciónala de nuevo para volver a intentarlo.',
+      imageUploading: 'Enviando imagen…',
       listIntro: 'Consulta registros e imágenes de la congregación activa.',
       member: 'Miembro relacionado',
       new: 'Registrar sobre',
@@ -666,13 +695,14 @@ export const productCopies: Record<Locale, ProductCopy> = {
       detailedDescription:
         'Fecha, miembro, valor y forma de pago de cada sobre.',
       download: 'Descargar PDF',
+      downloadError: 'No fue posible descargar el PDF. Inténtalo de nuevo.',
       empty: 'Elige las opciones anteriores para visualizar el informe.',
       generate: 'Visualizar informe',
       imagesIntro: 'Decide si el PDF también debe incluir los comprobantes.',
       imagesTitle: '¿Incluir imágenes?',
       includeImages: 'Incluir imágenes de los sobres en el PDF',
       includeImagesDescription:
-        'Las imágenes se añadirán en un anexo organizado después del informe.',
+        'Cada imagen permanecerá junto a los datos del registro correspondiente.',
       intro:
         'Crea el informe eligiendo el contenido, las imágenes y el período.',
       last30Days: 'Últimos 30 días',

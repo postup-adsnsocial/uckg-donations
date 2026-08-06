@@ -236,6 +236,24 @@ export class DonationsService {
   }
 
   async getEnvelope(context: TenantContext, donationId: string) {
+    const file = await this.findEnvelope(context, donationId);
+
+    return {
+      buffer: await this.storage.download(this.storageBucket, file.storageKey),
+      contentType: file.contentType,
+      originalName: file.originalName,
+    };
+  }
+
+  async getEnvelopeUrl(context: TenantContext, donationId: string) {
+    const file = await this.findEnvelope(context, donationId);
+    return this.storage.createSignedDownloadUrl(
+      this.storageBucket,
+      file.storageKey,
+    );
+  }
+
+  private async findEnvelope(context: TenantContext, donationId: string) {
     const file = await this.tenantUnitOfWork.run(
       context,
       async (transaction) => {
@@ -262,11 +280,7 @@ export class DonationsService {
       throw new NotFoundException('Envelope image not found.');
     }
 
-    return {
-      buffer: await this.storage.download(this.storageBucket, file.storageKey),
-      contentType: file.contentType,
-      originalName: file.originalName,
-    };
+    return file;
   }
 
   private safeExtension(originalName: string, contentType: string): string {

@@ -28,6 +28,7 @@ import { DomainRoute } from '../tenancy/domain-route.decorator.js';
 import { DonationsService, type EnvelopeUpload } from './donations.service.js';
 
 const supportedImageTypes = new Set(['image/jpeg', 'image/png']);
+const maximumEnvelopeImageBytes = 4_000_000;
 
 @Controller('donations')
 export class DonationsController {
@@ -100,7 +101,11 @@ export class DonationsController {
 
   @Post(':donationId/envelope')
   @DomainRoute('donations:write')
-  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 8_000_000 } }))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: maximumEnvelopeImageBytes },
+    }),
+  )
   attachEnvelope(
     @CurrentTenant() tenant: ResolvedTenantContext,
     @CurrentUser() user: AuthenticatedAdmin,
@@ -111,7 +116,7 @@ export class DonationsController {
 
     if (!parsedId.success || !file || !supportedImageTypes.has(file.mimetype)) {
       throw new BadRequestException(
-        'A JPEG or PNG envelope image up to 8 MB is required.',
+        'A JPEG or PNG envelope image up to 4 MB is required.',
       );
     }
 
@@ -136,10 +141,17 @@ export class DonationsController {
       throw new BadRequestException('Invalid envelope identifier.');
     }
 
-    const file = await this.donations.getEnvelope(
-      this.toTenantContext(tenant, user),
+    const context = this.toTenantContext(tenant, user);
+    const signedUrl = await this.donations.getEnvelopeUrl(
+      context,
       parsedId.data,
     );
+    if (signedUrl) {
+      response.redirect(302, signedUrl);
+      return;
+    }
+
+    const file = await this.donations.getEnvelope(context, parsedId.data);
     response.setHeader('Content-Type', file.contentType);
     response.setHeader('Content-Disposition', 'inline');
     response.setHeader('Cache-Control', 'private, max-age=300');
