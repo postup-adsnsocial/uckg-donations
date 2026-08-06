@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Universal · Commercial Proposal</title>
+    <style>
+      :root {
+        color: #fff;
+        background: #002a4d;
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+        background:
+          radial-gradient(
+            circle at 80% 15%,
+            rgba(255, 255, 255, 0.14),
+            transparent 28%
+          ),
+          linear-gradient(145deg, #0864a8 0%, #004b87 42%, #002a4d 100%);
+      }
+
+      body::before {
+        position: fixed;
+        inset: 0;
+        opacity: 0.08;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.3) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.3) 1px, transparent 1px);
+        background-size: 74px 74px;
+        mask-image: linear-gradient(to bottom right, transparent 8%, black 92%);
+        content: '';
+        pointer-events: none;
+      }
+
+      body::after {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: 7px;
+        background: #d9251c;
+        content: '';
+      }
+
+      main {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        width: min(1080px, calc(100% - 40px));
+        min-height: 100vh;
+        align-content: center;
+        margin: 0 auto;
+        padding: 70px 0;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+      }
+
+      .brand span:first-child {
+        display: grid;
+        width: 48px;
+        height: 48px;
+        place-items: center;
+        padding: 8px;
+        border-radius: 12px;
+        background: white;
+        box-shadow: 0 12px 30px rgba(0, 20, 37, 0.26);
+      }
+
+      .brand img {
+        width: 100%;
+      }
+
+      .brand strong,
+      .brand small {
+        display: block;
+      }
+
+      .brand strong {
+        letter-spacing: 0.08em;
+      }
+
+      .brand small {
+        color: rgba(255, 255, 255, 0.63);
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .copy {
+        max-width: 850px;
+        margin-top: 70px;
+      }
+
+      .copy p:first-child {
+        margin: 0 0 13px;
+        color: rgba(255, 255, 255, 0.68);
+        font-size: 0.73rem;
+        font-weight: 800;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(3rem, 7vw, 6.4rem);
+        letter-spacing: -0.065em;
+        line-height: 0.92;
+      }
+
+      .copy > p:last-child {
+        max-width: 700px;
+        margin: 27px 0 0;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 1rem;
+        line-height: 1.7;
+      }
+
+      .languages {
+        display: grid;
+        margin-top: 48px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .languages a {
+        display: grid;
+        min-height: 150px;
+        align-content: space-between;
+        padding: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 15px;
+        color: white;
+        background: rgba(255, 255, 255, 0.07);
+        text-decoration: none;
+        transition: 160ms ease;
+      }
+
+      .languages a:hover,
+      .languages a:focus-visible {
+        border-color: rgba(255, 255, 255, 0.46);
+        background: rgba(255, 255, 255, 0.13);
+        transform: translateY(-3px);
+        outline: none;
+      }
+
+      .languages span:first-child {
+        color: rgba(255, 255, 255, 0.56);
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.13em;
+      }
+
+      .languages strong {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 1.15rem;
+      }
+
+      footer {
+        margin-top: 54px;
+        color: rgba(255, 255, 255, 0.44);
+        font-size: 0.72rem;
+      }
+
+      @media (max-width: 680px) {
+        .copy {
+          margin-top: 50px;
+        }
+
+        .languages {
+          grid-template-columns: 1fr;
+        }
+
+        .languages a {
+          min-height: 118px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header class="brand">
+        <span><img src="assets/universal-logo.png" alt="Universal" /></span>
+        <span>
+          <strong>UNIVERSAL</strong>
+          <small>Financial Management</small>
+        </span>
+      </header>
+
+      <section class="copy">
+        <p>Commercial proposal · Propuesta comercial · Proposta comercial</p>
+        <h1>Choose your language.</h1>
+        <p>
+          Selecione o idioma da proposta · Select the proposal language ·
+          Seleccione el idioma de la propuesta.
+        </p>
+      </section>
+
+      <nav class="languages" aria-label="Proposal languages">
+        <a href="proposta-comercial-uckg-pt.html">
+          <span>PT-BR</span>
+          <strong>Português <span aria-hidden="true">→</span></strong>
+        </a>
+        <a href="commercial-proposal-uckg-en.html">
+          <span>EN</span>
+          <strong>English <span aria-hidden="true">→</span></strong>
+        </a>
+        <a href="propuesta-comercial-uckg-es.html">
+          <span>ES</span>
+          <strong>Español <span aria-hidden="true">→</span></strong>
+        </a>
+      </nav>
+
+      <footer>
+        Individual pricing per church · Values subject to negotiation
+      </footer>
+    </main>
+  </body>
+</html>
