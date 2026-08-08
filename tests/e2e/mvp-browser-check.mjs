@@ -49,6 +49,28 @@ async function assertResponsive(page, name) {
   }
 }
 
+async function assertControlFitsPanel(page, selector, panelSelector, name) {
+  const overflow = await page
+    .locator(selector)
+    .evaluate((control, targetPanelSelector) => {
+      const panel = control.closest(targetPanelSelector);
+      if (!panel) return 'panel not found';
+
+      const controlRect = control.getBoundingClientRect();
+      const panelRect = panel.getBoundingClientRect();
+      const tolerance = 1;
+
+      if (controlRect.left < panelRect.left - tolerance) {
+        return `left edge ${controlRect.left} is outside ${panelRect.left}`;
+      }
+      if (controlRect.right > panelRect.right + tolerance) {
+        return `right edge ${controlRect.right} exceeds ${panelRect.right}`;
+      }
+      return null;
+    }, panelSelector);
+  if (overflow) throw new Error(`${name}: ${overflow}`);
+}
+
 try {
   await mkdir(screenshotRoot, { recursive: true });
   const [church] = await connection.database
@@ -240,6 +262,12 @@ try {
     .getByRole('button', { name: 'Selecionar imagem', exact: true })
     .waitFor();
   await assertResponsive(page, 'envelope-new-empty');
+  await assertControlFitsPanel(
+    page,
+    'input[name="receivedOn"]',
+    '.product-form',
+    'Received date field overflows the envelope form',
+  );
   await page.getByLabel(/Imagem do envelope/).setInputFiles(envelopeImage);
   await page.getByText('Imagem pronta para envio').waitFor();
   await page.getByLabel(/Observação/).fill('Browser MVP verification');
