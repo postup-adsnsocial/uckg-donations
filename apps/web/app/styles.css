@@ -2276,9 +2276,31 @@ select:focus-visible {
   font-size: 0.82rem;
 }
 
-.form-field input[type='date'] {
+input[type='date'],
+input[type='datetime-local'],
+input[type='month'],
+input[type='time'],
+input[type='week'] {
   max-inline-size: 100%;
   min-inline-size: 0;
+}
+
+@supports selector(input::-webkit-datetime-edit) {
+  input[type='date'],
+  input[type='datetime-local'],
+  input[type='month'],
+  input[type='time'],
+  input[type='week'] {
+    padding: 0;
+  }
+
+  input[type='date']::-webkit-datetime-edit,
+  input[type='datetime-local']::-webkit-datetime-edit,
+  input[type='month']::-webkit-datetime-edit,
+  input[type='time']::-webkit-datetime-edit,
+  input[type='week']::-webkit-datetime-edit {
+    padding-inline: 12px;
+  }
 }
 
 .form-field textarea {

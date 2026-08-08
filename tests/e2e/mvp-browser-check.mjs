@@ -86,6 +86,19 @@ async function assertControlFitsPanel(page, selector, panelSelector, name) {
   if (overflow) throw new Error(`${name}: ${overflow}`);
 }
 
+async function assertNativeDateControlHasNoOuterPadding(page, selector) {
+  const padding = await page.locator(selector).evaluate((control) => {
+    const styles = getComputedStyle(control);
+    return [styles.paddingInlineEnd, styles.paddingInlineStart];
+  });
+
+  if (padding.some((value) => value !== '0px')) {
+    throw new Error(
+      `Native date control must not have outer padding on WebKit: ${padding.join(', ')}.`,
+    );
+  }
+}
+
 try {
   await mkdir(screenshotRoot, { recursive: true });
   const [church] = await connection.database
@@ -282,6 +295,10 @@ try {
     'input[name="receivedOn"]',
     '.product-form',
     'Received date field overflows the envelope form',
+  );
+  await assertNativeDateControlHasNoOuterPadding(
+    page,
+    'input[name="receivedOn"]',
   );
   await page.getByLabel(/Imagem do envelope/).setInputFiles(envelopeImage);
   await page.getByText('Imagem pronta para envio').waitFor();
