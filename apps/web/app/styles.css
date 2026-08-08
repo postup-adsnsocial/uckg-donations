@@ -503,6 +503,7 @@ button {
 
 .primary-button:focus-visible,
 .password-toggle:focus-visible,
+.mobile-logout:focus-visible,
 .sidebar-logout:focus-visible,
 .sidebar-link:focus-visible,
 select:focus-visible {
@@ -850,6 +851,10 @@ select:focus-visible {
   justify-content: flex-end;
   flex-wrap: wrap;
   gap: 22px;
+}
+
+.mobile-logout {
+  display: none;
 }
 
 .church-selector {
@@ -2738,7 +2743,7 @@ select:focus-visible {
 
 .overview-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
   gap: 18px;
 }
 
@@ -4064,23 +4069,23 @@ select:focus-visible {
   .mobile-product-nav {
     display: grid;
     overflow: visible;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 4px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
     border-bottom: 1px solid #e6eaee;
-    padding: 10px 16px;
+    padding: 12px 18px;
     background: #ffffff;
   }
 
   .mobile-product-nav a {
     display: inline-flex;
-    min-height: 44px;
+    min-height: 48px;
     align-items: center;
     justify-content: center;
     gap: 6px;
     border-radius: 8px;
-    padding: 0 8px;
+    padding: 0 10px;
     color: var(--ink-500);
-    font-size: 0.72rem;
+    font-size: 0.76rem;
     font-weight: 700;
     text-decoration: none;
   }
@@ -4364,12 +4369,15 @@ select:focus-visible {
   }
 
   .dashboard-topbar__actions {
+    display: grid;
     width: 100%;
-    justify-content: flex-start;
+    align-items: end;
+    grid-template-columns: minmax(0, 1fr) 44px 44px;
     gap: 10px;
   }
 
   .dashboard-topbar__actions .locale-switcher {
+    grid-column: 1 / -1;
     width: min(9.5rem, 100%);
     padding-inline: 7px;
   }
@@ -4379,9 +4387,41 @@ select:focus-visible {
     display: none;
   }
 
+  .church-selector {
+    min-width: 0;
+  }
+
   .church-selector select {
-    min-width: 130px;
-    max-width: 150px;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+  }
+
+  .user-chip,
+  .mobile-logout {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+    place-items: center;
+    border-radius: 9px;
+    padding: 2px;
+  }
+
+  .mobile-logout {
+    border: 1px solid var(--line);
+    background: #ffffff;
+    color: var(--ink-500);
+  }
+
+  .mobile-logout svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.7;
   }
 
   .dashboard-content {
@@ -4414,6 +4454,12 @@ select:focus-visible {
     grid-column: 1 / -1;
   }
 
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
   .donation-row {
     align-items: stretch;
     flex-direction: column;
@@ -4431,44 +4477,8 @@ select:focus-visible {
 }
 
 @media (max-width: 420px) {
-  .dashboard-topbar__actions {
-    display: grid;
-    align-items: end;
-    grid-template-columns: minmax(0, 1fr) 40px;
-  }
-
-  .dashboard-topbar__actions .locale-switcher {
-    grid-column: 1 / -1;
-  }
-
-  .church-selector {
-    min-width: 0;
-  }
-
-  .church-selector select {
-    width: 100%;
-    min-width: 0;
-    max-width: none;
-  }
-
-  .user-chip {
-    justify-self: end;
-  }
-
   .church-assignment--select > span {
     display: none;
-  }
-
-  .mobile-product-nav {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 4px;
-    padding-inline: 8px;
-  }
-
-  .mobile-product-nav a {
-    padding-inline: 6px;
-    font-size: 0.64rem;
-    white-space: nowrap;
   }
 
   .church-list li {

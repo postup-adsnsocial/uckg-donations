@@ -342,6 +342,15 @@ export function AppShell({ active, children, locale }: AppShellProps) {
                 <small>{user.email}</small>
               </div>
             </Link>
+            <button
+              aria-label={copy.logout}
+              className="mobile-logout"
+              onClick={logout}
+              type="button"
+            >
+              <ProductIcon name="logout" />
+              <span className="sr-only">{copy.logout}</span>
+            </button>
           </div>
         </header>
         <nav className="mobile-product-nav" aria-label={copy.adminPanel}>

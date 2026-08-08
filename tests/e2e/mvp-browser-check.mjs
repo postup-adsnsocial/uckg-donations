@@ -398,6 +398,10 @@ try {
       await assertResponsive(page, `${locale}-${path}`);
     }
   }
+  await page.goto('http://localhost:3000/pt-BR/dashboard');
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.getByRole('button', { name: 'Sair do sistema' }).click();
+  await page.waitForURL(/\/pt-BR\/login$/);
   console.log(
     `MVP visual and functional review passed in ${browserName}. Screenshots: ${screenshotRoot}`,
   );
