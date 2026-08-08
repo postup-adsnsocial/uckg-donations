@@ -46,6 +46,21 @@ async function assertResponsive(page, name) {
       throw new Error(
         `${name} overflows at ${viewport.width}px in ${browserName}.`,
       );
+
+    const overflowingCards = await page.evaluate(() =>
+      [
+        ...document.querySelectorAll(
+          '.product-panel, .workspace-card, .detail-card, .status-card, .summary-grid > article, .overview-card, .report-builder',
+        ),
+      ]
+        .filter((card) => card.scrollWidth > card.clientWidth + 1)
+        .map((card) => card.className || card.tagName),
+    );
+    if (overflowingCards.length) {
+      throw new Error(
+        `${name} has overflowing cards at ${viewport.width}px in ${browserName}: ${overflowingCards.join(', ')}`,
+      );
+    }
   }
 }
 

@@ -33,12 +33,16 @@
 }
 
 html {
+  overflow-x: clip;
   background: var(--canvas);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
-  min-width: 320px;
+  min-width: 0;
   margin: 0;
+  overflow-x: clip;
   background: var(--canvas);
 }
 
@@ -1118,13 +1122,13 @@ select:focus-visible {
 
 @media (max-width: 1180px) {
   .user-management-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
 @media (max-width: 800px) {
   .profile-settings-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .user-access-row {
@@ -1143,7 +1147,7 @@ select:focus-visible {
 
 @media (max-width: 520px) {
   .user-access-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .user-access-row__identity,
@@ -3998,7 +4002,7 @@ select:focus-visible {
   }
 
   .trust-list {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 15px;
   }
 
@@ -4026,15 +4030,15 @@ select:focus-visible {
   }
 
   .dashboard-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .mvp-workspace {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .detail-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .summary-grid {
@@ -4143,11 +4147,11 @@ select:focus-visible {
   }
 
   .form-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .church-management-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .form-field {
@@ -4158,7 +4162,7 @@ select:focus-visible {
     min-height: 108px;
     align-content: center;
     justify-items: center;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 7px;
     padding: 13px 8px 11px;
     text-align: center;
@@ -4185,7 +4189,7 @@ select:focus-visible {
   }
 
   .report-type-options {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .report-type-option {
@@ -4198,7 +4202,7 @@ select:focus-visible {
   }
 
   .report-period-modes {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .report-month-grid {
@@ -4206,7 +4210,7 @@ select:focus-visible {
   }
 
   .report-custom-dates {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .report-builder__footer {
@@ -4307,7 +4311,7 @@ select:focus-visible {
   }
 
   .detail-card dl {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .member-history__header {
@@ -4346,7 +4350,7 @@ select:focus-visible {
   .summary-grid--compact,
   .overview-grid,
   .detail-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .summary-grid article {
@@ -4454,7 +4458,7 @@ select:focus-visible {
   }
 
   .workspace-form {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .workspace-field {
@@ -4480,6 +4484,33 @@ select:focus-visible {
 
   .donation-row button {
     width: 100%;
+  }
+
+  .dashboard-main,
+  .product-page,
+  .product-page > *,
+  .product-panel,
+  .product-form,
+  .product-form fieldset,
+  .form-grid,
+  .form-field,
+  .workspace-card,
+  .workspace-form,
+  .detail-card,
+  .detail-layout,
+  .summary-grid,
+  .overview-grid,
+  .report-builder,
+  .report-builder__section {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    max-inline-size: 100%;
   }
 }
 
@@ -4543,7 +4574,7 @@ select:focus-visible {
 
   .image-source-actions,
   .envelope-image-selection {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .image-source-button {
@@ -4569,7 +4600,7 @@ select:focus-visible {
   }
 
   .camera-dialog__actions {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .report-builder__section {
@@ -4600,7 +4631,7 @@ select:focus-visible {
   }
 
   .report-period-shortcuts {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .report-year-input {
