@@ -3329,6 +3329,14 @@ input[type='week'] {
   color: var(--ink-500);
   font-size: 0.74rem;
   line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.report-builder__section-heading > div,
+.report-fixed-selection > div,
+.report-custom-dates label,
+.report-result .panel-heading > div {
+  min-width: 0;
 }
 
 .report-type-options {
@@ -3584,6 +3592,7 @@ input[type='week'] {
   color: var(--ink-500);
   font-size: 0.68rem;
   line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .report-image-option:has(input:disabled) {
@@ -3883,6 +3892,7 @@ input[type='week'] {
   color: var(--ink-500);
   font-size: 0.7rem;
   line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .report-builder__footer > button {
@@ -4243,6 +4253,11 @@ input[type='week'] {
 
   .report-builder__footer > button {
     width: 100%;
+  }
+
+  .report-result .panel-heading > .product-primary-link {
+    inline-size: 100%;
+    min-height: 48px;
   }
 
   .camera-dialog-backdrop {

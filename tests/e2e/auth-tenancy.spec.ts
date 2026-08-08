@@ -2,7 +2,7 @@ import { hashPassword } from '@uckg/authorization';
 import { createDatabase, schema } from '@uckg/database';
 import { eq, inArray } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 const databaseUrl =
   process.env.MIGRATION_DATABASE_URL ??
@@ -15,12 +15,89 @@ const email = `e2e-auditor-${suffix}@example.com`;
 const password = `e2e-password-${suffix}-secure`;
 const platformEmail = `e2e-platform-${suffix}@example.com`;
 const platformPassword = `e2e-platform-password-${suffix}-secure`;
+const reportEmail = `e2e-reports-${suffix}@example.com`;
+const reportPassword = `e2e-reports-password-${suffix}-secure`;
 let churchAId = '';
 let churchBId = '';
 let createdChurchId = '';
 let inactiveChurchId = '';
 let platformUserId = '';
+let reportUserId = '';
 let userId = '';
+
+async function expectMobileReportLayout(page: Page) {
+  for (const viewport of [
+    { height: 812, width: 375 },
+    { height: 800, width: 320 },
+  ]) {
+    await page.setViewportSize(viewport);
+    const issues = await page.evaluate(() => {
+      const problems: string[] = [];
+      const panels = document.querySelectorAll(
+        '.report-builder, .report-builder__section, .report-custom-dates, .report-result, .report-result .panel-heading',
+      );
+
+      if (
+        document.documentElement.scrollWidth >
+        document.documentElement.clientWidth
+      ) {
+        problems.push('page overflows horizontally');
+      }
+
+      for (const panel of panels) {
+        if (panel.scrollWidth > panel.clientWidth + 1) {
+          problems.push(`${panel.className} overflows horizontally`);
+        }
+      }
+
+      const controls = document.querySelectorAll(
+        '.report-period-shortcuts button, .report-period-modes button, .report-year-input > button, .report-year-input input, .report-apply-period, .report-builder__footer > button, .report-result .product-primary-link, .report-custom-dates input, .report-month-input input',
+      );
+      for (const control of controls) {
+        const controlRect = control.getBoundingClientRect();
+        const panelRect = control
+          .closest('.product-panel')
+          ?.getBoundingClientRect();
+        if (controlRect.height < 44) {
+          problems.push(
+            `${control.textContent?.trim() || control.getAttribute('type')} is shorter than 44px`,
+          );
+        }
+        if (
+          panelRect &&
+          (controlRect.left < panelRect.left - 1 ||
+            controlRect.right > panelRect.right + 1)
+        ) {
+          problems.push(
+            `${control.textContent?.trim() || control.getAttribute('type')} exceeds its card`,
+          );
+        }
+      }
+
+      const downloadButton = document.querySelector(
+        '.report-result .product-primary-link',
+      );
+      const heading = downloadButton?.closest('.panel-heading');
+      if (
+        downloadButton instanceof HTMLElement &&
+        heading instanceof HTMLElement
+      ) {
+        const headingStyle = getComputedStyle(heading);
+        const availableWidth =
+          heading.clientWidth -
+          Number.parseFloat(headingStyle.paddingInlineStart) -
+          Number.parseFloat(headingStyle.paddingInlineEnd);
+        if (downloadButton.getBoundingClientRect().width < availableWidth - 1) {
+          problems.push('PDF download button does not fill the mobile card');
+        }
+      }
+
+      return problems;
+    });
+
+    expect(issues, `report layout at ${viewport.width}px`).toEqual([]);
+  }
+}
 
 test.describe('administrative authentication and tenant isolation', () => {
   test.describe.configure({ mode: 'serial' });
@@ -39,7 +116,7 @@ test.describe('administrative authentication and tenant isolation', () => {
       ])
       .returning({ id: schema.churches.id });
 
-    const [user, platformUser] = await connection.database
+    const [user, platformUser, reportUser] = await connection.database
       .insert(schema.adminUsers)
       .values([
         {
@@ -53,10 +130,22 @@ test.describe('administrative authentication and tenant isolation', () => {
           isPlatformAdmin: true,
           passwordHash: await hashPassword(platformPassword),
         },
+        {
+          displayName: 'E2E Reports Operator',
+          email: reportEmail,
+          passwordHash: await hashPassword(reportPassword),
+        },
       ])
       .returning({ id: schema.adminUsers.id });
 
-    if (!churchA || !churchB || !inactiveChurch || !user || !platformUser) {
+    if (
+      !churchA ||
+      !churchB ||
+      !inactiveChurch ||
+      !user ||
+      !platformUser ||
+      !reportUser
+    ) {
       throw new Error('Unable to prepare the E2E tenant fixtures.');
     }
 
@@ -64,17 +153,27 @@ test.describe('administrative authentication and tenant isolation', () => {
     churchBId = churchB.id;
     inactiveChurchId = inactiveChurch.id;
     platformUserId = platformUser.id;
+    reportUserId = reportUser.id;
     userId = user.id;
 
-    await connection.database.insert(schema.churchMemberships).values({
-      churchId: churchAId,
-      role: 'auditor',
-      userId,
-    });
+    await connection.database.insert(schema.churchMemberships).values([
+      { churchId: churchAId, role: 'auditor', userId },
+      {
+        churchId: churchAId,
+        role: 'financial_operator',
+        userId: reportUserId,
+      },
+    ]);
   });
 
   test.afterAll(async () => {
-    const userIds = [userId, platformUserId].filter(Boolean);
+    if (reportUserId) {
+      await connection.database
+        .delete(schema.donations)
+        .where(eq(schema.donations.createdBy, reportUserId));
+    }
+
+    const userIds = [userId, platformUserId, reportUserId].filter(Boolean);
     if (userIds.length) {
       await connection.database
         .delete(schema.adminUsers)
@@ -324,5 +423,49 @@ test.describe('administrative authentication and tenant isolation', () => {
     await expect(
       page.locator('.overview-grid').getByRole('link', { name: /Lançar/ }),
     ).toBeVisible();
+  });
+
+  test('keeps the report builder and PDF action inside mobile cards', async ({
+    page,
+  }) => {
+    const receivedOn = new Date().toISOString().slice(0, 10);
+    const [donation] = await connection.database
+      .insert(schema.donations)
+      .values({
+        amountCents: 1_250,
+        churchId: churchAId,
+        createdBy: reportUserId,
+        paymentMethod: 'cash',
+        receivedOn,
+      })
+      .returning({ id: schema.donations.id });
+    if (!donation) throw new Error('Unable to prepare the report donation.');
+
+    await page.goto('/pt-BR/login');
+    await page.getByLabel('E-mail').fill(reportEmail);
+    await page.getByLabel('Senha', { exact: true }).fill(reportPassword);
+    await page.getByRole('button', { name: 'Entrar no painel' }).click();
+    await expect(page).toHaveURL(/\/pt-BR\/dashboard$/);
+
+    await page.goto('/pt-BR/reports');
+    await expect(page.locator('.report-builder')).toBeVisible();
+    await page.getByRole('tab', { name: 'Período personalizado' }).click();
+    await expect(
+      page.locator('.report-custom-dates input[type="date"]'),
+    ).toHaveCount(2);
+    await expectMobileReportLayout(page);
+
+    await page.getByRole('tab', { name: /^Mês/ }).click();
+    await expect(
+      page.locator('.report-month-input input[type="month"]'),
+    ).toBeVisible();
+    await expectMobileReportLayout(page);
+
+    await page.getByRole('button', { name: 'Visualizar relatório' }).click();
+    await expect(page.locator('.report-result')).toBeVisible();
+    await expect(
+      page.locator('.report-result .product-primary-link'),
+    ).toBeVisible();
+    await expectMobileReportLayout(page);
   });
 });

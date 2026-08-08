@@ -99,6 +99,89 @@ async function assertNativeDateControlHasNoOuterPadding(page, selector) {
   }
 }
 
+async function assertReportMobileLayout(page, name) {
+  for (const viewport of [
+    { height: 812, width: 375 },
+    { height: 800, width: 320 },
+  ]) {
+    await page.setViewportSize(viewport);
+    const issues = await page.evaluate(() => {
+      const problems = [];
+      const panelSelectors = [
+        '.report-builder',
+        '.report-builder__section',
+        '.report-custom-dates',
+        '.report-result',
+        '.report-result .panel-heading',
+      ];
+
+      if (
+        document.documentElement.scrollWidth >
+        document.documentElement.clientWidth
+      ) {
+        problems.push('page overflows horizontally');
+      }
+
+      for (const selector of panelSelectors) {
+        for (const panel of document.querySelectorAll(selector)) {
+          if (panel.scrollWidth > panel.clientWidth + 1) {
+            problems.push(`${selector} overflows horizontally`);
+          }
+        }
+      }
+
+      const controls = document.querySelectorAll(
+        '.report-period-shortcuts button, .report-period-modes button, .report-year-input > button, .report-year-input input, .report-apply-period, .report-builder__footer > button, .report-result .product-primary-link, .report-custom-dates input, .report-month-input input',
+      );
+      for (const control of controls) {
+        const controlRect = control.getBoundingClientRect();
+        const panel = control.closest('.product-panel');
+        const panelRect = panel?.getBoundingClientRect();
+        if (controlRect.height < 44) {
+          problems.push(
+            `${control.textContent?.trim() || control.getAttribute('type')} is shorter than 44px`,
+          );
+        }
+        if (
+          panelRect &&
+          (controlRect.left < panelRect.left - 1 ||
+            controlRect.right > panelRect.right + 1)
+        ) {
+          problems.push(
+            `${control.textContent?.trim() || control.getAttribute('type')} exceeds its card`,
+          );
+        }
+      }
+
+      const downloadButton = document.querySelector(
+        '.report-result .product-primary-link',
+      );
+      const heading = downloadButton?.closest('.panel-heading');
+      if (
+        downloadButton instanceof HTMLElement &&
+        heading instanceof HTMLElement
+      ) {
+        const headingStyle = getComputedStyle(heading);
+        const availableWidth =
+          heading.clientWidth -
+          Number.parseFloat(headingStyle.paddingInlineStart) -
+          Number.parseFloat(headingStyle.paddingInlineEnd);
+        if (downloadButton.getBoundingClientRect().width < availableWidth - 1) {
+          problems.push('PDF download button does not fill the mobile card');
+        }
+      }
+
+      return problems;
+    });
+
+    if (issues.length) {
+      throw new Error(
+        `${name} has mobile layout issues at ${viewport.width}px: ${issues.join(', ')}`,
+      );
+    }
+  }
+}
+
 try {
   await mkdir(screenshotRoot, { recursive: true });
   const [church] = await connection.database
@@ -329,6 +412,15 @@ try {
     throw new Error('Expected all twelve months in the period picker.');
   await page.getByLabel('Incluir imagens dos envelopes no PDF').check();
   await assertResponsive(page, 'reports-builder');
+  await page.getByRole('tab', { name: 'Período personalizado' }).click();
+  await page
+    .locator('.report-custom-dates input[type="date"]')
+    .first()
+    .waitFor();
+  await assertReportMobileLayout(page, 'reports-custom-period');
+  await page.getByRole('tab', { name: /^Mês/ }).click();
+  await page.locator('.report-month-input input[type="month"]').waitFor();
+  await assertReportMobileLayout(page, 'reports-month-period');
   const [reportDataResponse] = await Promise.all([
     page.waitForResponse((response) => response.url().includes('/donations?')),
     page.getByRole('button', { name: 'Visualizar relatório' }).click(),
@@ -344,6 +436,7 @@ try {
     '.report-result .product-primary-link',
   );
   await downloadReportButton.waitFor();
+  await assertReportMobileLayout(page, 'reports-result');
   const [pdfWithImagesDownload] = await Promise.all([
     page.waitForEvent('download'),
     downloadReportButton.click(),
