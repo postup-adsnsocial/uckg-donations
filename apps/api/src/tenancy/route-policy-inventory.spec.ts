@@ -157,6 +157,7 @@ describe('route policy inventory', () => {
       'ChurchesController.update',
       'DonationsController.attachEnvelope',
       'DonationsController.create',
+      'DonationsController.delete',
       'DonationsController.get',
       'DonationsController.getEnvelope',
       'DonationsController.list',

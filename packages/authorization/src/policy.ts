@@ -3,6 +3,7 @@ import type { ChurchRole } from './index.js';
 export type ChurchPermission =
   | 'audit:read'
   | 'church:read'
+  | 'donations:delete'
   | 'donations:read'
   | 'donations:write'
   | 'finance:write'
@@ -15,6 +16,7 @@ const rolePermissions: Record<ChurchRole, readonly ChurchPermission[]> = {
   church_admin: [
     'audit:read',
     'church:read',
+    'donations:delete',
     'donations:read',
     'donations:write',
     'finance:write',

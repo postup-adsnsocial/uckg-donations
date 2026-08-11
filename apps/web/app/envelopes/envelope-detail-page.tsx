@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { AppShell, type AppChurch } from '../components/app-shell';
@@ -13,18 +14,33 @@ import { type EnvelopeRecord, formatMoney } from './types';
 
 const editCopies = {
   'pt-BR': {
+    delete: 'Excluir lançamento',
+    deleteConfirm:
+      'Excluir este lançamento e sua imagem? Esta ação não poderá ser desfeita.',
+    deleteError: 'Não foi possível excluir o lançamento. Tente novamente.',
+    deleting: 'Excluindo…',
     edit: 'Editar envelope',
     replaceImage: 'Substituir imagem',
     updateError: 'Não foi possível salvar as alterações. Revise os dados.',
     updated: 'Envelope atualizado com sucesso.',
   },
   en: {
+    delete: 'Delete entry',
+    deleteConfirm:
+      'Delete this entry and its image? This action cannot be undone.',
+    deleteError: 'The entry could not be deleted. Please try again.',
+    deleting: 'Deleting…',
     edit: 'Edit envelope',
     replaceImage: 'Replace image',
     updateError: 'The changes could not be saved. Review the information.',
     updated: 'Envelope updated successfully.',
   },
   es: {
+    delete: 'Eliminar registro',
+    deleteConfirm:
+      '¿Eliminar este registro y su imagen? Esta acción no se puede deshacer.',
+    deleteError: 'No se pudo eliminar el registro. Inténtalo de nuevo.',
+    deleting: 'Eliminando…',
     edit: 'Editar sobre',
     replaceImage: 'Sustituir imagen',
     updateError: 'No se pudieron guardar los cambios. Revisa los datos.',
@@ -33,6 +49,10 @@ const editCopies = {
 } satisfies Record<
   Locale,
   {
+    delete: string;
+    deleteConfirm: string;
+    deleteError: string;
+    deleting: string;
     edit: string;
     replaceImage: string;
     updateError: string;
@@ -49,8 +69,9 @@ export function EnvelopeDetailPage({
 }) {
   return (
     <AppShell active="envelopes" locale={locale}>
-      {({ canWriteDonations, church }) => (
+      {({ canDeleteDonations, canWriteDonations, church }) => (
         <EnvelopeDetail
+          canDeleteDonations={canDeleteDonations}
           canWriteDonations={canWriteDonations}
           church={church}
           id={id}
@@ -62,16 +83,19 @@ export function EnvelopeDetailPage({
 }
 
 function EnvelopeDetail({
+  canDeleteDonations,
   canWriteDonations,
   church,
   id,
   locale,
 }: {
+  canDeleteDonations: boolean;
   canWriteDonations: boolean;
   church: AppChurch;
   id: string;
   locale: Locale;
 }) {
+  const router = useRouter();
   const copy = productCopies[locale];
   const editCopy = editCopies[locale];
   const [item, setItem] = useState<EnvelopeRecord | null>(null);
@@ -79,6 +103,8 @@ function EnvelopeDetail({
     Array<{ fullName: string; id: string }>
   >([]);
   const [editing, setEditing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
   const [saving, setSaving] = useState(false);
   const [editMessage, setEditMessage] = useState('');
   const [editError, setEditError] = useState('');
@@ -238,6 +264,24 @@ function EnvelopeDetail({
     }
   }
 
+  async function deleteEnvelope() {
+    if (!window.confirm(editCopy.deleteConfirm)) return;
+
+    setDeleting(true);
+    setDeleteError('');
+    try {
+      const response = await apiRequest(`/donations/${id}`, {
+        headers: { 'x-church-id': church.id },
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Envelope deletion failed.');
+      router.push(`/${locale}/envelopes?deleted=1`);
+    } catch {
+      setDeleteError(editCopy.deleteError);
+      setDeleting(false);
+    }
+  }
+
   if (!item) return <p className="product-empty">{copy.common.loading}</p>;
   return (
     <>
@@ -268,6 +312,16 @@ function EnvelopeDetail({
               {editCopy.edit}
             </button>
           ) : null}
+          {canDeleteDonations && !editing ? (
+            <button
+              className="danger-button"
+              disabled={deleting}
+              type="button"
+              onClick={() => void deleteEnvelope()}
+            >
+              {deleting ? editCopy.deleting : editCopy.delete}
+            </button>
+          ) : null}
           <Link
             className="product-secondary-link"
             href={`/${locale}/envelopes`}
@@ -276,6 +330,11 @@ function EnvelopeDetail({
           </Link>
         </div>
       </header>
+      {deleteError ? (
+        <p className="form-feedback form-feedback--error" role="alert">
+          {deleteError}
+        </p>
+      ) : null}
       {editMessage ? (
         <div className="toast toast--success" role="status">
           <span>✓</span>

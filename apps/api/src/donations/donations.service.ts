@@ -226,6 +226,48 @@ export class DonationsService {
     return donation;
   }
 
+  async delete(context: TenantContext, donationId: string) {
+    const result = await this.tenantUnitOfWork.run(
+      context,
+      async (transaction) => {
+        const [file] = await transaction
+          .select({ storageKey: schema.envelopeFiles.storageKey })
+          .from(schema.envelopeFiles)
+          .where(
+            and(
+              eq(schema.envelopeFiles.churchId, context.churchId),
+              eq(schema.envelopeFiles.donationId, donationId),
+            ),
+          )
+          .limit(1);
+
+        const [deleted] = await transaction
+          .delete(schema.donations)
+          .where(
+            and(
+              eq(schema.donations.churchId, context.churchId),
+              eq(schema.donations.id, donationId),
+            ),
+          )
+          .returning({ id: schema.donations.id });
+
+        return { deleted, storageKey: file?.storageKey };
+      },
+    );
+
+    if (!result.deleted) {
+      throw new NotFoundException(
+        'Envelope record not found in the active church.',
+      );
+    }
+
+    if (result.storageKey) {
+      await this.storage.remove(this.storageBucket, result.storageKey);
+    }
+
+    return { deleted: true, id: result.deleted.id };
+  }
+
   async attachEnvelope(
     context: TenantContext,
     donationId: string,

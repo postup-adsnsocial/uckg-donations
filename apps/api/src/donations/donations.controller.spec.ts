@@ -75,4 +75,23 @@ describe('DonationsController', () => {
       input,
     );
   });
+
+  it('deletes a valid envelope inside the active church context', async () => {
+    const donationId = '2edd561c-3a34-4927-a406-cc2fcf345989';
+    const donations = {
+      delete: vi.fn().mockResolvedValue({ deleted: true, id: donationId }),
+    };
+    const controller = new DonationsController(donations as never);
+
+    await controller.delete(
+      { church: { id: 'church-id' } } as never,
+      { id: 'user-id' } as never,
+      donationId,
+    );
+
+    expect(donations.delete).toHaveBeenCalledWith(
+      expect.objectContaining({ actorId: 'user-id', churchId: 'church-id' }),
+      donationId,
+    );
+  });
 });

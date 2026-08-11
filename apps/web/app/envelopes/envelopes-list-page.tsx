@@ -11,6 +11,12 @@ import { apiRequest } from '../lib/api';
 import type { MemberRecord } from '../members/types';
 import { type EnvelopeRecord, formatMoney } from './types';
 
+const deletionCopies: Record<Locale, string> = {
+  'pt-BR': 'Lançamento excluído com sucesso.',
+  en: 'Entry deleted successfully.',
+  es: 'Registro eliminado correctamente.',
+};
+
 export function EnvelopesListPage({ locale }: { locale: Locale }) {
   return (
     <AppShell active="envelopes" locale={locale}>
@@ -82,10 +88,12 @@ function EnvelopesList({
           ＋ {copy.envelopes.new}
         </Link>
       </header>
-      {searchParams.get('saved') ? (
+      {searchParams.get('saved') || searchParams.get('deleted') ? (
         <div className="toast toast--success" role="status">
           <span>✓</span>
-          {copy.envelopes.saved}
+          {searchParams.get('deleted')
+            ? deletionCopies[locale]
+            : copy.envelopes.saved}
         </div>
       ) : null}
       <div className="summary-grid summary-grid--compact">

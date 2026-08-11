@@ -27,6 +27,21 @@ describe('tenant permissions', () => {
     ).toBe(true);
   });
 
+  it('only lets administrators delete donation records', () => {
+    expect(
+      hasPermission(
+        { isPlatformAdmin: false, role: 'church_admin' },
+        'donations:delete',
+      ),
+    ).toBe(true);
+    expect(
+      hasPermission(
+        { isPlatformAdmin: false, role: 'financial_operator' },
+        'donations:delete',
+      ),
+    ).toBe(false);
+  });
+
   it('limits member data using least privilege', () => {
     expect(
       hasPermission(

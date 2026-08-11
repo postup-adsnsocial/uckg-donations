@@ -53,4 +53,38 @@ describe('DonationsService envelope updates', () => {
     });
     expect(where).toHaveBeenCalledOnce();
   });
+
+  it('deletes the tenant record and removes its private image', async () => {
+    const donationId = '2edd561c-3a34-4927-a406-cc2fcf345989';
+    const storageKey = `${context.churchId}/${donationId}-image.png`;
+    const limit = vi.fn().mockResolvedValue([{ storageKey }]);
+    const selectWhere = vi.fn().mockReturnValue({ limit });
+    const from = vi.fn().mockReturnValue({ where: selectWhere });
+    const returning = vi.fn().mockResolvedValue([{ id: donationId }]);
+    const deleteWhere = vi.fn().mockReturnValue({ returning });
+    const transaction = {
+      delete: vi.fn().mockReturnValue({ where: deleteWhere }),
+      select: vi.fn().mockReturnValue({ from }),
+    } as unknown as TenantTransaction;
+    const unitOfWork = {
+      run: vi.fn(
+        async (
+          receivedContext: TenantContext,
+          work: (tx: TenantTransaction) => Promise<unknown>,
+        ) => work(transaction),
+      ),
+    };
+    const storage = { remove: vi.fn().mockResolvedValue(undefined) };
+    const service = new DonationsService(unitOfWork as never, storage as never);
+
+    await expect(service.delete(context, donationId)).resolves.toEqual({
+      deleted: true,
+      id: donationId,
+    });
+
+    expect(unitOfWork.run).toHaveBeenCalledWith(context, expect.any(Function));
+    expect(selectWhere).toHaveBeenCalledOnce();
+    expect(deleteWhere).toHaveBeenCalledOnce();
+    expect(storage.remove).toHaveBeenCalledWith('envelopes', storageKey);
+  });
 });

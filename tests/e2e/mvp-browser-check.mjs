@@ -411,6 +411,20 @@ try {
   await page.getByRole('button', { name: 'Salvar', exact: true }).click();
   await page.getByText('Envelope atualizado com sucesso.').waitFor();
   await page.getByText(/123,45/).waitFor();
+  const deleteEnvelopeButton = page.getByRole('button', {
+    name: 'Excluir lançamento',
+  });
+  await deleteEnvelopeButton.waitFor();
+  page.once('dialog', async (dialog) => {
+    if (!dialog.message().includes('não poderá ser desfeita')) {
+      throw new Error('Envelope deletion did not show a clear warning.');
+    }
+    await dialog.dismiss();
+  });
+  await deleteEnvelopeButton.click();
+  await page
+    .getByRole('heading', { level: 2, name: 'Detalhes do envelope' })
+    .waitFor();
   await assertResponsive(page, 'envelope-detail');
 
   await page.goto('http://localhost:3000/pt-BR/reports');

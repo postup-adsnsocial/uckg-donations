@@ -40,6 +40,7 @@ export interface Membership {
 type SessionStatus = 'error' | 'idle' | 'loading' | 'ready';
 
 interface AppSessionValue {
+  canDeleteDonations: boolean;
   canManageUsers: boolean;
   canWriteDonations: boolean;
   church: AppChurch | null;
@@ -235,6 +236,8 @@ export function AppSessionProvider({
   )?.role;
   const canManageUsers =
     user?.isPlatformAdmin === true || selectedRole === 'church_admin';
+  const canDeleteDonations =
+    user?.isPlatformAdmin === true || selectedRole === 'church_admin';
   const canWriteDonations =
     user?.isPlatformAdmin === true ||
     selectedRole === 'church_admin' ||
@@ -242,6 +245,7 @@ export function AppSessionProvider({
 
   const value = useMemo<AppSessionValue>(
     () => ({
+      canDeleteDonations,
       canManageUsers,
       canWriteDonations,
       church,
@@ -254,6 +258,7 @@ export function AppSessionProvider({
       user,
     }),
     [
+      canDeleteDonations,
       canManageUsers,
       canWriteDonations,
       church,

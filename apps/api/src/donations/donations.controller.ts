@@ -4,6 +4,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -123,6 +124,25 @@ export class DonationsController {
       this.toTenantContext(tenant, user),
       parsedId.data,
       parsed.data,
+    );
+  }
+
+  @Delete(':donationId')
+  @DomainRoute('donations:delete')
+  delete(
+    @CurrentTenant() tenant: ResolvedTenantContext,
+    @CurrentUser() user: AuthenticatedAdmin,
+    @Param('donationId') donationId: string,
+  ) {
+    const parsedId = churchIdSchema.safeParse(donationId);
+
+    if (!parsedId.success) {
+      throw new BadRequestException('Invalid envelope identifier.');
+    }
+
+    return this.donations.delete(
+      this.toTenantContext(tenant, user),
+      parsedId.data,
     );
   }
 

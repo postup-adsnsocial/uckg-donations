@@ -23,6 +23,7 @@ interface AppShellProps {
     | 'reports'
     | 'users';
   children: (context: {
+    canDeleteDonations: boolean;
     canManageUsers: boolean;
     canWriteDonations: boolean;
     church: AppChurch;
@@ -35,6 +36,7 @@ export function AppShell({ active, children, locale }: AppShellProps) {
   const dictionary = getDictionary(locale);
   const copy = dictionary.dashboard;
   const {
+    canDeleteDonations,
     canManageUsers,
     canWriteDonations,
     church,
@@ -241,6 +243,7 @@ export function AppShell({ active, children, locale }: AppShellProps) {
         </nav>
         <div className="product-page">
           {children({
+            canDeleteDonations,
             canManageUsers,
             canWriteDonations,
             church,

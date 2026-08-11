@@ -126,6 +126,9 @@ async function testMigrations({
     churches_delete: boolean;
     churches_insert: boolean;
     churches_update: boolean;
+    donations_delete: boolean;
+    donations_update: boolean;
+    envelope_files_update: boolean;
     members_delete: boolean;
     members_insert: boolean;
     members_references: boolean;
@@ -147,6 +150,9 @@ async function testMigrations({
        has_table_privilege('uckg_runtime', 'churches', 'INSERT') as churches_insert,
        has_table_privilege('uckg_runtime', 'churches', 'UPDATE') as churches_update,
        has_table_privilege('uckg_runtime', 'churches', 'DELETE') as churches_delete,
+       has_table_privilege('uckg_runtime', 'donations', 'UPDATE') as donations_update,
+       has_table_privilege('uckg_runtime', 'donations', 'DELETE') as donations_delete,
+       has_table_privilege('uckg_runtime', 'envelope_files', 'UPDATE') as envelope_files_update,
        has_table_privilege('uckg_runtime', 'members', 'SELECT') as members_select,
        has_table_privilege('uckg_runtime', 'members', 'INSERT') as members_insert,
        has_table_privilege('uckg_runtime', 'members', 'UPDATE') as members_update,
@@ -167,6 +173,9 @@ async function testMigrations({
     !runtimePrivileges.churches_insert ||
     !runtimePrivileges.churches_update ||
     runtimePrivileges.churches_delete ||
+    !runtimePrivileges.donations_update ||
+    !runtimePrivileges.donations_delete ||
+    !runtimePrivileges.envelope_files_update ||
     !runtimePrivileges.members_select ||
     !runtimePrivileges.members_insert ||
     !runtimePrivileges.members_update ||
