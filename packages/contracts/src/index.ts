@@ -176,6 +176,10 @@ export const createDonationRequestSchema = z.object({
 
 export type CreateDonationRequest = z.infer<typeof createDonationRequestSchema>;
 
+export const updateDonationRequestSchema = createDonationRequestSchema.strict();
+
+export type UpdateDonationRequest = z.infer<typeof updateDonationRequestSchema>;
+
 export const donationSchema = z.object({
   amountCents: z.number().int().positive(),
   createdAt: z.string().datetime(),

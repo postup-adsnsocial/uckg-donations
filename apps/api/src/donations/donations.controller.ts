@@ -7,6 +7,7 @@ import {
   Get,
   Inject,
   Param,
+  Patch,
   Post,
   Query,
   Res,
@@ -14,7 +15,11 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { createDonationRequestSchema, churchIdSchema } from '@uckg/contracts';
+import {
+  createDonationRequestSchema,
+  churchIdSchema,
+  updateDonationRequestSchema,
+} from '@uckg/contracts';
 import type { Response } from 'express';
 
 import { CurrentUser } from '../auth/current-user.decorator.js';
@@ -95,6 +100,28 @@ export class DonationsController {
 
     return this.donations.create(
       this.toTenantContext(tenant, user),
+      parsed.data,
+    );
+  }
+
+  @Patch(':donationId')
+  @DomainRoute('donations:write')
+  update(
+    @CurrentTenant() tenant: ResolvedTenantContext,
+    @CurrentUser() user: AuthenticatedAdmin,
+    @Param('donationId') donationId: string,
+    @Body() body: unknown,
+  ) {
+    const parsedId = churchIdSchema.safeParse(donationId);
+    const parsed = updateDonationRequestSchema.safeParse(body);
+
+    if (!parsedId.success || !parsed.success) {
+      throw new BadRequestException('Invalid envelope data.');
+    }
+
+    return this.donations.update(
+      this.toTenantContext(tenant, user),
+      parsedId.data,
       parsed.data,
     );
   }

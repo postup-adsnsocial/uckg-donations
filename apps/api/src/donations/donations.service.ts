@@ -2,7 +2,10 @@ import { createHash, randomUUID } from 'node:crypto';
 import { extname } from 'node:path';
 
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import type { CreateDonationRequest } from '@uckg/contracts';
+import type {
+  CreateDonationRequest,
+  UpdateDonationRequest,
+} from '@uckg/contracts';
 import { schema } from '@uckg/database';
 import { and, desc, eq, gte, lte, type SQL } from 'drizzle-orm';
 
@@ -164,6 +167,63 @@ export class DonationsService {
 
       return donation;
     });
+  }
+
+  async update(
+    context: TenantContext,
+    donationId: string,
+    input: UpdateDonationRequest,
+  ) {
+    const donation = await this.tenantUnitOfWork.run(
+      context,
+      async (transaction) => {
+        if (input.memberId) {
+          const [member] = await transaction
+            .select({ id: schema.members.id })
+            .from(schema.members)
+            .where(
+              and(
+                eq(schema.members.churchId, context.churchId),
+                eq(schema.members.id, input.memberId),
+              ),
+            )
+            .limit(1);
+
+          if (!member) {
+            throw new NotFoundException(
+              'Member not found in the active church.',
+            );
+          }
+        }
+
+        const [updated] = await transaction
+          .update(schema.donations)
+          .set({
+            amountCents: input.amountCents,
+            memberId: input.memberId ?? null,
+            notes: input.notes ?? null,
+            paymentMethod: input.paymentMethod,
+            receivedOn: input.receivedOn,
+          })
+          .where(
+            and(
+              eq(schema.donations.churchId, context.churchId),
+              eq(schema.donations.id, donationId),
+            ),
+          )
+          .returning({ id: schema.donations.id });
+
+        return updated;
+      },
+    );
+
+    if (!donation) {
+      throw new NotFoundException(
+        'Envelope record not found in the active church.',
+      );
+    }
+
+    return donation;
   }
 
   async attachEnvelope(

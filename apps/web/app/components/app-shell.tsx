@@ -24,6 +24,7 @@ interface AppShellProps {
     | 'users';
   children: (context: {
     canManageUsers: boolean;
+    canWriteDonations: boolean;
     church: AppChurch;
     user: AppUser;
   }) => ReactNode;
@@ -35,6 +36,7 @@ export function AppShell({ active, children, locale }: AppShellProps) {
   const copy = dictionary.dashboard;
   const {
     canManageUsers,
+    canWriteDonations,
     church,
     ensureSession,
     loadChurch,
@@ -240,6 +242,7 @@ export function AppShell({ active, children, locale }: AppShellProps) {
         <div className="product-page">
           {children({
             canManageUsers,
+            canWriteDonations,
             church,
             user,
           })}

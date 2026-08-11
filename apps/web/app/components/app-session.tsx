@@ -41,6 +41,7 @@ type SessionStatus = 'error' | 'idle' | 'loading' | 'ready';
 
 interface AppSessionValue {
   canManageUsers: boolean;
+  canWriteDonations: boolean;
   church: AppChurch | null;
   ensureSession: () => Promise<void>;
   loadChurch: (churchId: string) => Promise<boolean>;
@@ -229,14 +230,20 @@ export function AppSessionProvider({
     router.replace(`/${locale}/login`);
   }, [clearSession, locale, router]);
 
+  const selectedRole = memberships.find(
+    (item) => item.churchId === selectedChurchId,
+  )?.role;
   const canManageUsers =
+    user?.isPlatformAdmin === true || selectedRole === 'church_admin';
+  const canWriteDonations =
     user?.isPlatformAdmin === true ||
-    memberships.find((item) => item.churchId === selectedChurchId)?.role ===
-      'church_admin';
+    selectedRole === 'church_admin' ||
+    selectedRole === 'financial_operator';
 
   const value = useMemo<AppSessionValue>(
     () => ({
       canManageUsers,
+      canWriteDonations,
       church,
       ensureSession,
       loadChurch,
@@ -248,6 +255,7 @@ export function AppSessionProvider({
     }),
     [
       canManageUsers,
+      canWriteDonations,
       church,
       ensureSession,
       loadChurch,

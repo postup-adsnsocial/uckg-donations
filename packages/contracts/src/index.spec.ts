@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { createMemberRequestSchema } from './index.js';
+import {
+  createMemberRequestSchema,
+  updateDonationRequestSchema,
+} from './index.js';
 
 describe('createMemberRequestSchema', () => {
   it('accepts a member without address information', () => {
@@ -32,5 +35,36 @@ describe('createMemberRequestSchema', () => {
     });
 
     expect(result.success).toBe(false);
+  });
+});
+
+describe('updateDonationRequestSchema', () => {
+  it('accepts a complete envelope update and normalizes empty notes', () => {
+    expect(
+      updateDonationRequestSchema.parse({
+        amountCents: 12_345,
+        memberId: null,
+        notes: '',
+        paymentMethod: 'card',
+        receivedOn: '2026-08-11',
+      }),
+    ).toEqual({
+      amountCents: 12_345,
+      memberId: null,
+      notes: undefined,
+      paymentMethod: 'card',
+      receivedOn: '2026-08-11',
+    });
+  });
+
+  it('rejects invalid envelope updates', () => {
+    expect(
+      updateDonationRequestSchema.safeParse({
+        amountCents: 0,
+        memberId: null,
+        paymentMethod: 'cash',
+        receivedOn: '2026-08-11',
+      }).success,
+    ).toBe(false);
   });
 });

@@ -404,6 +404,13 @@ try {
     throw new Error(
       'Envelope image must open without a second details button.',
     );
+  await page.getByRole('button', { name: 'Editar envelope' }).click();
+  await page.getByLabel('Valor (USD)').fill('123.45');
+  await page.getByLabel('Forma de pagamento').selectOption('card');
+  await page.getByLabel('Observação').fill('Updated by browser verification');
+  await page.getByRole('button', { name: 'Salvar', exact: true }).click();
+  await page.getByText('Envelope atualizado com sucesso.').waitFor();
+  await page.getByText(/123,45/).waitFor();
   await assertResponsive(page, 'envelope-detail');
 
   await page.goto('http://localhost:3000/pt-BR/reports');
