@@ -744,12 +744,12 @@ select:focus-visible {
 
 .sidebar-link {
   display: grid;
-  min-height: 46px;
+  min-height: 48px;
   align-items: center;
   border-radius: 9px;
-  padding: 0 12px;
-  grid-template-columns: 22px 1fr auto;
-  gap: 8px;
+  padding: 0 13px;
+  grid-template-columns: 25px 1fr auto;
+  gap: 10px;
   color: rgba(255, 255, 255, 0.7);
   font-size: 0.8rem;
   font-weight: 650;
@@ -757,13 +757,13 @@ select:focus-visible {
 }
 
 .sidebar-link svg {
-  width: 20px;
-  height: 20px;
+  width: 23px;
+  height: 23px;
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 1.7;
+  stroke-width: 2;
 }
 
 .sidebar-link--active {
@@ -2821,13 +2821,13 @@ input[type='week'] {
 }
 
 .overview-card__icon svg {
-  width: 25px;
-  height: 25px;
+  width: 27px;
+  height: 27px;
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 1.7;
+  stroke-width: 2;
 }
 
 .overview-card__copy {
@@ -4134,14 +4134,14 @@ input[type='week'] {
   }
 
   .mobile-product-nav a svg {
-    width: 18px;
-    height: 18px;
+    width: 21px;
+    height: 21px;
     flex: 0 0 auto;
     fill: none;
     stroke: currentColor;
     stroke-linecap: round;
     stroke-linejoin: round;
-    stroke-width: 1.7;
+    stroke-width: 2;
   }
 
   .mobile-product-nav a.is-active {
@@ -4463,13 +4463,13 @@ input[type='week'] {
   }
 
   .mobile-logout svg {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     fill: none;
     stroke: currentColor;
     stroke-linecap: round;
     stroke-linejoin: round;
-    stroke-width: 1.7;
+    stroke-width: 2;
   }
 
   .dashboard-content {
