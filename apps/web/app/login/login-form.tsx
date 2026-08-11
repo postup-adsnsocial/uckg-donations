@@ -14,7 +14,7 @@ interface LoginFormProps {
 
 export function LoginForm({ copy, locale }: LoginFormProps) {
   const router = useRouter();
-  const [email, setEmail] = useState('post.assessoria@gmail.com');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -48,7 +48,12 @@ export function LoginForm({ copy, locale }: LoginFormProps) {
   }
 
   return (
-    <form className="login-form" onSubmit={handleSubmit} noValidate>
+    <form
+      className="login-form"
+      method="post"
+      noValidate
+      onSubmit={handleSubmit}
+    >
       <div className="field-group">
         <label htmlFor="email">{copy.emailLabel}</label>
         <div className="field-control">

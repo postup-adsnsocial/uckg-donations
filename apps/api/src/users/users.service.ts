@@ -20,7 +20,7 @@ const userFields = {
   email: schema.adminUsers.email,
   id: schema.adminUsers.id,
   role: schema.churchMemberships.role,
-  status: schema.adminUsers.status,
+  status: schema.churchMemberships.status,
 };
 
 @Injectable()
@@ -80,12 +80,13 @@ export class UsersService {
           .values({ churchId, role: input.role, userId: user.id })
           .returning({
             role: schema.churchMemberships.role,
+            status: schema.churchMemberships.status,
           });
 
         if (!membership)
           throw new Error('The membership could not be created.');
 
-        return { ...user, ...membership, status: 'active' as const };
+        return { ...user, ...membership };
       });
     } catch (error) {
       if (error instanceof ConflictException) throw error;
@@ -117,7 +118,7 @@ export class UsersService {
           email: schema.adminUsers.email,
           id: schema.churchMemberships.id,
           role: schema.churchMemberships.role,
-          status: schema.adminUsers.status,
+          status: schema.churchMemberships.status,
         })
         .from(schema.churchMemberships)
         .innerJoin(
@@ -159,6 +160,7 @@ export class UsersService {
             and(
               eq(schema.churchMemberships.churchId, churchId),
               eq(schema.churchMemberships.role, 'church_admin'),
+              eq(schema.churchMemberships.status, 'active'),
               eq(schema.adminUsers.status, 'active'),
             ),
           )
@@ -175,19 +177,16 @@ export class UsersService {
         .update(schema.churchMemberships)
         .set({
           role: input.role,
+          status: input.status,
           updatedAt: new Date(),
         })
         .where(eq(schema.churchMemberships.id, membership.id))
         .returning({
           role: schema.churchMemberships.role,
+          status: schema.churchMemberships.status,
         });
 
       if (!updated) throw new NotFoundException('User not found.');
-
-      await transaction
-        .update(schema.adminUsers)
-        .set({ status: input.status, updatedAt: new Date() })
-        .where(eq(schema.adminUsers.id, userId));
 
       return {
         createdAt: membership.createdAt,
@@ -195,7 +194,6 @@ export class UsersService {
         email: membership.email,
         id: userId,
         ...updated,
-        status: input.status,
       };
     });
   }

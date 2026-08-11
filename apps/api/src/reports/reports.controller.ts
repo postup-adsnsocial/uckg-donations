@@ -113,6 +113,7 @@ export class ReportsController {
     },
     delivery: string | undefined,
   ) {
+    response.setHeader('Cache-Control', 'private, no-store, max-age=0');
     if (report.signedUrl) {
       if (delivery === 'url') {
         const downloadUrl = new URL(report.signedUrl);

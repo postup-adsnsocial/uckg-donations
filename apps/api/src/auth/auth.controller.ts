@@ -6,7 +6,9 @@ import {
   Inject,
   Patch,
   Post,
+  Req,
   Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -14,12 +16,13 @@ import {
   loginRequestSchema,
   updateProfileRequestSchema,
 } from '@uckg/contracts';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 
 import { AuthService } from './auth.service.js';
 import type { AuthenticatedAdmin } from './auth.types.js';
 import { readCookie, sessionCookieName } from './cookies.js';
 import { CurrentUser } from './current-user.decorator.js';
+import { LoginAttemptLimiter } from './login-attempt-limiter.js';
 import { SessionAuthGuard } from './session-auth.guard.js';
 import {
   IdentityRoute,
@@ -28,12 +31,17 @@ import {
 
 @Controller('auth')
 export class AuthController {
-  constructor(@Inject(AuthService) private readonly authService: AuthService) {}
+  constructor(
+    @Inject(AuthService) private readonly authService: AuthService,
+    @Inject(LoginAttemptLimiter)
+    private readonly loginAttemptLimiter: LoginAttemptLimiter,
+  ) {}
 
   @Post('login')
   @PublicRoute()
   async login(
     @Body() body: unknown,
+    @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ) {
     const parsed = loginRequestSchema.safeParse(body);
@@ -42,10 +50,22 @@ export class AuthController {
       throw new BadRequestException('A valid email and password are required.');
     }
 
-    const result = await this.authService.login(
-      parsed.data.email,
-      parsed.data.password,
-    );
+    const source = request.ip || request.socket.remoteAddress || 'unknown';
+    this.loginAttemptLimiter.assertAllowed(source, parsed.data.email);
+
+    let result: Awaited<ReturnType<AuthService['login']>>;
+    try {
+      result = await this.authService.login(
+        parsed.data.email,
+        parsed.data.password,
+      );
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        this.loginAttemptLimiter.recordFailure(source, parsed.data.email);
+      }
+      throw error;
+    }
+    this.loginAttemptLimiter.recordSuccess(parsed.data.email);
 
     response.cookie(sessionCookieName, result.token, {
       expires: result.expiresAt,

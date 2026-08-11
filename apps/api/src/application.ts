@@ -8,6 +8,7 @@ import helmetModule from 'helmet';
 
 import { AppModule } from './app.module.js';
 import { ApiConfigService } from './config/api-config.service.js';
+import { preventPrivateResponseCaching } from './security/private-cache-control.js';
 
 export async function createApplication(): Promise<NestExpressApplication> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -19,6 +20,7 @@ export async function createApplication(): Promise<NestExpressApplication> {
 
   app.set('trust proxy', config.trustProxy);
   app.use(helmet());
+  app.use(preventPrivateResponseCaching);
   app.use(json({ limit: config.bodyLimit }));
   app.use(urlencoded({ extended: true, limit: config.bodyLimit }));
 

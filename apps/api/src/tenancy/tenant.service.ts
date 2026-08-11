@@ -56,6 +56,7 @@ export class TenantService {
         and(
           eq(schema.churchMemberships.userId, user.id),
           eq(schema.churchMemberships.churchId, churchId),
+          eq(schema.churchMemberships.status, 'active'),
           eq(schema.churches.status, 'active'),
         ),
       )

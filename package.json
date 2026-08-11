@@ -20,6 +20,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint . --max-warnings=0",
+    "prepare": "simple-git-hooks",
+    "security:secrets": "gitleaks git --redact=100 --no-banner --log-opts=--all .",
+    "security:secrets:staged": "gitleaks git --redact=100 --no-banner --staged .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
@@ -35,15 +38,19 @@
   "devDependencies": {
     "@eslint/js": "9.32.0",
     "@next/eslint-plugin-next": "16.2.12",
-    "@playwright/test": "1.54.1",
+    "@playwright/test": "1.62.1",
     "@types/node": "24.1.0",
     "concurrently": "9.2.0",
     "eslint": "9.32.0",
     "eslint-config-prettier": "10.1.8",
     "globals": "16.3.0",
     "prettier": "3.6.2",
+    "simple-git-hooks": "2.13.1",
     "typescript": "5.9.2",
     "typescript-eslint": "8.65.0",
     "vitest": "3.2.4"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm security:secrets:staged"
   }
 }

@@ -18,6 +18,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { AppModule } from '../app.module.js';
 import { AuthService } from '../auth/auth.service.js';
+import { LoginAttemptLimiter } from '../auth/login-attempt-limiter.js';
 import { ChurchesService } from '../churches/churches.service.js';
 import { MembersService } from '../members/members.service.js';
 import { DonationsService } from '../donations/donations.service.js';
@@ -70,6 +71,7 @@ const registeredControllers = collectControllers(AppModule);
   imports: [DiscoveryModule],
   providers: [
     { provide: AuthService, useValue: {} },
+    { provide: LoginAttemptLimiter, useValue: {} },
     { provide: ChurchesService, useValue: {} },
     { provide: MembersService, useValue: {} },
     { provide: DonationsService, useValue: {} },

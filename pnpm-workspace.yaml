@@ -6,3 +6,13 @@ allowBuilds:
   '@nestjs/core': true
   esbuild: true
   sharp: true
+  simple-git-hooks: false
+
+overrides:
+  nanoid@3: 3.3.17
+  path-to-regexp@8: 8.4.2
+
+minimumReleaseAgeExclude:
+  - '@nestjs/common@11.1.29'
+  - '@nestjs/core@11.1.29'
+  - '@nestjs/platform-express@11.1.29'

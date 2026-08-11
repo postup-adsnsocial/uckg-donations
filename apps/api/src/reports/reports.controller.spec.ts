@@ -39,6 +39,10 @@ describe('ReportsController downloads', () => {
       filename: 'report.pdf',
       url: 'https://storage.example.test/report.pdf?token=secret&download=report.pdf',
     });
+    expect(response.setHeader).toHaveBeenCalledWith(
+      'Cache-Control',
+      'private, no-store, max-age=0',
+    );
     expect(response.redirect).not.toHaveBeenCalled();
   });
 });

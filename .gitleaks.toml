@@ -1,0 +1,10 @@
+title = "UCKG Donations Gitleaks configuration"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Ignore the empty optional metrics token followed by BODY_LIMIT"
+targetRules = ["generic-api-key"]
+regexTarget = "match"
+regexes = ['''(?m)^METRICS_TOKEN=\r?\nBODY_LIMIT=\d+(?:kb|mb|gb)$''']

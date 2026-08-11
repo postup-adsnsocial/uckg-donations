@@ -26,8 +26,8 @@ import type { TenantContext } from '../database/tenant-unit-of-work.js';
 import { CurrentTenant } from '../tenancy/current-tenant.decorator.js';
 import { DomainRoute } from '../tenancy/domain-route.decorator.js';
 import { DonationsService, type EnvelopeUpload } from './donations.service.js';
+import { isSupportedEnvelopeImage } from './envelope-upload.js';
 
-const supportedImageTypes = new Set(['image/jpeg', 'image/png']);
 const maximumEnvelopeImageBytes = 4_000_000;
 
 @Controller('donations')
@@ -114,7 +114,7 @@ export class DonationsController {
   ) {
     const parsedId = churchIdSchema.safeParse(donationId);
 
-    if (!parsedId.success || !file || !supportedImageTypes.has(file.mimetype)) {
+    if (!parsedId.success || !file || !isSupportedEnvelopeImage(file)) {
       throw new BadRequestException(
         'A JPEG or PNG envelope image up to 4 MB is required.',
       );
@@ -154,7 +154,7 @@ export class DonationsController {
     const file = await this.donations.getEnvelope(context, parsedId.data);
     response.setHeader('Content-Type', file.contentType);
     response.setHeader('Content-Disposition', 'inline');
-    response.setHeader('Cache-Control', 'private, max-age=300');
+    response.setHeader('Cache-Control', 'private, no-store, max-age=0');
     response.send(file.buffer);
   }
 
