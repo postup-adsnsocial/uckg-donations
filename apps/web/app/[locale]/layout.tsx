@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
+import { AppSessionProvider } from '../components/app-session';
 import { DocumentLocale } from '../components/document-locale';
 import { isLocale, locales } from '../i18n/config';
 import { getDictionary } from '../i18n/dictionaries';
@@ -43,9 +44,9 @@ export default async function LocaleLayout({
   }
 
   return (
-    <>
+    <AppSessionProvider locale={locale}>
       <DocumentLocale locale={locale} />
       {children}
-    </>
+    </AppSessionProvider>
   );
 }

@@ -8,13 +8,22 @@ import {
   type AppChurch,
   type AppUser,
 } from '../components/app-shell';
+import { AppSessionProvider } from '../components/app-session';
 import { ProductIcon, type ProductIconName } from '../components/product-icon';
 import { type Locale, localeFromRoute } from '../i18n/config';
 import { productCopies } from '../i18n/product-copy';
 
 type ModuleId = 'churches' | 'launch' | 'members' | 'reports';
 
-export default function DashboardPage() {
+export default function StandaloneDashboardPage() {
+  return (
+    <AppSessionProvider locale="pt-BR">
+      <DashboardPage />
+    </AppSessionProvider>
+  );
+}
+
+export function DashboardPage() {
   const params = useParams<{ locale?: string }>();
   const locale = localeFromRoute(params.locale);
   return (
