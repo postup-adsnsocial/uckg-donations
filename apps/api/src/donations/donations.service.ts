@@ -245,14 +245,6 @@ export class DonationsService {
     };
   }
 
-  async getEnvelopeUrl(context: TenantContext, donationId: string) {
-    const file = await this.findEnvelope(context, donationId);
-    return this.storage.createSignedDownloadUrl(
-      this.storageBucket,
-      file.storageKey,
-    );
-  }
-
   private async findEnvelope(context: TenantContext, donationId: string) {
     const file = await this.tenantUnitOfWork.run(
       context,

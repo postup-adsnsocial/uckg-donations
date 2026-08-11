@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { AppShell, type AppChurch } from '../components/app-shell';
 import type { Locale } from '../i18n/config';
@@ -43,6 +43,7 @@ function EnvelopeDetail({
   const [imageMessageTone, setImageMessageTone] = useState<'error' | 'success'>(
     'error',
   );
+  const [imageLoading, setImageLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
@@ -68,12 +69,26 @@ function EnvelopeDetail({
     },
     [imageUrl],
   );
-  async function showImage() {
-    const response = await apiRequest(`/donations/${id}/envelope`, {
-      headers: { 'x-church-id': church.id },
-    });
-    if (response.ok) setImageUrl(URL.createObjectURL(await response.blob()));
-  }
+  const showImage = useCallback(async () => {
+    setImageLoading(true);
+    try {
+      const response = await apiRequest(`/donations/${id}/envelope`, {
+        headers: { 'x-church-id': church.id },
+      });
+      if (!response.ok) throw new Error('Envelope image could not be loaded.');
+      setImageUrl(URL.createObjectURL(await response.blob()));
+    } catch {
+      setImageMessageTone('error');
+      setImageMessage(copy.envelopes.imageError);
+    } finally {
+      setImageLoading(false);
+    }
+  }, [church.id, copy.envelopes.imageError, id]);
+
+  const hasEnvelopeImage = Boolean(item?.envelope);
+  useEffect(() => {
+    if (hasEnvelopeImage) void showImage();
+  }, [hasEnvelopeImage, showImage]);
 
   async function uploadImage(file: File | undefined) {
     if (!file) return;
@@ -174,15 +189,7 @@ function EnvelopeDetail({
           <h3>{copy.envelopes.image}</h3>
           <p>{item.envelope?.originalName ?? copy.envelopes.empty}</p>
         </div>
-        {item.envelope ? (
-          <button
-            className="product-primary-link"
-            type="button"
-            onClick={() => void showImage()}
-          >
-            {copy.envelopes.view}
-          </button>
-        ) : (
+        {!item.envelope ? (
           <>
             <input
               ref={imageInputRef}
@@ -204,13 +211,18 @@ function EnvelopeDetail({
                 : copy.envelopes.addImage}
             </button>
           </>
-        )}
+        ) : null}
         {imageMessage ? (
           <p
             className={`form-feedback form-feedback--${imageMessageTone}`}
             role="status"
           >
             {imageMessage}
+          </p>
+        ) : null}
+        {imageLoading ? (
+          <p className="product-empty" role="status">
+            {copy.common.loading}
           </p>
         ) : null}
         {imageUrl ? (

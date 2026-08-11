@@ -399,8 +399,11 @@ try {
   await page
     .getByRole('heading', { level: 2, name: 'Detalhes do envelope' })
     .waitFor();
-  await page.getByRole('button', { name: 'Ver detalhes' }).click();
   await page.locator('.envelope-preview').waitFor();
+  if ((await page.getByRole('button', { name: 'Ver detalhes' }).count()) !== 0)
+    throw new Error(
+      'Envelope image must open without a second details button.',
+    );
   await assertResponsive(page, 'envelope-detail');
 
   await page.goto('http://localhost:3000/pt-BR/reports');

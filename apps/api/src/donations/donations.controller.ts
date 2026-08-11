@@ -141,17 +141,10 @@ export class DonationsController {
       throw new BadRequestException('Invalid envelope identifier.');
     }
 
-    const context = this.toTenantContext(tenant, user);
-    const signedUrl = await this.donations.getEnvelopeUrl(
-      context,
+    const file = await this.donations.getEnvelope(
+      this.toTenantContext(tenant, user),
       parsedId.data,
     );
-    if (signedUrl) {
-      response.redirect(302, signedUrl);
-      return;
-    }
-
-    const file = await this.donations.getEnvelope(context, parsedId.data);
     response.setHeader('Content-Type', file.contentType);
     response.setHeader('Content-Disposition', 'inline');
     response.setHeader('Cache-Control', 'private, no-store, max-age=0');
