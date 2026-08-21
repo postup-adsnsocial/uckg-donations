@@ -345,7 +345,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       historyIntro:
         'Doações registradas para este membro, da mais recente para a mais antiga.',
       historyTitle: 'Histórico de lançamentos',
-      listIntro: 'Consulte, pesquise e mantenha os membros desta congregação.',
+      listIntro: 'Consulte, pesquise e mantenha os membros desta igreja.',
       name: 'Nome completo',
       new: 'Novo membro',
       notes: 'Observações',
@@ -391,7 +391,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       imageUploadError:
         'O lançamento foi salvo, mas a imagem não foi enviada. Selecione-a novamente para tentar outra vez.',
       imageUploading: 'Enviando imagem…',
-      listIntro: 'Consulte lançamentos e imagens da congregação ativa.',
+      listIntro: 'Consulte lançamentos e imagens da igreja ativa.',
       member: 'Membro relacionado',
       new: 'Lançar envelope',
       notes: 'Observação',
@@ -419,13 +419,12 @@ export const productCopies: Record<Locale, ProductCopy> = {
       launchDescription:
         'Registre uma nova doação, a forma de pagamento e a imagem do envelope.',
       members: 'Membros',
-      membersDescription:
-        'Cadastre, consulte e atualize os membros da congregação.',
+      membersDescription: 'Cadastre, consulte e atualize os membros da igreja.',
       open: 'Acessar',
       reports: 'Relatórios',
       reportsDescription:
         'Gere relatórios por período, membro e forma de pagamento.',
-      subtitle: 'Acesse as principais áreas de gestão da congregação.',
+      subtitle: 'Acesse as principais áreas de gestão da igreja.',
       title: 'Visão geral',
     },
     reports: {
@@ -598,7 +597,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       historyIntro:
         'Donations recorded for this member, from newest to oldest.',
       historyTitle: 'Entry history',
-      listIntro: 'Find, review and manage members in this congregation.',
+      listIntro: 'Find, review and manage members in this church.',
       name: 'Full name',
       new: 'New member',
       notes: 'Notes',
@@ -644,7 +643,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       imageUploadError:
         'The entry was saved, but the image was not uploaded. Select it again to retry.',
       imageUploading: 'Uploading image…',
-      listIntro: 'Review entries and images for the active congregation.',
+      listIntro: 'Review entries and images for the active church.',
       member: 'Related member',
       new: 'Record envelope',
       notes: 'Note',
@@ -671,13 +670,12 @@ export const productCopies: Record<Locale, ProductCopy> = {
       launchDescription:
         'Record a new donation, payment method and envelope image.',
       members: 'Members',
-      membersDescription:
-        'Register, review and update members of the congregation.',
+      membersDescription: 'Register, review and update members of the church.',
       open: 'Open',
       reports: 'Reports',
       reportsDescription:
         'Generate reports by period, member and payment method.',
-      subtitle: 'Open the main management areas for this congregation.',
+      subtitle: 'Open the main management areas for this church.',
       title: 'Overview',
     },
     reports: {
@@ -856,8 +854,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       historyIntro:
         'Donaciones registradas para este miembro, de la más reciente a la más antigua.',
       historyTitle: 'Historial de registros',
-      listIntro:
-        'Consulta, busca y administra los miembros de esta congregación.',
+      listIntro: 'Consulta, busca y administra los miembros de esta iglesia.',
       name: 'Nombre completo',
       new: 'Nuevo miembro',
       notes: 'Observaciones',
@@ -903,7 +900,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       imageUploadError:
         'El registro se guardó, pero la imagen no se envió. Selecciónala de nuevo para volver a intentarlo.',
       imageUploading: 'Enviando imagen…',
-      listIntro: 'Consulta registros e imágenes de la congregación activa.',
+      listIntro: 'Consulta registros e imágenes de la iglesia activa.',
       member: 'Miembro relacionado',
       new: 'Registrar sobre',
       notes: 'Observación',
@@ -932,12 +929,12 @@ export const productCopies: Record<Locale, ProductCopy> = {
         'Registra una nueva donación, la forma de pago y la imagen del sobre.',
       members: 'Miembros',
       membersDescription:
-        'Registra, consulta y actualiza los miembros de la congregación.',
+        'Registra, consulta y actualiza los miembros de la iglesia.',
       open: 'Acceder',
       reports: 'Informes',
       reportsDescription:
         'Genera informes por período, miembro y forma de pago.',
-      subtitle: 'Accede a las principales áreas de gestión de la congregación.',
+      subtitle: 'Accede a las principales áreas de gestión de la iglesia.',
       title: 'Vista general',
     },
     reports: {

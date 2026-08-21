@@ -20,7 +20,7 @@ progress:
 
 See: .planning/PROJECT.md (updated 2026-08-03)
 
-**Core value:** Cada igreja consegue registrar e acompanhar suas contribuições com segurança, clareza e isolamento total dos dados de outras congregações.
+**Core value:** Cada igreja consegue registrar e acompanhar suas contribuições com segurança, clareza e isolamento total dos dados de outras igrejas.
 **Current focus:** Phase 01 — tenant-and-production-safety-foundation
 
 ## Current Position

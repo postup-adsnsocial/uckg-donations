@@ -19,8 +19,8 @@ Missing these features would make the product incomplete or unsafe for routine c
 
 | Feature | Why Expected | Complexity | Dependencies / Notes |
 |---|---|---:|---|
-| Tenant-scoped member directory | Operators need a canonical list for the active church without exposing another congregation's people. | Medium | Existing tenant context; every read/write filtered by `church_id`; adversarial cross-tenant tests. |
-| Paginated list with deterministic sort | A professional directory must remain usable as congregations grow; the current unbounded list is a known scaling defect. | Medium | Cursor contract, capped page size, `(church_id, full_name, id)`-compatible query/index. |
+| Tenant-scoped member directory | Operators need a canonical list for the active church without exposing another church's people. | Medium | Existing tenant context; every read/write filtered by `church_id`; adversarial cross-tenant tests. |
+| Paginated list with deterministic sort | A professional directory must remain usable as churches grow; the current unbounded list is a known scaling defect. | Medium | Cursor contract, capped page size, `(church_id, full_name, id)`-compatible query/index. |
 | Search by name, email, or phone | Fast lookup is essential during donation entry and ordinary record maintenance. Tithely documents the same identifiers for transaction/member lookup. | Medium | Normalization rules; indexed strategy chosen from measured volume; search must remain tenant-scoped. |
 | Create, view, and edit a member | Correcting contact data is a basic lifecycle need. | Medium | Shared request/response schemas; runtime response serialization; `updated_at` maintained reliably. |
 | Active/inactive lifecycle with reactivation | Former or unavailable members should leave default workflows without destroying historical donation links. | Medium | Status filter; reason/actor/timestamp in audit trail; no hard delete in normal UI. |
@@ -63,7 +63,7 @@ Missing these features would make the product incomplete or unsafe for routine c
 
 | Feature | Why Expected | Complexity | Dependencies / Notes |
 |---|---|---:|---|
-| Explicit active-church context on every domain screen | Prevents operators from recording or interpreting data under the wrong congregation. | Low | Existing tenant selector; church name remains visible near titles/actions, especially in donation entry. |
+| Explicit active-church context on every domain screen | Prevents operators from recording or interpreting data under the wrong church. | Low | Existing tenant selector; church name remains visible near titles/actions, especially in donation entry. |
 | Deny-by-default permissions | Financial read, write, correction, posting, reporting, export, and audit access should not collapse into one broad role. | High | Permission matrix and route-metadata inventory tests; current policy lacks `finance:read`. |
 | Append-only domain audit trail | Member status/contact changes, donation creation/correction/reversal, batch posting, and exports need actor, time, church, action, subject, and safe before/after metadata. | High | Audit schema and viewer; redact unnecessary PII; never log credentials/session tokens. |
 | Empty, loading, error, and retry states | Operational screens must fail clearly without losing draft work or inviting duplicate submission. | Medium | Request cancellation/sequencing, idempotency, localized copy. |
@@ -98,7 +98,7 @@ These are deliberate boundaries for the current milestone. Some may be future pr
 | Hard deletion of posted donations, funds with history, or members with giving history | Deletion destroys traceability and can change historical totals silently. | Reverse/supersede donations and archive members/funds, with audited exceptional data-retention workflows outside normal UI. |
 | Silent in-place edits to posted financial facts | Users cannot explain changed totals after the fact. | Require correction reason and preserve original plus correction/reversal history. |
 | Cross-church “all data” mode for ordinary operators | Undermines the core tenant-isolation promise and increases wrong-church entry risk. | Require explicit active church. Any future platform-wide view must be separately permissioned, read-only by default, and visibly scoped. |
-| Treating members as administrator accounts | The project explicitly separates congregation people from system operators; combining lifecycles creates privilege and privacy hazards. | Keep member profiles non-authenticating and admin identity in the existing identity domain. |
+| Treating members as administrator accounts | The project explicitly separates church people from system operators; combining lifecycles creates privilege and privacy hazards. | Keep member profiles non-authenticating and admin identity in the existing identity domain. |
 | Fake member records for anonymous donors | Pollutes the directory, skews people counts, and makes donor identity ambiguous. | Use nullable member association with an explicit anonymous/unidentified state. |
 | Free-form currency per donation | Permits incomparable totals inside one church and invites data-entry errors. | Configure one ISO currency per church for this milestone; research multi-currency accounting only when required. |
 | In-kind donation valuation | Non-cash gifts have different data and jurisdiction-specific statement treatment; Planning Center manages them separately. | Defer to a dedicated researched phase; do not overload the monetary amount field. |

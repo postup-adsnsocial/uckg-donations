@@ -6,7 +6,7 @@
 - The API generates the technical slug internally and applies the US defaults (`en` and `America/New_York`).
 - Only platform administrators can list or create churches globally; ordinary church roles receive `403`.
 - Platform administrators can choose any active church while creating a member.
-- Existing members continue to show their church as read-only, preventing accidental transfers between congregations.
+- Existing members continue to show their church as read-only, preventing accidental transfers between churches.
 - The active-church selector now includes every active church for platform administrators, so members, entries, and reports remain scoped to the selected church.
 - PT-BR, English, and Spanish interfaces were reviewed at desktop, mobile, and 320 px widths, including refinements that keep church names legible on narrow screens.
 

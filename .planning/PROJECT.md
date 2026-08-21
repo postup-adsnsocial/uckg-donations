@@ -3,14 +3,14 @@
 ## What This Is
 
 UCKG Donations é uma plataforma web administrativa multi-igreja para cadastro de membros, gestão
-de doações e acompanhamento financeiro das congregações da Universal. Operadores trabalham sempre
+de doações e acompanhamento financeiro das igrejas da Universal. Operadores trabalham sempre
 dentro de uma igreja selecionada, com permissões por função, rastreabilidade e uma experiência
 profissional em português brasileiro, inglês e espanhol.
 
 ## Core Value
 
 Cada igreja consegue registrar e acompanhar suas contribuições com segurança, clareza e isolamento
-total dos dados de outras congregações.
+total dos dados de outras igrejas.
 
 ## Requirements
 
@@ -71,7 +71,7 @@ total dos dados de outras congregações.
 | ---------------------------------------------------------- | ------------------------------------------------------------------------- | --------- |
 | Monólito modular com processos web, API e worker separados | Preserva limites claros sem custo prematuro de microsserviços             | ✓ Good    |
 | Sessões opacas próprias com cookie seguro                  | Controle explícito de identidade administrativa e tenant                  | ✓ Good    |
-| Contas administrativas separadas de membros                | Evita misturar operadores do sistema com pessoas da congregação           | ✓ Good    |
+| Contas administrativas separadas de membros                | Evita misturar operadores do sistema com pessoas da igreja                 | ✓ Good    |
 | PT-BR, EN e ES desde a fundação da interface               | Internacionalização tardia geraria retrabalho estrutural                  | ✓ Good    |
 | Senhas administrativas com mínimo de 6 caracteres          | Política solicitada explicitamente pelo responsável do produto            | — Pending |
 | Gate visual obrigatório após E2E                           | Impede regressões de acabamento e traduções truncadas                     | ✓ Good    |

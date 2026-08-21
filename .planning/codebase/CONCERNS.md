@@ -155,7 +155,7 @@
 **All member search/sort work targets the primary database:**
 - Current capacity: No documented member-count target or benchmark exists.
 - Limit: Sorting and transferring the full tenant population grows linearly; the `(church_id, full_name)` index helps ordered scans but does not bound response size or support flexible normalized search.
-- Scaling path: Establish expected congregation sizes, implement cursor pagination first, then add a deliberate search index only for confirmed query patterns.
+- Scaling path: Establish expected church sizes, implement cursor pagination first, then add a deliberate search index only for confirmed query patterns.
 - Files: `packages/database/src/schema.ts`, `apps/api/src/members/members.service.ts`
 
 ## Dependencies at Risk

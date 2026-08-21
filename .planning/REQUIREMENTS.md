@@ -2,7 +2,7 @@
 
 **Defined:** 2026-08-03  
 **Core Value:** Cada igreja consegue registrar e acompanhar suas contribuições com segurança,
-clareza e isolamento total dos dados de outras congregações.
+clareza e isolamento total dos dados de outras igrejas.
 
 ## Existing Baseline
 

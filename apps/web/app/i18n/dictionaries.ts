@@ -106,7 +106,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
         'Uma visão responsável das contribuições, com isolamento por igreja e rastreabilidade para cada operação.',
       features: [
         {
-          description: 'Dados separados por congregação',
+          description: 'Dados separados por igreja',
           title: 'Multi-igreja',
         },
         {
@@ -124,7 +124,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       title: 'Clareza para cuidar. Segurança para servir.',
     },
     dashboard: {
-      activeChurch: 'Congregação ativa',
+      activeChurch: 'Igreja ativa',
       activeStatus: 'Ativo',
       adminPanel: 'Painel administrativo',
       backToLogin: 'Voltar ao login',
@@ -226,7 +226,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
         'A responsible view of contributions, with church-level isolation and traceability for every operation.',
       features: [
         {
-          description: 'Data separated by congregation',
+          description: 'Data separated by church',
           title: 'Multi-church',
         },
         {
@@ -241,7 +241,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       title: 'Clarity to care. Security to serve.',
     },
     dashboard: {
-      activeChurch: 'Active congregation',
+      activeChurch: 'Active church',
       activeStatus: 'Active',
       adminPanel: 'Administrative dashboard',
       backToLogin: 'Back to login',
@@ -341,7 +341,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
         'Una visión responsable de las contribuciones, con aislamiento por iglesia y trazabilidad en cada operación.',
       features: [
         {
-          description: 'Datos separados por congregación',
+          description: 'Datos separados por iglesia',
           title: 'Multiiglesia',
         },
         {
@@ -359,7 +359,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       title: 'Claridad para cuidar. Seguridad para servir.',
     },
     dashboard: {
-      activeChurch: 'Congregación activa',
+      activeChurch: 'Iglesia activa',
       activeStatus: 'Activo',
       adminPanel: 'Panel administrativo',
       backToLogin: 'Volver al inicio de sesión',

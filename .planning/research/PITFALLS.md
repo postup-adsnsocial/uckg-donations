@@ -5,7 +5,7 @@
 
 ## 1. Tenant filtering treated as a controller convention
 
-**Risk:** One forgotten `church_id` predicate exposes member or donation data across congregations.
+**Risk:** One forgotten `church_id` predicate exposes member or donation data across churches.
 
 **Warning signs:** Services accept naked IDs, queries do not receive a tenant-scoped unit of work,
 or new tables lack composite tenant relationships.
@@ -58,7 +58,7 @@ but administrator identity remains the actor who performed the operation.
 ## 5. Unbounded member and ledger queries
 
 **Risk:** A screen that works with ten fixtures becomes slow, memory-heavy and unstable with a real
-congregation's history.
+church's history.
 
 **Warning signs:** `GET` endpoints return every row, sorting happens in the browser, search ignores
 indexes or page order is nondeterministic.

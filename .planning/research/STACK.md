@@ -167,7 +167,7 @@ jobs:      managed by pg-boss; do not hand-edit its indexes
 
 For a common report scan, benchmark a covering index such as `(church_id, donated_at) INCLUDE (amount, currency_code)`; add it only when `EXPLAIN (ANALYZE, BUFFERS)` shows value because every index increases write and vacuum cost. PostgreSQL multicolumn B-tree indexes work best when tenant equality is the leftmost condition.
 
-If product requirements demand accent-tolerant substring/fuzzy member search, enable PostgreSQL's bundled `pg_trgm` extension and add a measured GIN trigram index on the normalized search expression. Do not install Elasticsearch for this. Do not add trigram indexes speculatively: congregation size and the exact search predicate should drive the migration.
+If product requirements demand accent-tolerant substring/fuzzy member search, enable PostgreSQL's bundled `pg_trgm` extension and add a measured GIN trigram index on the normalized search expression. Do not install Elasticsearch for this. Do not add trigram indexes speculatively: church size and the exact search predicate should drive the migration.
 
 ### 7. Reports Start as Parameterized SQL Aggregates
 
