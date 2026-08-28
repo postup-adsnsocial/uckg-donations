@@ -51,7 +51,7 @@
           system-ui,
           -apple-system,
           BlinkMacSystemFont,
-          "Segoe UI",
+          'Segoe UI',
           sans-serif;
         line-height: 1.55;
         text-rendering: optimizeLegibility;
@@ -171,8 +171,17 @@
         min-height: 480px;
         overflow: hidden;
         background:
-          radial-gradient(circle at 82% 16%, rgba(255, 255, 255, 0.14), transparent 27%),
-          linear-gradient(145deg, var(--blue-700) 0%, var(--blue-800) 42%, var(--blue-950) 100%);
+          radial-gradient(
+            circle at 82% 16%,
+            rgba(255, 255, 255, 0.14),
+            transparent 27%
+          ),
+          linear-gradient(
+            145deg,
+            var(--blue-700) 0%,
+            var(--blue-800) 42%,
+            var(--blue-950) 100%
+          );
         color: white;
       }
 
@@ -185,7 +194,7 @@
           linear-gradient(90deg, rgba(255, 255, 255, 0.3) 1px, transparent 1px);
         background-size: 76px 76px;
         mask-image: linear-gradient(to bottom right, transparent 5%, black 85%);
-        content: "";
+        content: '';
       }
 
       .hero::after {
@@ -199,7 +208,7 @@
         box-shadow:
           0 0 0 92px rgba(255, 255, 255, 0.025),
           0 0 0 184px rgba(255, 255, 255, 0.018);
-        content: "";
+        content: '';
       }
 
       .hero__redline {
@@ -272,7 +281,7 @@
         border-radius: 50%;
         background: #6ce9a6;
         box-shadow: 0 0 0 5px rgba(108, 233, 166, 0.12);
-        content: "";
+        content: '';
       }
 
       .proposal-card {
@@ -574,7 +583,7 @@
         color: var(--blue-800);
         background: white;
         font-size: 0.78rem;
-        content: "→";
+        content: '→';
       }
 
       .workflow small {
@@ -750,7 +759,7 @@
         background: #e7f6ee;
         font-size: 0.68rem;
         font-weight: 900;
-        content: "✓";
+        content: '✓';
       }
 
       .security-grid {
@@ -1111,7 +1120,7 @@
         width: 7px;
         height: 100%;
         background: var(--red-600);
-        content: "";
+        content: '';
       }
 
       .contact-grid {
@@ -1184,7 +1193,7 @@
         width: 7px;
         height: 100%;
         background: var(--red-600);
-        content: "";
+        content: '';
       }
 
       .cta__grid {
@@ -1249,7 +1258,6 @@
         justify-content: space-between;
         gap: 20px;
       }
-
 
       .language-links {
         display: flex;
@@ -1466,5 +1474,831 @@
       }
     </style>
   </head>
-  <body> <header class="topbar"> <a class="brand" href="#inicio" aria-label="Volver al inicio"> <span class="brand__mark"> <img src="assets/universal-logo.png" alt="Universal" /> </span> <span class="brand__copy"> <strong>UNIVERSAL</strong> <small>Gestión Financiera</small> </span> </a> <div class="topbar__actions"><nav class="language-links" aria-label="Idiomas de la propuesta"><a class="" href="proposta-comercial-uckg-pt.html">PT</a><a class="" href="commercial-proposal-uckg-en.html">EN</a><a class="is-active" href="propuesta-comercial-uckg-es.html">ES</a></nav> <a href="#solucao">La solución</a> <a href="#seguranca">Seguridad</a> <a href="#investimento">Inversión</a> <button class="print-button" type="button" onclick="window.print()"> Imprimir / Guardar PDF </button> </div> </header> <main class="page"> <section class="hero" id="inicio"> <span class="hero__redline" aria-hidden="true"></span> <div class="shell hero__content"> <div> <p class="eyebrow eyebrow--light">Propuesta comercial · 2026</p> <p class="hero__lead"> Plataforma de gestión de miembros, sobres e informes, diseñada para organizar la operación financiera de cada iglesia con trazabilidad, privacidad y una visión centralizada. </p> </div> </div> </section> <section class="section" id="solucao"> <div class="shell"> <header class="section-heading"> <div> <p class="eyebrow">Visión ejecutiva</p> <h2>Una operación más sencilla, verificable y responsable.</h2> </div> <p> El sistema reúne en una sola experiencia el registro de miembros, los registros de sobres, las imágenes de comprobantes y la emisión de informes. Cada iglesia decide individualmente si desea contratarlo, sin depender de la adhesión de otras unidades. </p> </header> <div class="intro-grid"> <article class="intro-card"> <span class="intro-card__number">01</span> <h3>Menos trabajo manual</h3> <p> El registro, la búsqueda, los movimientos y los informes siguen un flujo único, reduciendo hojas de cálculo paralelas y retrabajo administrativo. </p> </article> <article class="intro-card"> <span class="intro-card__number">02</span> <h3>Mayor trazabilidad</h3> <p> Cada registro guarda la fecha, el importe, la forma de pago, el miembro relacionado, el operador y la imagen del sobre cuando corresponde. </p> </article> <article class="intro-card"> <span class="intro-card__number">03</span> <h3>Datos separados por iglesia</h3> <p> La arquitectura fue diseñada para que cada iglesia vea únicamente sus propios miembros, registros, imágenes e informes. </p> </article> </div> </div> </section> <section class="section section--white"> <div class="shell"> <header class="section-heading"> <div> <p class="eyebrow">Alcance funcional</p> <h2>Todo lo que la iglesia necesita para su gestión diaria.</h2> </div> <p> La plataforma ya cubre los principales flujos administrativos y financieros del proyecto, con una experiencia adaptable en portugués, inglés y español. </p> </header> <ul class="feature-list"> <li> <span class="feature-icon">01</span> <div> <h3>Acceso y perfiles</h3> <p> Inicio de sesión protegido, iglesia activa, administrador de la plataforma, administrador de la iglesia, operador financiero y auditor, con permisos adecuados para cada función. </p> </div> </li> <li> <span class="feature-icon">02</span> <div> <h3>Gestión de iglesias y usuarios</h3> <p> Registro y organización de las unidades disponibles, selección de la iglesia activa y administración de usuarios autorizados. </p> </div> </li> <li> <span class="feature-icon">03</span> <div> <h3>Registro de miembros</h3> <p> Listado, búsqueda, alta, edición, estado, contactos, dirección, observaciones, detalle individual e historial de registros. </p> </div> </li> <li> <span class="feature-icon">04</span> <div> <h3>Registro de sobres</h3> <p> Registro del importe, fecha, forma de pago, miembro, notas y fotografía privada del sobre desde una computadora o un teléfono móvil. </p> </div> </li> <li> <span class="feature-icon">05</span> <div> <h3>Informes y PDF</h3> <p> Informe detallado, resumen anual por donante, total por miembro, filtros por período y opción de incluir las imágenes de los sobres en el PDF. </p> </div> </li> <li> <span class="feature-icon">06</span> <div> <h3>Experiencia multilingüe</h3> <p> Interfaz disponible en portugués, inglés y español, con navegación adaptable para computadora, tableta y teléfono móvil. </p> </div> </li> </ul> </div> </section> <section class="section section--blue" id="telas"> <div class="shell"> <header class="section-heading"> <div> <p class="eyebrow eyebrow--light">Experiencia del producto</p> <h2>Una interfaz clara para quienes operan todos los días.</h2> </div> <p> Las pantallas siguientes son capturas reales de la aplicación ejecutada con datos de demostración. No se utilizó información personal de miembros reales en esta propuesta. </p> </header> <article class="screen-stage"> <div class="screen-stage__chrome" aria-hidden="true"> <i></i><i></i><i></i> </div> <img src="assets/screens/es/dashboard.png" alt="Pantalla de vista general de la plataforma" /> <div class="screen-caption"> <strong>Vista general</strong> <span>Acceso rápido a los módulos de la iglesia activa</span> </div> </article> <div class="screen-grid"> <figure class="screen-card"> <div class="screen-card__image"> <img src="assets/screens/es/login.png" alt="Pantalla de acceso seguro al sistema" /> </div> <figcaption> <strong>Acceso protegido</strong> <span>Inicio de sesión institucional y selección de idioma.</span> </figcaption> </figure> <figure class="screen-card"> <div class="screen-card__image"> <img src="assets/screens/es/members.png" alt="Pantalla de listado y búsqueda de miembros" /> </div> <figcaption> <strong>Gestión de miembros</strong> <span>Búsqueda, estado de registro y acciones administrativas.</span> </figcaption> </figure> <figure class="screen-card"> <div class="screen-card__image screen-card__image--tall"> <img src="assets/screens/es/envelope-launch.png" alt="Pantalla de registro de sobres" /> </div> <figcaption> <strong>Registro de sobre</strong> <span>Importe, pago, miembro e imagen en un único flujo.</span> </figcaption> </figure> <figure class="screen-card"> <div class="screen-card__image screen-card__image--tall"> <img src="assets/screens/es/reports-builder.png" alt="Pantalla de configuración de informes" /> </div> <figcaption> <strong>Constructor de informes</strong> <span>Contenido, miembro, imágenes y período configurables.</span> </figcaption> </figure> </div> </div> </section> <section class="section section--white" id="relatorios"> <div class="shell"> <header class="section-heading"> <div> <p class="eyebrow">Rendición de cuentas</p> <h2>Informes listos para consultar, archivar y compartir.</h2> </div> <p> La iglesia puede ver los resultados en pantalla, descargar el PDF y, cuando sea necesario, incluir las imágenes vinculadas a cada registro para su verificación documental. </p> </header> <article class="report-showcase"> <div class="report-showcase__image"> <img src="assets/screens/es/reports-result.png" alt="Resultado demostrativo de un informe de donaciones" /> </div> <div class="report-showcase__copy"> <p class="eyebrow">Resultado demostrativo</p> <h3>Información organizada para decisiones y auditorías.</h3> <p> Los datos se presentan con período, miembro, importe, forma de pago e indicación de la existencia de la imagen del sobre. </p> <ul class="check-list"> <li>Filtros por período y por miembro.</li> <li>Consolidación individual y anual.</li> <li>PDF archivados y disponibles para recuperación.</li> <li>Inclusión opcional de las imágenes de los comprobantes.</li> </ul> </div> </article> <section class="report-examples" aria-labelledby="report-examples-title"> <header class="report-examples__heading"> <div> <p class="eyebrow">Ejemplos generados por el sistema</p> <h3 id="report-examples-title">Abra y consulte los informes completos.</h3> </div> <p> Los documentos siguientes fueron generados por la propia plataforma y muestran distintos formatos de consolidación y verificación. </p> </header> <div class="report-gallery"> <article class="report-example"> <div class="report-example__preview"> <img src="assets/report-previews/annual-donor-report.png" alt="Vista previa del informe anual por donante" /> </div> <div class="report-example__body"> <small>Informe anual</small> <h4>Resumen anual por donante</h4> <p> Tabla consolidada con los importes mensuales y el total de cada miembro en el período seleccionado. </p> <a href="assets/reports/annual-donor-report-2026.pdf" target="_blank" rel="noopener" >Abrir PDF completo</a > </div> </article> <article class="report-example"> <div class="report-example__preview"> <img src="assets/report-previews/detailed-donations-with-images.png" alt="Vista previa del informe detallado con imágenes de los sobres" /> </div> <div class="report-example__body"> <small>Informe detallado · 2 páginas</small> <h4>Registros con imágenes</h4> <p> Cada registro muestra el miembro, la fecha, el importe, el operador y la fotografía privada del sobre cuando está disponible. </p> <a href="assets/reports/detailed-donations-with-images-2026.pdf" target="_blank" rel="noopener" >Abrir PDF completo</a > </div> </article> <article class="report-example"> <div class="report-example__preview"> <img src="assets/report-previews/donation-totals-by-member.png" alt="Vista previa del informe de totales por miembro" /> </div> <div class="report-example__body"> <small>Consolidación por miembro</small> <h4>Totales de contribuciones</h4> <p> Vista objetiva de la cantidad de registros y del importe total atribuido a cada miembro. </p> <a href="assets/reports/donation-totals-by-member-2026.pdf" target="_blank" rel="noopener" >Abrir PDF completo</a > </div> </article> </div> </section> </div> </section> <section class="section"> <div class="shell"> <header class="section-heading"> <div> <p class="eyebrow">Flujo operativo</p> <h2>Del registro al informe en cuatro etapas.</h2> </div> <p> El recorrido fue diseñado para reducir dudas y mantener una operación consistente incluso entre equipos con distintos niveles de familiaridad tecnológica. </p> </header> <div class="workflow"> <article> <small>Paso 01</small> <h3>Seleccionar la iglesia</h3> <p>El usuario autorizado trabaja dentro de la iglesia activa.</p> </article> <article> <small>Paso 02</small> <h3>Localizar al miembro</h3> <p>Búsqueda rápida por nombre, correo o teléfono.</p> </article> <article> <small>Paso 03</small> <h3>Registrar el sobre</h3> <p>Importe, método, fecha e imagen se guardan juntos.</p> </article> <article> <small>Paso 04</small> <h3>Emitir el informe</h3> <p>El equipo visualiza, descarga y archiva el documento generado.</p> </article> </div> </div> </section> <section class="section section--blue" id="seguranca"> <div class="shell"> <header class="section-heading"> <div> <p class="eyebrow eyebrow--light">Seguridad y privacidad</p> <h2>Protección en capas para reducir el riesgo de fuga de datos.</h2> </div> <p> La seguridad no depende de una única barrera. La plataforma combina la protección de credenciales, sesiones, autorizaciones, base de datos y archivos privados, preservando el principio de mínimo privilegio. </p> </header> <div class="security-grid"> <article class="security-card"> <span class="security-card__status">Implementado</span> <h3>Contraseñas protegidas</h3> <p> Las contraseñas se transforman mediante un algoritmo de derivación con sal individual; la contraseña original no se almacena en la base de datos. </p> </article> <article class="security-card"> <span class="security-card__status">Implementado</span> <h3>Sesiones seguras</h3> <p> Tokens opacos de alta entropía, solo el hash persistido, cookies HTTP-only, SameSite Strict y Secure en producción. </p> </article> <article class="security-card"> <span class="security-card__status">Implementado</span> <h3>Aislamiento por iglesia</h3> <p> Contexto de iglesia aplicado a las transacciones, políticas en la base de datos y verificaciones para impedir el acceso cruzado entre iglesias. </p> </article> <article class="security-card"> <span class="security-card__status">Implementado</span> <h3>Permisos por función</h3> <p> Las rutas y operaciones se habilitan según la función del usuario y su asociación válida con la iglesia activa. </p> </article> <article class="security-card"> <span class="security-card__status">Implementado</span> <h3>Archivos privados</h3> <p> Las imágenes y los PDF permanecen en almacenamiento privado. El acceso utiliza enlaces temporales con una vigencia predeterminada de cinco minutos. </p> </article> <article class="security-card"> <span class="security-card__status">Implementado</span> <h3>Límites y validación</h3> <p> Carga restringida a JPEG o PNG de hasta 4 MB, políticas de origen, encabezados de seguridad y límites para el cuerpo de las solicitudes. </p> </article> </div> <div class="security-note"> <div> <strong>Paquete de preparación para producción</strong> <p> Antes de la puesta en marcha se configurarán y probarán: limitación de intentos de inicio de sesión, copia y restauración de respaldo, monitoreo sin datos sensibles, rotación de secretos y procedimiento de respuesta a incidentes. </p> </div> <span>Incluido en la implementación</span> </div> </div> </section> <section class="section" id="investimento"> <div class="shell"> <header class="section-heading"> <div> <p class="eyebrow">Inversión por iglesia</p> <h2>Dos formas de contratar. Una decisión por iglesia.</h2> </div> <p> No existe un compromiso mínimo para toda la red. Una iglesia puede adherirse y otra no; cada contratación tiene implementación, entorno, datos y facturación individuales. </p> </header> <div class="tenant-banner"> <div> <strong>Todos los valores siguientes corresponden a 1 iglesia.</strong> <p> Las nuevas iglesias reciben su propia propuesta y eligen la modalidad más adecuada a su realidad local. </p> <p> <strong>Los valores están sujetos a negociación.</strong> Las condiciones comerciales pueden ajustarse según el alcance, el plazo y las necesidades específicas de cada iglesia. </p> </div> </div> <div class="pricing-grid"> <article class="price-card"> <div class="price-card__head"> <p class="eyebrow">Modalidad 01</p> <h3>Adquisición del código fuente completo</h3> <p> Para la iglesia que desea conservar una copia propia del sistema y asumir la infraestructura después de la entrega. </p> <div class="price"> <strong>US$ 14.900</strong> <span>pago único<br />por iglesia</span> </div> </div> <div class="price-card__body"> <h4>Incluye</h4> <ul class="check-list"> <li>Código fuente completo de la aplicación.</li> <li>Licencia perpetua y no exclusiva para una iglesia.</li> <li>Configuración de un entorno de producción.</li> <li>Importación inicial de hasta 500 miembros.</li> <li>Dos sesiones remotas de capacitación.</li> <li>Documentación técnica y operativa.</li> <li>Garantía correctiva de 90 días después de la aceptación.</li> </ul> <div class="price-card__footer"> <div class="payment-box"> <strong>Forma de pago sugerida</strong> <p> 40% al contratar (US$ 5.960), 30% en la homologación (US$ 4.470) y 30% en la entrega (US$ 4.470). Al contado: US$ 14.155, con un 5% de descuento. </p> </div> </div> </div> </article> <article class="price-card price-card--featured"> <span class="price-card__recommended">Recomendado</span> <div class="price-card__head"> <p class="eyebrow">Modalidad 02</p> <h3>Implementación + mensualidad</h3> <p> Para la iglesia que prefiere utilizar el sistema sin administrar servidores, actualizaciones y la operación técnica. </p> <div class="price"> <strong>US$ 189</strong> <span>por mes<br />por iglesia</span> </div> <p class="setup-price">Implementación inicial: US$ 1.290</p> </div> <div class="price-card__body"> <h4>Incluye</h4> <ul class="check-list"> <li>Entorno alojado y administrado.</li> <li>Configuración e importación de hasta 500 miembros.</li> <li>Actualizaciones funcionales y de seguridad.</li> <li>Copias de respaldo, monitoreo y mantenimiento técnico.</li> <li>Dos sesiones remotas de capacitación.</li> <li>Soporte remoto en horario comercial.</li> <li>Hasta 10 usuarios administrativos y 10 GB de archivos.</li> </ul> <div class="price-card__footer"> <div class="payment-box"> <strong>Forma de pago sugerida</strong> <p> Implementación: 50% al inicio y 50% en la aceptación. La mensualidad comienza con la puesta en producción, con una permanencia mínima de 12 meses. Anualidad anticipada: US$ 2.041,20, con un 10% de descuento. </p> </div> </div> </div> </article> </div> <table class="comparison"> <thead> <tr> <th>Comparación</th> <th>Adquisición del código</th> <th>Implementación + mensualidad</th> </tr> </thead> <tbody> <tr> <td>Inversión inicial</td> <td>US$ 14.900</td> <td>US$ 1.290</td> </tr> <tr> <td>Pago recurrente obligatorio</td> <td>No</td> <td>US$ 189/mes</td> </tr> <tr> <td>Infraestructura</td> <td>Responsabilidad de la iglesia después de la entrega</td> <td>Administrada e incluida</td> </tr> <tr> <td>Actualizaciones continuas</td> <td>Plan opcional</td> <td>Incluidas</td> </tr> <tr> <td>Ideal para</td> <td>Autonomía técnica e inversión de capital</td> <td>Previsibilidad y operación sin equipo técnico</td> </tr> </tbody> </table> <div class="commercial-note"> <strong>Nota sobre la adquisición:</strong> “Código completo” significa una licencia perpetua, irrevocable y no exclusiva para uso de una iglesia. La propiedad intelectual original permanece con el proveedor, lo que permite la contratación individual por otras iglesias. La cesión exclusiva de los derechos del producto, que impediría su comercialización a otras unidades, no está incluida y requiere una negociación específica. El soporte y las actualizaciones después de los 90 días pueden contratarse por US$ 2.490/año o US$ 249/mes. En la modalidad de adquisición, los costos de nube y servicios de terceros son pagados por la iglesia y se estiman inicialmente entre US$ 25 y US$ 100/mes, según el uso. </div> </div> </section> <section class="section section--white" id="implantacao"> <div class="shell"> <header class="section-heading"> <div> <p class="eyebrow">Plan de implementación</p> <h2>Puesta en producción en 10 a 15 días hábiles.</h2> </div> <p> El plazo comienza después de la firma, el pago inicial y la recepción de los datos y responsables indicados por la iglesia. </p> </header> <div class="timeline"> <article> <span class="timeline__week">Etapa 01 · 2 días</span> <h3>Inicio y diagnóstico</h3> <p> Definición de responsables, iglesia, usuarios, idioma, dominio y formato de los datos existentes. </p> </article> <article> <span class="timeline__week">Etapa 02 · 5 días</span> <h3>Configuración e importación</h3> <p> Preparación del entorno, seguridad, perfiles y carga inicial de los miembros proporcionados por la iglesia. </p> </article> <article> <span class="timeline__week">Etapa 03 · 3 días</span> <h3>Homologación y capacitación</h3> <p> Validación de los flujos, pruebas con los responsables y capacitación del equipo administrativo. </p> </article> <article> <span class="timeline__week">Etapa 04 · 2 días</span> <h3>Puesta en producción</h3> <p> Publicación, acompañamiento asistido y corrección de eventuales ajustes de configuración. </p> </article> </div> <div class="two-columns"> <article class="terms-card"> <h3>Responsabilidades del proveedor</h3> <ul> <li>Configurar y validar el entorno contratado.</li> <li>Importar los datos recibidos en el formato acordado.</li> <li>Capacitar a los responsables y proporcionar documentación.</li> <li>Aplicar los controles técnicos descritos en esta propuesta.</li> <li>Corregir defectos cubiertos por la garantía o la suscripción.</li> </ul> </article> <article class="terms-card"> <h3>Responsabilidades de la iglesia</h3> <ul> <li>Designar un responsable de la implementación y aceptación.</li> <li>Proporcionar datos correctos y autorización para la importación.</li> <li>Administrar quién tendrá acceso administrativo al sistema.</li> <li>Orientar a su equipo sobre confidencialidad y uso adecuado.</li> <li>Validar los resultados dentro del período de homologación.</li> </ul> </article> </div> <div class="two-columns"> <article class="terms-card"> <h3>Supuestos y elementos no incluidos</h3> <ul> <li> El sistema registra contribuciones; no procesa pagos ni sustituye al software contable. </li> <li> Las integraciones bancarias, pasarelas de pago, aplicaciones móviles nativas y la conciliación automática requieren un presupuesto adicional. </li> <li> Las migraciones de más de 500 miembros o los datos que requieran tratamiento especial se cotizarán después del análisis. </li> <li> El dominio, las tarifas de terceros y los impuestos aplicables no están incluidos, salvo indicación expresa. </li> </ul> </article> <article class="terms-card"> <h3>Soporte y nivel de servicio</h3> <ul> <li> Atención remota en días hábiles, dentro del horario comercial acordado con la iglesia. </li> <li> Incidente crítico: primera respuesta en un máximo de 4 horas hábiles. </li> <li> Objetivo de disponibilidad en la modalidad mensual: 99,5%, excluyendo mantenimientos programados y fallas de terceros. </li> <li> Las mejoras específicas se evalúan y cotizan antes de su ejecución. </li> </ul> </article> </div> </div> </section> <section class="contact-section" id="contato"> <div class="shell contact-grid"> <div> <p class="eyebrow eyebrow--light">Contacto</p> <h2>Si tiene alguna duda, estoy a su disposición.</h2> <p> Póngase en contacto para conversar sobre el sistema, las condiciones comerciales, la implementación o cualquier necesidad específica de la iglesia. </p> </div> <div class="contact-card"> <a href="mailto:post.assessoria@gmail.com"> <small>Correo electrónico</small> <strong>post.assessoria@gmail.com</strong> </a> <a href="https://wa.me/5541991828466" target="_blank" rel="noopener"> <small>Teléfono / WhatsApp</small> <strong>+55 41 99182-8466</strong> </a> </div> </div> </section> </main> <footer class="footer"> <div class="shell"> <span>Universal · Sistema de Gestión Financiera</span> <span>Valores individuales por iglesia · sujetos a negociación</span> </div> </footer> </body>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#inicio" aria-label="Volver al inicio">
+        <span class="brand__mark">
+          <img src="assets/universal-logo.png" alt="Universal" />
+        </span>
+        <span class="brand__copy">
+          <strong>UNIVERSAL</strong> <small>Gestión Financiera</small>
+        </span>
+      </a>
+      <div class="topbar__actions">
+        <nav class="language-links" aria-label="Idiomas de la propuesta">
+          <a class="" href="proposta-comercial-uckg-pt.html">PT</a
+          ><a class="" href="commercial-proposal-uckg-en.html">EN</a
+          ><a class="is-active" href="propuesta-comercial-uckg-es.html">ES</a>
+        </nav>
+        <a href="#solucao">La solución</a> <a href="#seguranca">Seguridad</a>
+        <a href="#investimento">Inversión</a>
+        <button class="print-button" type="button" onclick="window.print()">
+          Imprimir / Guardar PDF
+        </button>
+      </div>
+    </header>
+    <main class="page">
+      <section class="hero" id="inicio">
+        <span class="hero__redline" aria-hidden="true"></span>
+        <div class="shell hero__content">
+          <div>
+            <p class="eyebrow eyebrow--light">Propuesta comercial · 2026</p>
+            <p class="hero__lead">
+              Plataforma de gestión de miembros, sobres e informes, diseñada
+              para organizar la operación financiera de cada iglesia con
+              trazabilidad, privacidad y una visión centralizada.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section class="section" id="solucao">
+        <div class="shell">
+          <header class="section-heading">
+            <div>
+              <p class="eyebrow">Visión ejecutiva</p>
+              <h2>Una operación más sencilla, verificable y responsable.</h2>
+            </div>
+            <p>
+              El sistema reúne en una sola experiencia el registro de miembros,
+              los registros de sobres, las imágenes de comprobantes y la emisión
+              de informes. Cada iglesia decide individualmente si desea
+              contratarlo, sin depender de la adhesión de otras unidades.
+            </p>
+          </header>
+          <div class="intro-grid">
+            <article class="intro-card">
+              <span class="intro-card__number">01</span>
+              <h3>Menos trabajo manual</h3>
+              <p>
+                El registro, la búsqueda, los movimientos y los informes siguen
+                un flujo único, reduciendo hojas de cálculo paralelas y
+                retrabajo administrativo.
+              </p>
+            </article>
+            <article class="intro-card">
+              <span class="intro-card__number">02</span>
+              <h3>Mayor trazabilidad</h3>
+              <p>
+                Cada registro guarda la fecha, el importe, la forma de pago, el
+                miembro relacionado, el operador y la imagen del sobre cuando
+                corresponde.
+              </p>
+            </article>
+            <article class="intro-card">
+              <span class="intro-card__number">03</span>
+              <h3>Datos separados por iglesia</h3>
+              <p>
+                La arquitectura fue diseñada para que cada iglesia vea
+                únicamente sus propios miembros, registros, imágenes e informes.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+      <section class="section section--white">
+        <div class="shell">
+          <header class="section-heading">
+            <div>
+              <p class="eyebrow">Alcance funcional</p>
+              <h2>Todo lo que la iglesia necesita para su gestión diaria.</h2>
+            </div>
+            <p>
+              La plataforma ya cubre los principales flujos administrativos y
+              financieros del proyecto, con una experiencia adaptable en
+              portugués, inglés y español.
+            </p>
+          </header>
+          <ul class="feature-list">
+            <li>
+              <span class="feature-icon">01</span>
+              <div>
+                <h3>Acceso y perfiles</h3>
+                <p>
+                  Inicio de sesión protegido, iglesia activa, administrador de
+                  la plataforma, administrador de la iglesia, operador
+                  financiero y auditor, con permisos adecuados para cada
+                  función.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span class="feature-icon">02</span>
+              <div>
+                <h3>Gestión de iglesias y usuarios</h3>
+                <p>
+                  Registro y organización de las unidades disponibles, selección
+                  de la iglesia activa y administración de usuarios autorizados.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span class="feature-icon">03</span>
+              <div>
+                <h3>Registro de miembros</h3>
+                <p>
+                  Listado, búsqueda, alta, edición, estado, contactos,
+                  dirección, observaciones, detalle individual e historial de
+                  registros.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span class="feature-icon">04</span>
+              <div>
+                <h3>Registro de sobres</h3>
+                <p>
+                  Registro del importe, fecha, forma de pago, miembro, notas y
+                  fotografía privada del sobre desde una computadora o un
+                  teléfono móvil.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span class="feature-icon">05</span>
+              <div>
+                <h3>Informes y PDF</h3>
+                <p>
+                  Informe detallado, resumen anual por donante, total por
+                  miembro, filtros por período y opción de incluir las imágenes
+                  de los sobres en el PDF.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span class="feature-icon">06</span>
+              <div>
+                <h3>Experiencia multilingüe</h3>
+                <p>
+                  Interfaz disponible en portugués, inglés y español, con
+                  navegación adaptable para computadora, tableta y teléfono
+                  móvil.
+                </p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+      <section class="section section--blue" id="telas">
+        <div class="shell">
+          <header class="section-heading">
+            <div>
+              <p class="eyebrow eyebrow--light">Experiencia del producto</p>
+              <h2>Una interfaz clara para quienes operan todos los días.</h2>
+            </div>
+            <p>
+              Las pantallas siguientes son capturas reales de la aplicación
+              ejecutada con datos de demostración. No se utilizó información
+              personal de miembros reales en esta propuesta.
+            </p>
+          </header>
+          <article class="screen-stage">
+            <div class="screen-stage__chrome" aria-hidden="true">
+              <i></i><i></i><i></i>
+            </div>
+            <img
+              src="assets/screens/es/dashboard.png"
+              alt="Pantalla de vista general de la plataforma"
+            />
+            <div class="screen-caption">
+              <strong>Vista general</strong>
+              <span>Acceso rápido a los módulos de la iglesia activa</span>
+            </div>
+          </article>
+          <div class="screen-grid">
+            <figure class="screen-card">
+              <div class="screen-card__image">
+                <img
+                  src="assets/screens/es/login.png"
+                  alt="Pantalla de acceso seguro al sistema"
+                />
+              </div>
+              <figcaption>
+                <strong>Acceso protegido</strong>
+                <span
+                  >Inicio de sesión institucional y selección de idioma.</span
+                >
+              </figcaption>
+            </figure>
+            <figure class="screen-card">
+              <div class="screen-card__image">
+                <img
+                  src="assets/screens/es/members.png"
+                  alt="Pantalla de listado y búsqueda de miembros"
+                />
+              </div>
+              <figcaption>
+                <strong>Gestión de miembros</strong>
+                <span
+                  >Búsqueda, estado de registro y acciones
+                  administrativas.</span
+                >
+              </figcaption>
+            </figure>
+            <figure class="screen-card">
+              <div class="screen-card__image screen-card__image--tall">
+                <img
+                  src="assets/screens/es/envelope-launch.png"
+                  alt="Pantalla de registro de sobres"
+                />
+              </div>
+              <figcaption>
+                <strong>Registro de sobre</strong>
+                <span>Importe, pago, miembro e imagen en un único flujo.</span>
+              </figcaption>
+            </figure>
+            <figure class="screen-card">
+              <div class="screen-card__image screen-card__image--tall">
+                <img
+                  src="assets/screens/es/reports-builder.png"
+                  alt="Pantalla de configuración de informes"
+                />
+              </div>
+              <figcaption>
+                <strong>Constructor de informes</strong>
+                <span
+                  >Contenido, miembro, imágenes y período configurables.</span
+                >
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+      <section class="section section--white" id="relatorios">
+        <div class="shell">
+          <header class="section-heading">
+            <div>
+              <p class="eyebrow">Rendición de cuentas</p>
+              <h2>Informes listos para consultar, archivar y compartir.</h2>
+            </div>
+            <p>
+              La iglesia puede ver los resultados en pantalla, descargar el PDF
+              y, cuando sea necesario, incluir las imágenes vinculadas a cada
+              registro para su verificación documental.
+            </p>
+          </header>
+          <article class="report-showcase">
+            <div class="report-showcase__image">
+              <img
+                src="assets/screens/es/reports-result.png"
+                alt="Resultado demostrativo de un informe de donaciones"
+              />
+            </div>
+            <div class="report-showcase__copy">
+              <p class="eyebrow">Resultado demostrativo</p>
+              <h3>Información organizada para decisiones y auditorías.</h3>
+              <p>
+                Los datos se presentan con período, miembro, importe, forma de
+                pago e indicación de la existencia de la imagen del sobre.
+              </p>
+              <ul class="check-list">
+                <li>Filtros por período y por miembro.</li>
+                <li>Consolidación individual y anual.</li>
+                <li>PDF archivados y disponibles para recuperación.</li>
+                <li>Inclusión opcional de las imágenes de los comprobantes.</li>
+              </ul>
+            </div>
+          </article>
+          <section
+            class="report-examples"
+            aria-labelledby="report-examples-title"
+          >
+            <header class="report-examples__heading">
+              <div>
+                <p class="eyebrow">Ejemplos generados por el sistema</p>
+                <h3 id="report-examples-title">
+                  Abra y consulte los informes completos.
+                </h3>
+              </div>
+              <p>
+                Los documentos siguientes fueron generados por la propia
+                plataforma y muestran distintos formatos de consolidación y
+                verificación.
+              </p>
+            </header>
+            <div class="report-gallery">
+              <article class="report-example">
+                <div class="report-example__preview">
+                  <img
+                    src="assets/report-previews/annual-donor-report.png"
+                    alt="Vista previa del informe anual por donante"
+                  />
+                </div>
+                <div class="report-example__body">
+                  <small>Informe anual</small>
+                  <h4>Resumen anual por donante</h4>
+                  <p>
+                    Tabla consolidada con los importes mensuales y el total de
+                    cada miembro en el período seleccionado.
+                  </p>
+                  <a
+                    href="assets/reports/annual-donor-report-2026.pdf"
+                    target="_blank"
+                    rel="noopener"
+                    >Abrir PDF completo</a
+                  >
+                </div>
+              </article>
+              <article class="report-example">
+                <div class="report-example__preview">
+                  <img
+                    src="assets/report-previews/detailed-donations-with-images.png"
+                    alt="Vista previa del informe detallado con imágenes de los sobres"
+                  />
+                </div>
+                <div class="report-example__body">
+                  <small>Informe detallado · 2 páginas</small>
+                  <h4>Registros con imágenes</h4>
+                  <p>
+                    Cada registro muestra el miembro, la fecha, el importe, el
+                    operador y la fotografía privada del sobre cuando está
+                    disponible.
+                  </p>
+                  <a
+                    href="assets/reports/detailed-donations-with-images-2026.pdf"
+                    target="_blank"
+                    rel="noopener"
+                    >Abrir PDF completo</a
+                  >
+                </div>
+              </article>
+              <article class="report-example">
+                <div class="report-example__preview">
+                  <img
+                    src="assets/report-previews/donation-totals-by-member.png"
+                    alt="Vista previa del informe de totales por miembro"
+                  />
+                </div>
+                <div class="report-example__body">
+                  <small>Consolidación por miembro</small>
+                  <h4>Totales de contribuciones</h4>
+                  <p>
+                    Vista objetiva de la cantidad de registros y del importe
+                    total atribuido a cada miembro.
+                  </p>
+                  <a
+                    href="assets/reports/donation-totals-by-member-2026.pdf"
+                    target="_blank"
+                    rel="noopener"
+                    >Abrir PDF completo</a
+                  >
+                </div>
+              </article>
+            </div>
+          </section>
+        </div>
+      </section>
+      <section class="section">
+        <div class="shell">
+          <header class="section-heading">
+            <div>
+              <p class="eyebrow">Flujo operativo</p>
+              <h2>Del registro al informe en cuatro etapas.</h2>
+            </div>
+            <p>
+              El recorrido fue diseñado para reducir dudas y mantener una
+              operación consistente incluso entre equipos con distintos niveles
+              de familiaridad tecnológica.
+            </p>
+          </header>
+          <div class="workflow">
+            <article>
+              <small>Paso 01</small>
+              <h3>Seleccionar la iglesia</h3>
+              <p>El usuario autorizado trabaja dentro de la iglesia activa.</p>
+            </article>
+            <article>
+              <small>Paso 02</small>
+              <h3>Localizar al miembro</h3>
+              <p>Búsqueda rápida por nombre, correo o teléfono.</p>
+            </article>
+            <article>
+              <small>Paso 03</small>
+              <h3>Registrar el sobre</h3>
+              <p>Importe, método, fecha e imagen se guardan juntos.</p>
+            </article>
+            <article>
+              <small>Paso 04</small>
+              <h3>Emitir el informe</h3>
+              <p>
+                El equipo visualiza, descarga y archiva el documento generado.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+      <section class="section section--blue" id="seguranca">
+        <div class="shell">
+          <header class="section-heading">
+            <div>
+              <p class="eyebrow eyebrow--light">Seguridad y privacidad</p>
+              <h2>
+                Protección en capas para reducir el riesgo de fuga de datos.
+              </h2>
+            </div>
+            <p>
+              La seguridad no depende de una única barrera. La plataforma
+              combina la protección de credenciales, sesiones, autorizaciones,
+              base de datos y archivos privados, preservando el principio de
+              mínimo privilegio.
+            </p>
+          </header>
+          <div class="security-grid">
+            <article class="security-card">
+              <span class="security-card__status">Implementado</span>
+              <h3>Contraseñas protegidas</h3>
+              <p>
+                Las contraseñas se transforman mediante un algoritmo de
+                derivación con sal individual; la contraseña original no se
+                almacena en la base de datos.
+              </p>
+            </article>
+            <article class="security-card">
+              <span class="security-card__status">Implementado</span>
+              <h3>Sesiones seguras</h3>
+              <p>
+                Tokens opacos de alta entropía, solo el hash persistido, cookies
+                HTTP-only, SameSite Strict y Secure en producción.
+              </p>
+            </article>
+            <article class="security-card">
+              <span class="security-card__status">Implementado</span>
+              <h3>Aislamiento por iglesia</h3>
+              <p>
+                Contexto de iglesia aplicado a las transacciones, políticas en
+                la base de datos y verificaciones para impedir el acceso cruzado
+                entre iglesias.
+              </p>
+            </article>
+            <article class="security-card">
+              <span class="security-card__status">Implementado</span>
+              <h3>Permisos por función</h3>
+              <p>
+                Las rutas y operaciones se habilitan según la función del
+                usuario y su asociación válida con la iglesia activa.
+              </p>
+            </article>
+            <article class="security-card">
+              <span class="security-card__status">Implementado</span>
+              <h3>Archivos privados</h3>
+              <p>
+                Las imágenes y los PDF permanecen en almacenamiento privado. El
+                acceso utiliza enlaces temporales con una vigencia
+                predeterminada de cinco minutos.
+              </p>
+            </article>
+            <article class="security-card">
+              <span class="security-card__status">Implementado</span>
+              <h3>Límites y validación</h3>
+              <p>
+                Carga restringida a JPEG o PNG de hasta 4 MB, políticas de
+                origen, encabezados de seguridad y límites para el cuerpo de las
+                solicitudes.
+              </p>
+            </article>
+          </div>
+          <div class="security-note">
+            <div>
+              <strong>Paquete de preparación para producción</strong>
+              <p>
+                Antes de la puesta en marcha se configurarán y probarán:
+                limitación de intentos de inicio de sesión, copia y restauración
+                de respaldo, monitoreo sin datos sensibles, rotación de secretos
+                y procedimiento de respuesta a incidentes.
+              </p>
+            </div>
+            <span>Incluido en la implementación</span>
+          </div>
+        </div>
+      </section>
+      <section class="section" id="investimento">
+        <div class="shell">
+          <header class="section-heading">
+            <div>
+              <p class="eyebrow">Inversión por iglesia</p>
+              <h2>Dos formas de contratar. Una decisión por iglesia.</h2>
+            </div>
+            <p>
+              No existe un compromiso mínimo para toda la red. Una iglesia puede
+              adherirse y otra no; cada contratación tiene implementación,
+              entorno, datos y facturación individuales.
+            </p>
+          </header>
+          <div class="tenant-banner">
+            <div>
+              <strong
+                >Todos los valores siguientes corresponden a 1 iglesia.</strong
+              >
+              <p>
+                Las nuevas iglesias reciben su propia propuesta y eligen la
+                modalidad más adecuada a su realidad local.
+              </p>
+              <p>
+                <strong>Los valores están sujetos a negociación.</strong> Las
+                condiciones comerciales pueden ajustarse según el alcance, el
+                plazo y las necesidades específicas de cada iglesia.
+              </p>
+            </div>
+          </div>
+          <div class="pricing-grid">
+            <article class="price-card">
+              <div class="price-card__head">
+                <p class="eyebrow">Modalidad 01</p>
+                <h3>Adquisición del código fuente completo</h3>
+                <p>
+                  Para la iglesia que desea conservar una copia propia del
+                  sistema y asumir la infraestructura después de la entrega.
+                </p>
+                <div class="price">
+                  <strong>US$ 14.900</strong>
+                  <span>pago único<br />por iglesia</span>
+                </div>
+              </div>
+              <div class="price-card__body">
+                <h4>Incluye</h4>
+                <ul class="check-list">
+                  <li>Código fuente completo de la aplicación.</li>
+                  <li>Licencia perpetua y no exclusiva para una iglesia.</li>
+                  <li>Configuración de un entorno de producción.</li>
+                  <li>Importación inicial de hasta 500 miembros.</li>
+                  <li>Dos sesiones remotas de capacitación.</li>
+                  <li>Documentación técnica y operativa.</li>
+                  <li>
+                    Garantía correctiva de 90 días después de la aceptación.
+                  </li>
+                </ul>
+                <div class="price-card__footer">
+                  <div class="payment-box">
+                    <strong>Forma de pago sugerida</strong>
+                    <p>
+                      40% al contratar (US$ 5.960), 30% en la homologación (US$
+                      4.470) y 30% en la entrega (US$ 4.470). Al contado: US$
+                      14.155, con un 5% de descuento.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </article>
+            <article class="price-card price-card--featured">
+              <span class="price-card__recommended">Recomendado</span>
+              <div class="price-card__head">
+                <p class="eyebrow">Modalidad 02</p>
+                <h3>Implementación + mensualidad</h3>
+                <p>
+                  Para la iglesia que prefiere utilizar el sistema sin
+                  administrar servidores, actualizaciones y la operación
+                  técnica.
+                </p>
+                <div class="price">
+                  <strong>US$ 189</strong> <span>por mes<br />por iglesia</span>
+                </div>
+                <p class="setup-price">Implementación inicial: US$ 1.290</p>
+              </div>
+              <div class="price-card__body">
+                <h4>Incluye</h4>
+                <ul class="check-list">
+                  <li>Entorno alojado y administrado.</li>
+                  <li>Configuración e importación de hasta 500 miembros.</li>
+                  <li>Actualizaciones funcionales y de seguridad.</li>
+                  <li>
+                    Copias de respaldo, monitoreo y mantenimiento técnico.
+                  </li>
+                  <li>Dos sesiones remotas de capacitación.</li>
+                  <li>Soporte remoto en horario comercial.</li>
+                  <li>
+                    Hasta 10 usuarios administrativos y 10 GB de archivos.
+                  </li>
+                </ul>
+                <div class="price-card__footer">
+                  <div class="payment-box">
+                    <strong>Forma de pago sugerida</strong>
+                    <p>
+                      Implementación: 50% al inicio y 50% en la aceptación. La
+                      mensualidad comienza con la puesta en producción, con una
+                      permanencia mínima de 12 meses. Anualidad anticipada: US$
+                      2.041,20, con un 10% de descuento.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+          <table class="comparison">
+            <thead>
+              <tr>
+                <th>Comparación</th>
+                <th>Adquisición del código</th>
+                <th>Implementación + mensualidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Inversión inicial</td>
+                <td>US$ 14.900</td>
+                <td>US$ 1.290</td>
+              </tr>
+              <tr>
+                <td>Pago recurrente obligatorio</td>
+                <td>No</td>
+                <td>US$ 189/mes</td>
+              </tr>
+              <tr>
+                <td>Infraestructura</td>
+                <td>Responsabilidad de la iglesia después de la entrega</td>
+                <td>Administrada e incluida</td>
+              </tr>
+              <tr>
+                <td>Actualizaciones continuas</td>
+                <td>Plan opcional</td>
+                <td>Incluidas</td>
+              </tr>
+              <tr>
+                <td>Ideal para</td>
+                <td>Autonomía técnica e inversión de capital</td>
+                <td>Previsibilidad y operación sin equipo técnico</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="commercial-note">
+            <strong>Nota sobre la adquisición:</strong> “Código completo”
+            significa una licencia perpetua, irrevocable y no exclusiva para uso
+            de una iglesia. La propiedad intelectual original permanece con el
+            proveedor, lo que permite la contratación individual por otras
+            iglesias. La cesión exclusiva de los derechos del producto, que
+            impediría su comercialización a otras unidades, no está incluida y
+            requiere una negociación específica. El soporte y las
+            actualizaciones después de los 90 días pueden contratarse por US$
+            2.490/año o US$ 249/mes. En la modalidad de adquisición, los costos
+            de nube y servicios de terceros son pagados por la iglesia y se
+            estiman inicialmente entre US$ 25 y US$ 100/mes, según el uso.
+          </div>
+        </div>
+      </section>
+      <section class="section section--white" id="implantacao">
+        <div class="shell">
+          <header class="section-heading">
+            <div>
+              <p class="eyebrow">Plan de implementación</p>
+              <h2>Puesta en producción en 10 a 15 días hábiles.</h2>
+            </div>
+            <p>
+              El plazo comienza después de la firma, el pago inicial y la
+              recepción de los datos y responsables indicados por la iglesia.
+            </p>
+          </header>
+          <div class="timeline">
+            <article>
+              <span class="timeline__week">Etapa 01 · 2 días</span>
+              <h3>Inicio y diagnóstico</h3>
+              <p>
+                Definición de responsables, iglesia, usuarios, idioma, dominio y
+                formato de los datos existentes.
+              </p>
+            </article>
+            <article>
+              <span class="timeline__week">Etapa 02 · 5 días</span>
+              <h3>Configuración e importación</h3>
+              <p>
+                Preparación del entorno, seguridad, perfiles y carga inicial de
+                los miembros proporcionados por la iglesia.
+              </p>
+            </article>
+            <article>
+              <span class="timeline__week">Etapa 03 · 3 días</span>
+              <h3>Homologación y capacitación</h3>
+              <p>
+                Validación de los flujos, pruebas con los responsables y
+                capacitación del equipo administrativo.
+              </p>
+            </article>
+            <article>
+              <span class="timeline__week">Etapa 04 · 2 días</span>
+              <h3>Puesta en producción</h3>
+              <p>
+                Publicación, acompañamiento asistido y corrección de eventuales
+                ajustes de configuración.
+              </p>
+            </article>
+          </div>
+          <div class="two-columns">
+            <article class="terms-card">
+              <h3>Responsabilidades del proveedor</h3>
+              <ul>
+                <li>Configurar y validar el entorno contratado.</li>
+                <li>Importar los datos recibidos en el formato acordado.</li>
+                <li>
+                  Capacitar a los responsables y proporcionar documentación.
+                </li>
+                <li>
+                  Aplicar los controles técnicos descritos en esta propuesta.
+                </li>
+                <li>
+                  Corregir defectos cubiertos por la garantía o la suscripción.
+                </li>
+              </ul>
+            </article>
+            <article class="terms-card">
+              <h3>Responsabilidades de la iglesia</h3>
+              <ul>
+                <li>
+                  Designar un responsable de la implementación y aceptación.
+                </li>
+                <li>
+                  Proporcionar datos correctos y autorización para la
+                  importación.
+                </li>
+                <li>
+                  Administrar quién tendrá acceso administrativo al sistema.
+                </li>
+                <li>
+                  Orientar a su equipo sobre confidencialidad y uso adecuado.
+                </li>
+                <li>
+                  Validar los resultados dentro del período de homologación.
+                </li>
+              </ul>
+            </article>
+          </div>
+          <div class="two-columns">
+            <article class="terms-card">
+              <h3>Supuestos y elementos no incluidos</h3>
+              <ul>
+                <li>
+                  El sistema registra contribuciones; no procesa pagos ni
+                  sustituye al software contable.
+                </li>
+                <li>
+                  Las integraciones bancarias, pasarelas de pago, aplicaciones
+                  móviles nativas y la conciliación automática requieren un
+                  presupuesto adicional.
+                </li>
+                <li>
+                  Las migraciones de más de 500 miembros o los datos que
+                  requieran tratamiento especial se cotizarán después del
+                  análisis.
+                </li>
+                <li>
+                  El dominio, las tarifas de terceros y los impuestos aplicables
+                  no están incluidos, salvo indicación expresa.
+                </li>
+              </ul>
+            </article>
+            <article class="terms-card">
+              <h3>Soporte y nivel de servicio</h3>
+              <ul>
+                <li>
+                  Atención remota en días hábiles, dentro del horario comercial
+                  acordado con la iglesia.
+                </li>
+                <li>
+                  Incidente crítico: primera respuesta en un máximo de 4 horas
+                  hábiles.
+                </li>
+                <li>
+                  Objetivo de disponibilidad en la modalidad mensual: 99,5%,
+                  excluyendo mantenimientos programados y fallas de terceros.
+                </li>
+                <li>
+                  Las mejoras específicas se evalúan y cotizan antes de su
+                  ejecución.
+                </li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+      <section class="contact-section" id="contato">
+        <div class="shell contact-grid">
+          <div>
+            <p class="eyebrow eyebrow--light">Contacto</p>
+            <h2>Si tiene alguna duda, estoy a su disposición.</h2>
+            <p>
+              Póngase en contacto para conversar sobre el sistema, las
+              condiciones comerciales, la implementación o cualquier necesidad
+              específica de la iglesia.
+            </p>
+          </div>
+          <div class="contact-card">
+            <a href="mailto:post.assessoria@gmail.com">
+              <small>Correo electrónico</small>
+              <strong>post.assessoria@gmail.com</strong>
+            </a>
+            <a
+              href="https://wa.me/5541991828466"
+              target="_blank"
+              rel="noopener"
+            >
+              <small>Teléfono / WhatsApp</small>
+              <strong>+55 41 99182-8466</strong>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="footer">
+      <div class="shell">
+        <span>Universal · Sistema de Gestión Financiera</span>
+        <span>Valores individuales por iglesia · sujetos a negociación</span>
+      </div>
+    </footer>
+  </body>
 </html>

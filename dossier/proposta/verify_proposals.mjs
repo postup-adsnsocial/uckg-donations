@@ -48,16 +48,22 @@ for (const proposal of proposals) {
   await page.evaluate(async () => document.fonts.ready);
   await page.getByText(proposal.marker).waitFor();
 
-  const failedImages = await page.locator('img').evaluateAll((images) =>
-    images
-      .filter((image) => !image.complete || image.naturalWidth === 0)
-      .map((image) => image.getAttribute('src')),
-  );
+  const failedImages = await page
+    .locator('img')
+    .evaluateAll((images) =>
+      images
+        .filter((image) => !image.complete || image.naturalWidth === 0)
+        .map((image) => image.getAttribute('src')),
+    );
   if (failedImages.length)
-    throw new Error(`${proposal.locale}: broken images: ${failedImages.join(', ')}`);
+    throw new Error(
+      `${proposal.locale}: broken images: ${failedImages.join(', ')}`,
+    );
 
   const desktopOverflow = await page.evaluate(
-    () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+    () =>
+      document.documentElement.scrollWidth >
+      document.documentElement.clientWidth,
   );
   if (desktopOverflow) throw new Error(`${proposal.locale}: desktop overflow.`);
 
@@ -72,7 +78,9 @@ for (const proposal of proposals) {
 
   await page.setViewportSize({ height: 812, width: 375 });
   const mobileOverflow = await page.evaluate(
-    () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+    () =>
+      document.documentElement.scrollWidth >
+      document.documentElement.clientWidth,
   );
   if (mobileOverflow) throw new Error(`${proposal.locale}: mobile overflow.`);
   await page.locator('.hero').screenshot({
@@ -83,4 +91,6 @@ for (const proposal of proposals) {
 
 await browser.close();
 if (errors.length) throw new Error(`Browser errors:\n${errors.join('\n')}`);
-console.log(`Verified ${proposals.length} proposals and language index. QA: ${qaRoot}`);
+console.log(
+  `Verified ${proposals.length} proposals and language index. QA: ${qaRoot}`,
+);

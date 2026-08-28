@@ -21,31 +21,69 @@ const user = {
 };
 
 const memberSeed = [
-  ['Ana Oliveira', 'ana.oliveira@example.org', '+1 718 555 0101', 'Brooklyn', 'NY'],
-  ['Carlos Santos', 'carlos.santos@example.org', '+1 718 555 0102', 'Queens', 'NY'],
-  ['Daniela Costa', 'daniela.costa@example.org', '+1 718 555 0103', 'Brooklyn', 'NY'],
-  ['João Pereira', 'joao.pereira@example.org', '+1 718 555 0104', 'Manhattan', 'NY'],
-  ['Mariana Lima', 'mariana.lima@example.org', '+1 718 555 0105', 'Bronx', 'NY'],
-  ['Rafael Souza', 'rafael.souza@example.org', '+1 718 555 0106', 'Brooklyn', 'NY'],
+  [
+    'Ana Oliveira',
+    'ana.oliveira@example.org',
+    '+1 718 555 0101',
+    'Brooklyn',
+    'NY',
+  ],
+  [
+    'Carlos Santos',
+    'carlos.santos@example.org',
+    '+1 718 555 0102',
+    'Queens',
+    'NY',
+  ],
+  [
+    'Daniela Costa',
+    'daniela.costa@example.org',
+    '+1 718 555 0103',
+    'Brooklyn',
+    'NY',
+  ],
+  [
+    'João Pereira',
+    'joao.pereira@example.org',
+    '+1 718 555 0104',
+    'Manhattan',
+    'NY',
+  ],
+  [
+    'Mariana Lima',
+    'mariana.lima@example.org',
+    '+1 718 555 0105',
+    'Bronx',
+    'NY',
+  ],
+  [
+    'Rafael Souza',
+    'rafael.souza@example.org',
+    '+1 718 555 0106',
+    'Brooklyn',
+    'NY',
+  ],
 ];
 
-const members = memberSeed.map(([fullName, email, phone, city, region], index) => ({
-  addressLine1: `${101 + index} Church Avenue`,
-  addressLine2: null,
-  city,
-  country: 'US',
-  createdAt: '2026-01-10T12:00:00.000Z',
-  deletedAt: null,
-  email,
-  fullName,
-  id: `33333333-3333-4333-8333-33333333333${index}`,
-  notes: null,
-  phone,
-  postalCode: '11218',
-  region,
-  status: 'active',
-  updatedAt: '2026-08-01T12:00:00.000Z',
-}));
+const members = memberSeed.map(
+  ([fullName, email, phone, city, region], index) => ({
+    addressLine1: `${101 + index} Church Avenue`,
+    addressLine2: null,
+    city,
+    country: 'US',
+    createdAt: '2026-01-10T12:00:00.000Z',
+    deletedAt: null,
+    email,
+    fullName,
+    id: `33333333-3333-4333-8333-33333333333${index}`,
+    notes: null,
+    phone,
+    postalCode: '11218',
+    region,
+    status: 'active',
+    updatedAt: '2026-08-01T12:00:00.000Z',
+  }),
+);
 
 const donationSeed = [
   [0, 12550, 'cash', '2026-08-02'],
@@ -56,24 +94,26 @@ const donationSeed = [
   [0, 15000, 'card', '2026-08-06'],
 ];
 
-const donations = donationSeed.map(([memberIndex, amountCents, paymentMethod, receivedOn], index) => ({
-  amountCents,
-  createdAt: `${receivedOn}T15:30:00.000Z`,
-  envelope: {
-    contentType: 'image/jpeg',
-    originalName: `envelope-${index + 1}.jpg`,
-    sizeBytes: 284000 + index * 9000,
-  },
-  id: `44444444-4444-4444-8444-44444444444${index}`,
-  member: {
-    fullName: members[memberIndex].fullName,
-    id: members[memberIndex].id,
-  },
-  notes: index === 1 ? 'Culto de domingo' : null,
-  operatorName: 'Administração UCKG',
-  paymentMethod,
-  receivedOn,
-}));
+const donations = donationSeed.map(
+  ([memberIndex, amountCents, paymentMethod, receivedOn], index) => ({
+    amountCents,
+    createdAt: `${receivedOn}T15:30:00.000Z`,
+    envelope: {
+      contentType: 'image/jpeg',
+      originalName: `envelope-${index + 1}.jpg`,
+      sizeBytes: 284000 + index * 9000,
+    },
+    id: `44444444-4444-4444-8444-44444444444${index}`,
+    member: {
+      fullName: members[memberIndex].fullName,
+      id: members[memberIndex].id,
+    },
+    notes: index === 1 ? 'Culto de domingo' : null,
+    operatorName: 'Administração UCKG',
+    paymentMethod,
+    receivedOn,
+  }),
+);
 
 const archivedReports = [
   {
@@ -217,14 +257,19 @@ for (const locale of [
   { code: 'en', generate: 'Preview report' },
   { code: 'es', generate: 'Visualizar informe' },
 ]) {
-  const localeOutputDir = new URL(`./assets/screens/${locale.code}/`, import.meta.url);
+  const localeOutputDir = new URL(
+    `./assets/screens/${locale.code}/`,
+    import.meta.url,
+  );
   await mkdir(localeOutputDir, { recursive: true });
 
   await page.goto(`http://127.0.0.1:3100/${locale.code}/login`, {
     waitUntil: 'domcontentloaded',
   });
   await page.evaluate(async () => document.fonts.ready);
-  await page.getByLabel(locale.code === 'en' ? 'Email' : 'Correo electrónico').fill('admin@uckg.org');
+  await page
+    .getByLabel(locale.code === 'en' ? 'Email' : 'Correo electrónico')
+    .fill('admin@uckg.org');
   await page.addStyleTag({
     content: 'nextjs-portal { display: none !important; }',
   });

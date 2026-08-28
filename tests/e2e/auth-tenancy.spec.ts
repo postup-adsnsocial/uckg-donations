@@ -520,7 +520,16 @@ test.describe('administrative authentication and tenant isolation', () => {
     ).toBeVisible();
     await expect(page.locator('input[type="month"]')).toHaveValue(month);
 
-    const todayEditor = page.locator('.annual-book-day[open]');
+    const todayLabel = new Intl.DateTimeFormat('pt-BR', {
+      day: '2-digit',
+      month: 'long',
+      timeZone: 'UTC',
+      weekday: 'long',
+      year: 'numeric',
+    }).format(new Date(`${today}T12:00:00Z`));
+    const todayEditor = page
+      .locator('.annual-book-day')
+      .filter({ hasText: todayLabel });
     await expect(todayEditor).toHaveCount(1);
     await todayEditor.getByLabel('Dinheiro — 1º culto').fill('10.25');
     await todayEditor.getByLabel('Designated (envelopes)').fill('5.00');
