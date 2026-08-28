@@ -634,7 +634,6 @@ function DayEditor({
   const [notes, setNotes] = useState(day.notes ?? '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const today = new Date().toISOString().slice(0, 10);
 
   async function save() {
     setSaving(true);
@@ -667,15 +666,20 @@ function DayEditor({
   }
 
   return (
-    <details className="annual-book-day" open={day.entryDate === today}>
-      <summary>
-        <span className="annual-book-day__date">
-          {dateLabel(day.entryDate, locale)}
-        </span>
+    <article className="annual-book-day">
+      <header className="annual-book-day__heading">
+        <div>
+          <span className="annual-book-day__number">
+            {new Date(`${day.entryDate}T12:00:00Z`).getUTCDate()}
+          </span>
+          <span className="annual-book-day__date">
+            {dateLabel(day.entryDate, locale)}
+          </span>
+        </div>
         <span className={day.saved ? 'is-saved' : undefined}>
           {formatMoney(day.metrics.totalWithAthCents, locale)}
         </span>
-      </summary>
+      </header>
       <div className="annual-book-day__body">
         <div className="annual-book-entry-grid-wrap">
           <table className="annual-book-entry-grid">
@@ -760,7 +764,7 @@ function DayEditor({
           </button>
         ) : null}
       </div>
-    </details>
+    </article>
   );
 }
 

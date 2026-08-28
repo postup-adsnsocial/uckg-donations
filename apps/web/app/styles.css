@@ -4800,7 +4800,7 @@ input[type='week'] {
   border-bottom: 0;
 }
 
-.annual-book-day > summary {
+.annual-book-day__heading {
   display: flex;
   min-height: 62px;
   align-items: center;
@@ -4808,16 +4808,16 @@ input[type='week'] {
   gap: 16px;
   padding: 13px 22px;
   color: var(--ink-950);
-  cursor: pointer;
-  list-style: none;
 }
 
-.annual-book-day > summary::-webkit-details-marker {
-  display: none;
+.annual-book-day__heading > div {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
 }
 
-.annual-book-day > summary::before {
-  content: '+';
+.annual-book-day__number {
   display: grid;
   width: 28px;
   height: 28px;
@@ -4826,11 +4826,8 @@ input[type='week'] {
   border-radius: 50%;
   background: var(--blue-50);
   color: var(--blue-800);
-  font-size: 1.1rem;
-}
-
-.annual-book-day[open] > summary::before {
-  content: '−';
+  font-size: 0.75rem;
+  font-weight: 800;
 }
 
 .annual-book-day__date {
@@ -4839,7 +4836,7 @@ input[type='week'] {
   text-transform: capitalize;
 }
 
-.annual-book-day > summary > span:last-child {
+.annual-book-day__heading > span:last-child {
   border-radius: 999px;
   padding: 7px 10px;
   background: #f3f5f7;
@@ -4848,7 +4845,7 @@ input[type='week'] {
   font-weight: 720;
 }
 
-.annual-book-day > summary > span.is-saved {
+.annual-book-day__heading > span.is-saved {
   background: #e9f7ef;
   color: #067647;
 }
@@ -5009,7 +5006,7 @@ input[type='week'] {
     padding: 2px 14px 20px;
   }
 
-  .annual-book-day > summary {
+  .annual-book-day__heading {
     padding-inline: 14px;
   }
 
@@ -5033,14 +5030,13 @@ input[type='week'] {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .annual-book-day > summary {
+  .annual-book-day__heading {
     display: grid;
-    grid-template-columns: 28px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .annual-book-day > summary > span:last-child {
+  .annual-book-day__heading > span:last-child {
     justify-self: start;
-    grid-column: 2;
   }
 
   .annual-book-comparison-form {
