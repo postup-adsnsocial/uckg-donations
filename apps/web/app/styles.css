@@ -4690,6 +4690,364 @@ input[type='week'] {
   }
 }
 
+.annual-book-heading {
+  align-items: flex-end;
+}
+
+.annual-book-month-bar {
+  display: grid;
+  width: min(100%, 480px);
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  align-items: end;
+  gap: 10px;
+  margin: 0 auto;
+  padding: 14px;
+  border: 1px solid #dfe6ec;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 10px 28px rgba(0, 42, 77, 0.05);
+}
+
+.annual-book-month-bar button {
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--blue-50);
+  color: var(--blue-800);
+  font-size: 1.7rem;
+  cursor: pointer;
+}
+
+.annual-book-month-bar label,
+.annual-book-day__extras label,
+.annual-book-comparison-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--ink-600);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.annual-book-month-bar input,
+.annual-book-day__extras input,
+.annual-book-comparison-form input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  outline: none;
+  padding: 0 12px;
+  background: #ffffff;
+  color: var(--ink-950);
+}
+
+.annual-book-month-bar input:focus,
+.annual-book-day input:focus,
+.annual-book-comparison-form input:focus {
+  border-color: var(--blue-700);
+  box-shadow: 0 0 0 4px rgba(0, 75, 135, 0.09);
+}
+
+.annual-book-readonly {
+  margin: 0;
+  border: 1px solid #d8e5ee;
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: var(--blue-50);
+  color: var(--blue-800);
+  font-size: 0.8rem;
+}
+
+.annual-book-loading {
+  padding: 32px;
+  color: var(--ink-500);
+  text-align: center;
+}
+
+.annual-book-summary {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.annual-book-summary article:last-child {
+  border-color: rgba(0, 75, 135, 0.24);
+  background: linear-gradient(145deg, #f3f8fb, #ffffff);
+}
+
+.annual-book-section {
+  overflow: hidden;
+}
+
+.annual-book-section > .panel-heading {
+  padding: 22px;
+  border-bottom: 1px solid #e8edf1;
+}
+
+.annual-book-section > .panel-heading p {
+  max-width: 760px;
+}
+
+.annual-book-days {
+  display: grid;
+  gap: 0;
+}
+
+.annual-book-day {
+  border-bottom: 1px solid #e8edf1;
+  background: #ffffff;
+}
+
+.annual-book-day:last-child {
+  border-bottom: 0;
+}
+
+.annual-book-day > summary {
+  display: flex;
+  min-height: 62px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 22px;
+  color: var(--ink-950);
+  cursor: pointer;
+  list-style: none;
+}
+
+.annual-book-day > summary::-webkit-details-marker {
+  display: none;
+}
+
+.annual-book-day > summary::before {
+  content: '+';
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--blue-50);
+  color: var(--blue-800);
+  font-size: 1.1rem;
+}
+
+.annual-book-day[open] > summary::before {
+  content: '−';
+}
+
+.annual-book-day__date {
+  flex: 1;
+  font-weight: 760;
+  text-transform: capitalize;
+}
+
+.annual-book-day > summary > span:last-child {
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: #f3f5f7;
+  color: var(--ink-600);
+  font-size: 0.76rem;
+  font-weight: 720;
+}
+
+.annual-book-day > summary > span.is-saved {
+  background: #e9f7ef;
+  color: #067647;
+}
+
+.annual-book-day__body {
+  display: grid;
+  gap: 18px;
+  padding: 2px 22px 24px 72px;
+}
+
+.annual-book-entry-grid-wrap {
+  overflow-x: auto;
+}
+
+.annual-book-entry-grid {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: separate;
+  border-spacing: 6px;
+}
+
+.annual-book-entry-grid th {
+  min-width: 108px;
+  padding: 7px;
+  color: var(--ink-500);
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.annual-book-entry-grid td {
+  position: relative;
+}
+
+.annual-book-entry-grid td > span {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  color: var(--ink-400);
+  font-size: 0.72rem;
+  transform: translateY(-50%);
+}
+
+.annual-book-entry-grid input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  outline: 0;
+  padding: 0 8px 0 24px;
+  color: var(--ink-950);
+}
+
+.annual-book-day__extras {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(180px, 1.4fr);
+  gap: 12px;
+}
+
+.annual-book-money-input {
+  position: relative;
+}
+
+.annual-book-money-input b {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 12px;
+  color: var(--ink-400);
+  font-weight: 500;
+  transform: translateY(-50%);
+}
+
+.annual-book-money-input input {
+  padding-left: 26px;
+}
+
+.annual-book-day__body > .product-primary-link {
+  justify-self: end;
+}
+
+.annual-book-deposits {
+  min-width: 840px;
+}
+
+.annual-book-comparison-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  align-items: end;
+  gap: 16px;
+  padding: 22px;
+}
+
+.annual-book-comparison-form fieldset {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  border: 1px solid #e3e9ee;
+  border-radius: 11px;
+  padding: 12px;
+}
+
+.annual-book-comparison-form legend {
+  padding: 0 5px;
+  color: var(--blue-800);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.annual-book-comparison-table {
+  border-top: 1px solid #e8edf1;
+}
+
+.annual-book-comparison-table table {
+  min-width: 760px;
+}
+
+.annual-book-comparison-table tr.is-undesignated td {
+  background: #f1f7fb;
+  color: var(--blue-800);
+}
+
+@media (max-width: 1100px) {
+  .annual-book-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .annual-book-day__extras {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .annual-book-comparison-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .annual-book-comparison-form > .product-primary-link {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 720px) {
+  .annual-book-heading {
+    align-items: stretch;
+  }
+
+  .annual-book-heading .product-primary-link {
+    width: 100%;
+  }
+
+  .annual-book-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .annual-book-day__body {
+    padding: 2px 14px 20px;
+  }
+
+  .annual-book-day > summary {
+    padding-inline: 14px;
+  }
+
+  .annual-book-day__date {
+    font-size: 0.78rem;
+  }
+
+  .annual-book-day__extras,
+  .annual-book-comparison-form fieldset {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 420px) {
+  .annual-book-month-bar {
+    grid-template-columns: 42px minmax(0, 1fr) 42px;
+    padding: 10px;
+  }
+
+  .annual-book-summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .annual-book-day > summary {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+  }
+
+  .annual-book-day > summary > span:last-child {
+    justify-self: start;
+    grid-column: 2;
+  }
+
+  .annual-book-comparison-form {
+    padding: 14px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

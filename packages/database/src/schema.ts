@@ -35,6 +35,13 @@ export const donationPaymentMethod = pgEnum('donation_payment_method', [
   'cash',
   'check',
 ]);
+export const annualBookServiceSlot = pgEnum('annual_book_service_slot', [
+  'first',
+  'second',
+  'third',
+  'fourth',
+  'extra',
+]);
 
 export const churches = pgTable(
   'churches',
@@ -269,6 +276,104 @@ export const envelopeFiles = pgTable(
   ],
 );
 
+export const annualBookDays = pgTable(
+  'annual_book_days',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    churchId: uuid('church_id')
+      .notNull()
+      .references(() => churches.id, { onDelete: 'cascade' }),
+    entryDate: date('entry_date').notNull(),
+    designatedEnvelopeCents: integer('designated_envelope_cents')
+      .notNull()
+      .default(0),
+    athMobileCents: integer('ath_mobile_cents').notNull().default(0),
+    cardMachineCents: integer('card_machine_cents'),
+    notes: text('notes'),
+    createdBy: uuid('created_by')
+      .notNull()
+      .references(() => adminUsers.id, { onDelete: 'restrict' }),
+    updatedBy: uuid('updated_by')
+      .notNull()
+      .references(() => adminUsers.id, { onDelete: 'restrict' }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    unique('annual_book_days_church_id_id_unique').on(table.churchId, table.id),
+    uniqueIndex('annual_book_days_church_date_unique').on(
+      table.churchId,
+      table.entryDate,
+    ),
+    index('annual_book_days_church_date_idx').on(
+      table.churchId,
+      table.entryDate,
+    ),
+    check(
+      'annual_book_days_designated_nonnegative',
+      sql`${table.designatedEnvelopeCents} >= 0`,
+    ),
+    check(
+      'annual_book_days_ath_mobile_nonnegative',
+      sql`${table.athMobileCents} >= 0`,
+    ),
+    check(
+      'annual_book_days_card_machine_nonnegative',
+      sql`${table.cardMachineCents} is null or ${table.cardMachineCents} >= 0`,
+    ),
+    check(
+      'annual_book_days_notes_not_blank',
+      sql`${table.notes} is null or length(trim(${table.notes})) > 0`,
+    ),
+  ],
+);
+
+export const annualBookAmounts = pgTable(
+  'annual_book_amounts',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    churchId: uuid('church_id').notNull(),
+    annualBookDayId: uuid('annual_book_day_id').notNull(),
+    serviceSlot: annualBookServiceSlot('service_slot').notNull(),
+    paymentMethod: donationPaymentMethod('payment_method').notNull(),
+    amountCents: integer('amount_cents').notNull(),
+    createdBy: uuid('created_by')
+      .notNull()
+      .references(() => adminUsers.id, { onDelete: 'restrict' }),
+    updatedBy: uuid('updated_by')
+      .notNull()
+      .references(() => adminUsers.id, { onDelete: 'restrict' }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.churchId, table.annualBookDayId],
+      foreignColumns: [annualBookDays.churchId, annualBookDays.id],
+      name: 'annual_book_amounts_church_day_fk',
+    }).onDelete('cascade'),
+    uniqueIndex('annual_book_amounts_day_slot_method_unique').on(
+      table.churchId,
+      table.annualBookDayId,
+      table.serviceSlot,
+      table.paymentMethod,
+    ),
+    index('annual_book_amounts_church_day_idx').on(
+      table.churchId,
+      table.annualBookDayId,
+    ),
+    check('annual_book_amounts_positive', sql`${table.amountCents} > 0`),
+  ],
+);
+
 export const reportFiles = pgTable(
   'report_files',
   {
@@ -303,7 +408,7 @@ export const reportFiles = pgTable(
     check('report_files_total_valid', sql`${table.totalCents} >= 0`),
     check(
       'report_files_type_valid',
-      sql`${table.reportType} in ('detailed', 'member_totals', 'payment_methods', 'annual_members')`,
+      sql`${table.reportType} in ('detailed', 'member_totals', 'payment_methods', 'annual_members', 'annual_book')`,
     ),
   ],
 );
@@ -315,4 +420,6 @@ export type AdminSession = typeof adminSessions.$inferSelect;
 export type Member = typeof members.$inferSelect;
 export type Donation = typeof donations.$inferSelect;
 export type EnvelopeFile = typeof envelopeFiles.$inferSelect;
+export type AnnualBookDay = typeof annualBookDays.$inferSelect;
+export type AnnualBookAmount = typeof annualBookAmounts.$inferSelect;
 export type ReportFile = typeof reportFiles.$inferSelect;

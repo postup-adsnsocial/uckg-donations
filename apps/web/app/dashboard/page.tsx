@@ -13,7 +13,7 @@ import { ProductIcon, type ProductIconName } from '../components/product-icon';
 import { type Locale, localeFromRoute } from '../i18n/config';
 import { productCopies } from '../i18n/product-copy';
 
-type ModuleId = 'churches' | 'launch' | 'members' | 'reports';
+type ModuleId = 'annual-book' | 'churches' | 'launch' | 'members' | 'reports';
 
 export default function StandaloneDashboardPage() {
   return (
@@ -72,6 +72,12 @@ function Dashboard({
       href: `/${locale}/envelopes/new`,
       id: 'launch',
       title: copy.dashboard.launch,
+    },
+    {
+      description: copy.dashboard.annualBookDescription,
+      href: `/${locale}/annual-book`,
+      id: 'annual-book',
+      title: copy.dashboard.annualBook,
     },
     {
       description: copy.dashboard.reportsDescription,

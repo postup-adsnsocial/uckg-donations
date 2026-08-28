@@ -15,9 +15,11 @@ import {
 import type { TenantContext } from '../database/tenant-unit-of-work.js';
 import { TenantUnitOfWork } from '../database/tenant-unit-of-work.js';
 import { DonationsService } from '../donations/donations.service.js';
+import { AnnualBookService } from '../annual-book/annual-book.service.js';
 import { PrivateObjectStorage } from '../storage/private-object-storage.js';
 
 export type ReportType =
+  | 'annual_book'
   | 'annual_members'
   | 'detailed'
   | 'member_totals'
@@ -31,6 +33,8 @@ export class ReportsService {
 
   constructor(
     @Inject(DonationsService) private readonly donations: DonationsService,
+    @Inject(AnnualBookService)
+    private readonly annualBook: AnnualBookService,
     @Inject(TenantUnitOfWork)
     private readonly tenantUnitOfWork: TenantUnitOfWork,
     @Inject(PrivateObjectStorage)
@@ -117,22 +121,44 @@ export class ReportsService {
     memberId?: string,
   ) {
     const effectiveIncludeImages =
-      reportType === 'annual_members' ? false : includeImages;
-    const items = await this.donations.list(context, {
-      endDate,
-      memberId,
-      startDate,
-    });
-    const totalCents = items.reduce((sum, item) => sum + item.amountCents, 0);
-    const buffer = await this.createPdf(
-      context,
-      churchName,
-      startDate,
-      endDate,
-      reportType,
-      effectiveIncludeImages,
-      items,
-    );
+      reportType === 'annual_members' || reportType === 'annual_book'
+        ? false
+        : includeImages;
+    let envelopeCount: number;
+    let totalCents: number;
+    let buffer: Buffer;
+
+    if (reportType === 'annual_book') {
+      const summary = await this.annualBook.summary(context, {
+        endDate,
+        startDate,
+      });
+      envelopeCount = summary.dayCount;
+      totalCents = summary.metrics.totalWithAthCents;
+      buffer = await this.createAnnualBookPdf(
+        churchName,
+        startDate,
+        endDate,
+        summary.metrics,
+      );
+    } else {
+      const items = await this.donations.list(context, {
+        endDate,
+        memberId,
+        startDate,
+      });
+      envelopeCount = items.length;
+      totalCents = items.reduce((sum, item) => sum + item.amountCents, 0);
+      buffer = await this.createPdf(
+        context,
+        churchName,
+        startDate,
+        endDate,
+        reportType,
+        effectiveIncludeImages,
+        items,
+      );
+    }
     const imageLabel = effectiveIncludeImages
       ? 'with-images'
       : 'without-images';
@@ -151,7 +177,7 @@ export class ReportsService {
         churchId: context.churchId,
         createdBy: context.actorId,
         endDate,
-        envelopeCount: items.length,
+        envelopeCount,
         reportType: storedReportType,
         startDate,
         storageKey,
@@ -167,6 +193,106 @@ export class ReportsService {
         storageKey,
       ),
     };
+  }
+
+  private async createAnnualBookPdf(
+    churchName: string,
+    startDate: string,
+    endDate: string,
+    metrics: Awaited<ReturnType<AnnualBookService['summary']>>['metrics'],
+  ) {
+    const document = await PDFDocument.create();
+    const regular = await document.embedFont(StandardFonts.Helvetica);
+    const bold = await document.embedFont(StandardFonts.HelveticaBold);
+    const logo = await this.loadUniversalLogo(document);
+    const page = document.addPage([612, 792]);
+    page.drawRectangle({
+      x: 0,
+      y: 742,
+      width: 612,
+      height: 50,
+      color: rgb(1, 1, 1),
+    });
+    this.drawUniversalLogo(page, logo, 44, 750, 250, 32);
+    page.drawRectangle({
+      x: 0,
+      y: 682,
+      width: 612,
+      height: 60,
+      color: rgb(0.01, 0.19, 0.32),
+    });
+    page.drawText('ANNUAL BOOK REPORT', {
+      x: 44,
+      y: 710,
+      font: bold,
+      size: 15,
+      color: rgb(1, 1, 1),
+    });
+    page.drawText(this.clean(churchName), {
+      x: 44,
+      y: 692,
+      font: regular,
+      size: 10,
+      color: rgb(0.78, 0.88, 0.94),
+    });
+    page.drawText(
+      `${this.formatDate(startDate)} to ${this.formatDate(endDate)}`,
+      {
+        x: 44,
+        y: 656,
+        font: bold,
+        size: 11,
+        color: rgb(0.05, 0.12, 0.22),
+      },
+    );
+
+    const rows = [
+      ['Cash', metrics.cashCents],
+      ['Checks', metrics.checkCents],
+      ['Cards recorded', metrics.cardCents],
+      ['Card machine', metrics.cardMachineCents],
+      ['Card difference', metrics.cardDifferenceCents],
+      ['ATH Movil', metrics.athMobileCents],
+      ['Designated envelopes', metrics.designatedEnvelopeCents],
+      ['UNDESIGNATED', metrics.undesignatedCents],
+      ['Expected deposits', metrics.expectedDepositCents],
+      ['Total without ATH Movil', metrics.totalWithoutAthCents],
+      ['Total with ATH Movil', metrics.totalWithAthCents],
+    ] as const;
+    let y = 610;
+    rows.forEach(([label, value], index) => {
+      if (index % 2 === 0) {
+        page.drawRectangle({
+          x: 44,
+          y: y - 9,
+          width: 524,
+          height: 30,
+          color: rgb(0.97, 0.98, 0.99),
+        });
+      }
+      page.drawText(label, {
+        x: 56,
+        y,
+        font: label === 'UNDESIGNATED' ? bold : regular,
+        size: 10,
+        color:
+          label === 'UNDESIGNATED'
+            ? rgb(0.02, 0.28, 0.5)
+            : rgb(0.05, 0.12, 0.22),
+      });
+      page.drawText(
+        value === null ? 'Not informed' : `USD ${(value / 100).toFixed(2)}`,
+        {
+          x: 430,
+          y,
+          font: label === 'UNDESIGNATED' ? bold : regular,
+          size: 10,
+          color: rgb(0.05, 0.12, 0.22),
+        },
+      );
+      y -= 32;
+    });
+    return Buffer.from(await document.save());
   }
 
   private async createPdf(

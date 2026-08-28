@@ -169,6 +169,9 @@ test.describe('administrative authentication and tenant isolation', () => {
   test.afterAll(async () => {
     if (reportUserId) {
       await connection.database
+        .delete(schema.annualBookDays)
+        .where(eq(schema.annualBookDays.createdBy, reportUserId));
+      await connection.database
         .delete(schema.donations)
         .where(eq(schema.donations.createdBy, reportUserId));
     }
@@ -261,6 +264,33 @@ test.describe('administrative authentication and tenant isolation', () => {
       headers: { 'x-church-id': churchAId },
     });
     expect(ownChurch.status()).toBe(200);
+
+    const annualBook = await request.get(
+      `${apiBaseUrl}/annual-book?month=2026-08`,
+      { headers: { 'x-church-id': churchAId } },
+    );
+    expect(annualBook.status()).toBe(200);
+    expect(
+      (
+        await request.put(`${apiBaseUrl}/annual-book/days/2026-08-28`, {
+          data: {
+            athMobileCents: 0,
+            cardMachineCents: null,
+            designatedEnvelopeCents: 0,
+            entries: [],
+            entryDate: '2026-08-28',
+          },
+          headers: { 'x-church-id': churchAId },
+        })
+      ).status(),
+    ).toBe(403);
+    expect(
+      (
+        await request.get(`${apiBaseUrl}/annual-book?month=2026-08`, {
+          headers: { 'x-church-id': churchBId },
+        })
+      ).status(),
+    ).toBe(403);
 
     const otherChurch = await request.get(`${apiBaseUrl}/churches/current`, {
       headers: { 'x-church-id': churchBId },
@@ -418,8 +448,11 @@ test.describe('administrative authentication and tenant isolation', () => {
       }),
     ).toBeVisible();
     await expect(page.locator('.overview-grid').getByRole('link')).toHaveCount(
-      3,
+      4,
     );
+    await expect(
+      page.locator('.overview-grid').getByRole('link', { name: /Livro Anual/ }),
+    ).toBeVisible();
     await expect(
       page.locator('.overview-grid').getByRole('link', { name: /Lançar/ }),
     ).toBeVisible();
@@ -467,5 +500,56 @@ test.describe('administrative authentication and tenant isolation', () => {
       page.locator('.report-result .product-primary-link'),
     ).toBeVisible();
     await expectMobileReportLayout(page);
+  });
+
+  test('records a daily annual book entry with the correct calendar day', async ({
+    page,
+  }) => {
+    const today = new Date().toISOString().slice(0, 10);
+    const month = today.slice(0, 7);
+
+    await page.goto('/pt-BR/login');
+    await page.getByLabel('E-mail').fill(reportEmail);
+    await page.getByLabel('Senha', { exact: true }).fill(reportPassword);
+    await page.getByRole('button', { name: 'Entrar no painel' }).click();
+    await expect(page).toHaveURL(/\/pt-BR\/dashboard$/);
+
+    await page.goto(`/pt-BR/annual-book`);
+    await expect(
+      page.getByRole('heading', { level: 2, name: 'Livro Anual' }),
+    ).toBeVisible();
+    await expect(page.locator('input[type="month"]')).toHaveValue(month);
+
+    const todayEditor = page.locator('.annual-book-day[open]');
+    await expect(todayEditor).toHaveCount(1);
+    await todayEditor.getByLabel('Dinheiro — 1º culto').fill('10.25');
+    await todayEditor.getByLabel('Designated (envelopes)').fill('5.00');
+    await todayEditor.getByLabel('ATH Móvil').fill('2.00');
+    await todayEditor.getByRole('button', { name: 'Salvar este dia' }).click();
+
+    await expect(page.getByText(/Dia salvo com sucesso/)).toBeVisible();
+    await expect(
+      page
+        .locator('.annual-book-summary article')
+        .filter({ hasText: 'Undesignated' }),
+    ).toContainText('5,25');
+    await expect(
+      page.getByRole('heading', {
+        level: 3,
+        name: 'Depósitos esperados — segunda a sexta',
+      }),
+    ).toBeVisible();
+    await expect(
+      page
+        .locator('.annual-book-deposits tbody tr')
+        .filter({ hasText: '10,25' }),
+    ).toHaveCount(1);
+
+    await page.getByRole('button', { name: 'Comparar períodos' }).click();
+    const undesignatedComparison = page
+      .locator('.annual-book-comparison-table tbody tr')
+      .filter({ hasText: 'Undesignated' });
+    await expect(undesignatedComparison).toBeVisible();
+    await expect(undesignatedComparison).toContainText('5,25');
   });
 });

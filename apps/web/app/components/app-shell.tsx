@@ -14,6 +14,7 @@ export type { AppChurch, AppUser } from './app-session';
 
 interface AppShellProps {
   active:
+    | 'annual-book'
     | 'churches'
     | 'dashboard'
     | 'envelopes'
@@ -26,6 +27,7 @@ interface AppShellProps {
     canDeleteDonations: boolean;
     canManageUsers: boolean;
     canWriteDonations: boolean;
+    canWriteFinance: boolean;
     church: AppChurch;
     user: AppUser;
   }) => ReactNode;
@@ -39,6 +41,7 @@ export function AppShell({ active, children, locale }: AppShellProps) {
     canDeleteDonations,
     canManageUsers,
     canWriteDonations,
+    canWriteFinance,
     church,
     ensureSession,
     loadChurch,
@@ -141,6 +144,12 @@ export function AppShell({ active, children, locale }: AppShellProps) {
       id: 'launch' as const,
       label: copy.navigation.launch,
       path: 'envelopes/new',
+    },
+    {
+      icon: 'annual-book',
+      id: 'annual-book' as const,
+      label: copy.navigation.annualBook,
+      path: 'annual-book',
     },
     {
       icon: 'reports',
@@ -246,6 +255,7 @@ export function AppShell({ active, children, locale }: AppShellProps) {
             canDeleteDonations,
             canManageUsers,
             canWriteDonations,
+            canWriteFinance,
             church,
             user,
           })}

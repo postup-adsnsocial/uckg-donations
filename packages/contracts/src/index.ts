@@ -199,3 +199,56 @@ export const donationSchema = z.object({
 });
 
 export type DonationResponse = z.infer<typeof donationSchema>;
+
+export const annualBookServiceSlotSchema = z.enum([
+  'first',
+  'second',
+  'third',
+  'fourth',
+  'extra',
+]);
+
+export const annualBookAmountSchema = z
+  .object({
+    amountCents: z.number().int().positive().max(100_000_000),
+    paymentMethod: z.enum(['card', 'cash', 'check']),
+    serviceSlot: annualBookServiceSlotSchema,
+  })
+  .strict();
+
+export const saveAnnualBookDayRequestSchema = z
+  .object({
+    athMobileCents: z.number().int().nonnegative().max(100_000_000),
+    cardMachineCents: z
+      .number()
+      .int()
+      .nonnegative()
+      .max(100_000_000)
+      .nullable(),
+    designatedEnvelopeCents: z.number().int().nonnegative().max(100_000_000),
+    entries: z.array(annualBookAmountSchema).max(15),
+    entryDate: z.iso.date(),
+    notes: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z.string().trim().min(1).max(500).optional(),
+    ),
+  })
+  .strict()
+  .superRefine((input, context) => {
+    const combinations = new Set<string>();
+    input.entries.forEach((entry, index) => {
+      const key = `${entry.serviceSlot}:${entry.paymentMethod}`;
+      if (combinations.has(key)) {
+        context.addIssue({
+          code: 'custom',
+          message: 'Duplicate service slot and payment method.',
+          path: ['entries', index],
+        });
+      }
+      combinations.add(key);
+    });
+  });
+
+export type SaveAnnualBookDayRequest = z.infer<
+  typeof saveAnnualBookDayRequestSchema
+>;

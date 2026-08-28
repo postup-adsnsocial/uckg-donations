@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 
+import { AnnualBookModule } from './annual-book/annual-book.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { ChurchesModule } from './churches/churches.module.js';
 import { ApiConfigModule } from './config/api-config.module.js';
@@ -16,6 +17,7 @@ import { UsersModule } from './users/users.module.js';
   imports: [
     ApiConfigModule,
     DatabaseModule,
+    AnnualBookModule,
     AuthModule,
     TenancyModule,
     ChurchesModule,

@@ -1,4 +1,5 @@
 export type ProductIconName =
+  | 'annual-book'
   | 'churches'
   | 'envelopes'
   | 'launch'
@@ -85,6 +86,15 @@ export function ProductIcon({ className = '', name }: ProductIconProps) {
       <svg {...sharedProps}>
         <path d="M5 3h10l4 4v14H5zM15 3v5h4" />
         <path d="M9 17v-3M12 17v-6M15 17v-4M8.5 10h2" />
+      </svg>
+    );
+  }
+
+  if (name === 'annual-book') {
+    return (
+      <svg {...sharedProps}>
+        <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H12v18H6.5A2.5 2.5 0 0 0 4 22z" />
+        <path d="M20 4.5A2.5 2.5 0 0 0 17.5 2H12v18h5.5A2.5 2.5 0 0 1 20 22zM7 7h2M15 7h2M7 11h2M15 11h2" />
       </svg>
     );
   }

@@ -92,6 +92,13 @@
       "when": 1786496400000,
       "tag": "0012_donation_mutations",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1787948467869,
+      "tag": "0013_red_supreme_intelligence",
+      "breakpoints": true
     }
   ]
 }

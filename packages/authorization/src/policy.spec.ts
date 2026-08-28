@@ -13,6 +13,12 @@ describe('tenant permissions', () => {
     expect(
       hasPermission(
         { isPlatformAdmin: false, role: 'auditor' },
+        'finance:read',
+      ),
+    ).toBe(true);
+    expect(
+      hasPermission(
+        { isPlatformAdmin: false, role: 'auditor' },
         'finance:write',
       ),
     ).toBe(false);

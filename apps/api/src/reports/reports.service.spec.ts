@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { TenantContext } from '../database/tenant-unit-of-work.js';
 import type { TenantUnitOfWork } from '../database/tenant-unit-of-work.js';
+import type { AnnualBookService } from '../annual-book/annual-book.service.js';
 import type { DonationsService } from '../donations/donations.service.js';
 import type { PrivateObjectStorage } from '../storage/private-object-storage.js';
 import { ReportsService } from './reports.service.js';
@@ -57,7 +58,13 @@ describe('ReportsService detailed PDF', () => {
       createSignedDownloadUrl: vi.fn().mockResolvedValue(null),
       upload: vi.fn().mockResolvedValue(undefined),
     } as unknown as PrivateObjectStorage;
-    const service = new ReportsService(donations, tenantUnitOfWork, storage);
+    const annualBook = {} as AnnualBookService;
+    const service = new ReportsService(
+      donations,
+      annualBook,
+      tenantUnitOfWork,
+      storage,
+    );
 
     const report = await service.generate(
       context,
@@ -71,5 +78,75 @@ describe('ReportsService detailed PDF', () => {
 
     expect(pdf.getPageCount()).toBe(1);
     expect(donations.getEnvelope).toHaveBeenCalledWith(context, item.id);
+  });
+
+  it('generates the Annual Book PDF from financial summary data', async () => {
+    const donations = {
+      list: vi.fn(),
+    } as unknown as DonationsService;
+    const annualBook = {
+      summary: vi.fn().mockResolvedValue({
+        dayCount: 2,
+        endDate: '2026-08-31',
+        metrics: {
+          athMobileCents: 2_000,
+          cardCents: 3_000,
+          cardDifferenceCents: 0,
+          cardMachineCents: 3_000,
+          cashCents: 10_000,
+          checkCents: 1_000,
+          designatedEnvelopeCents: 5_000,
+          expectedDepositCents: 11_000,
+          totalWithAthCents: 16_000,
+          totalWithoutAthCents: 14_000,
+          undesignatedCents: 9_000,
+        },
+        startDate: '2026-08-01',
+      }),
+    } as unknown as AnnualBookService;
+    const values = vi.fn().mockResolvedValue(undefined);
+    const transaction = { insert: vi.fn(() => ({ values })) };
+    const tenantUnitOfWork = {
+      run: vi.fn(
+        async (
+          _context: TenantContext,
+          work: (received: typeof transaction) => Promise<unknown>,
+        ) => work(transaction),
+      ),
+    } as unknown as TenantUnitOfWork;
+    const storage = {
+      createSignedDownloadUrl: vi.fn().mockResolvedValue(null),
+      upload: vi.fn().mockResolvedValue(undefined),
+    } as unknown as PrivateObjectStorage;
+    const service = new ReportsService(
+      donations,
+      annualBook,
+      tenantUnitOfWork,
+      storage,
+    );
+
+    const report = await service.generate(
+      context,
+      'Universal Church',
+      '2026-08-01',
+      '2026-08-31',
+      'annual_book',
+      false,
+    );
+    const pdf = await PDFDocument.load(report.buffer);
+
+    expect(pdf.getPageCount()).toBe(1);
+    expect(annualBook.summary).toHaveBeenCalledWith(context, {
+      endDate: '2026-08-31',
+      startDate: '2026-08-01',
+    });
+    expect(donations.list).not.toHaveBeenCalled();
+    expect(values).toHaveBeenCalledWith(
+      expect.objectContaining({
+        envelopeCount: 2,
+        reportType: 'annual_book',
+        totalCents: 16_000,
+      }),
+    );
   });
 });

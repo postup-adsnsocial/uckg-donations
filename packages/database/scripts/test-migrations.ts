@@ -13,7 +13,7 @@ async function testMigrations({
     `select table_name
        from information_schema.tables
       where table_schema = 'public'
-        and table_name in ('churches', 'admin_users', 'church_memberships', 'admin_sessions', 'members', 'donations', 'envelope_files')
+        and table_name in ('churches', 'admin_users', 'church_memberships', 'admin_sessions', 'members', 'donations', 'envelope_files', 'annual_book_days', 'annual_book_amounts')
       order by table_name`,
   );
 
@@ -21,6 +21,8 @@ async function testMigrations({
   const expectedTables = [
     'admin_sessions',
     'admin_users',
+    'annual_book_amounts',
+    'annual_book_days',
     'church_memberships',
     'churches',
     'donations',
@@ -104,6 +106,39 @@ async function testMigrations({
     throw new Error('members tenant policy is missing or inconsistent.');
   }
 
+  const annualBookSecurity = await migratorPool.query<{
+    policy_count: number;
+    relforcerowsecurity: boolean;
+    relname: string;
+    relrowsecurity: boolean;
+  }>(
+    `select c.relname,
+            c.relforcerowsecurity,
+            c.relrowsecurity,
+            count(p.policyname)::int as policy_count
+       from pg_class c
+       join pg_namespace n on n.oid = c.relnamespace
+       left join pg_policies p
+         on p.schemaname = n.nspname
+        and p.tablename = c.relname
+        and p.policyname = c.relname || '_tenant_isolation'
+      where n.nspname = 'public'
+        and c.relname in ('annual_book_days', 'annual_book_amounts')
+      group by c.relname, c.relforcerowsecurity, c.relrowsecurity
+      order by c.relname`,
+  );
+  if (
+    annualBookSecurity.rows.length !== 2 ||
+    annualBookSecurity.rows.some(
+      (row) =>
+        !row.relrowsecurity ||
+        !row.relforcerowsecurity ||
+        row.policy_count !== 1,
+    )
+  ) {
+    throw new Error('Annual book tables must use forced tenant RLS.');
+  }
+
   const candidateKey = await migratorPool.query<{ exists: boolean }>(
     `select exists (
        select 1
@@ -123,6 +158,14 @@ async function testMigrations({
     admin_sessions_insert: boolean;
     admin_sessions_select: boolean;
     admin_sessions_update: boolean;
+    annual_book_amounts_delete: boolean;
+    annual_book_amounts_insert: boolean;
+    annual_book_amounts_select: boolean;
+    annual_book_amounts_update: boolean;
+    annual_book_days_delete: boolean;
+    annual_book_days_insert: boolean;
+    annual_book_days_select: boolean;
+    annual_book_days_update: boolean;
     churches_delete: boolean;
     churches_insert: boolean;
     churches_update: boolean;
@@ -147,6 +190,14 @@ async function testMigrations({
        has_table_privilege('uckg_runtime', 'admin_sessions', 'INSERT') as admin_sessions_insert,
        has_table_privilege('uckg_runtime', 'admin_sessions', 'UPDATE') as admin_sessions_update,
        has_table_privilege('uckg_runtime', 'admin_sessions', 'DELETE') as admin_sessions_delete,
+       has_table_privilege('uckg_runtime', 'annual_book_days', 'SELECT') as annual_book_days_select,
+       has_table_privilege('uckg_runtime', 'annual_book_days', 'INSERT') as annual_book_days_insert,
+       has_table_privilege('uckg_runtime', 'annual_book_days', 'UPDATE') as annual_book_days_update,
+       has_table_privilege('uckg_runtime', 'annual_book_days', 'DELETE') as annual_book_days_delete,
+       has_table_privilege('uckg_runtime', 'annual_book_amounts', 'SELECT') as annual_book_amounts_select,
+       has_table_privilege('uckg_runtime', 'annual_book_amounts', 'INSERT') as annual_book_amounts_insert,
+       has_table_privilege('uckg_runtime', 'annual_book_amounts', 'UPDATE') as annual_book_amounts_update,
+       has_table_privilege('uckg_runtime', 'annual_book_amounts', 'DELETE') as annual_book_amounts_delete,
        has_table_privilege('uckg_runtime', 'churches', 'INSERT') as churches_insert,
        has_table_privilege('uckg_runtime', 'churches', 'UPDATE') as churches_update,
        has_table_privilege('uckg_runtime', 'churches', 'DELETE') as churches_delete,
@@ -170,6 +221,14 @@ async function testMigrations({
     !runtimePrivileges.admin_sessions_insert ||
     !runtimePrivileges.admin_sessions_update ||
     !runtimePrivileges.admin_sessions_delete ||
+    !runtimePrivileges.annual_book_days_select ||
+    !runtimePrivileges.annual_book_days_insert ||
+    !runtimePrivileges.annual_book_days_update ||
+    runtimePrivileges.annual_book_days_delete ||
+    !runtimePrivileges.annual_book_amounts_select ||
+    !runtimePrivileges.annual_book_amounts_insert ||
+    !runtimePrivileges.annual_book_amounts_update ||
+    !runtimePrivileges.annual_book_amounts_delete ||
     !runtimePrivileges.churches_insert ||
     !runtimePrivileges.churches_update ||
     runtimePrivileges.churches_delete ||

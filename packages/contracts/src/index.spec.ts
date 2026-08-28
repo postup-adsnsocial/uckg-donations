@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   createMemberRequestSchema,
+  saveAnnualBookDayRequestSchema,
   updateDonationRequestSchema,
 } from './index.js';
 
@@ -64,6 +65,35 @@ describe('updateDonationRequestSchema', () => {
         memberId: null,
         paymentMethod: 'cash',
         receivedOn: '2026-08-11',
+      }).success,
+    ).toBe(false);
+  });
+});
+
+describe('saveAnnualBookDayRequestSchema', () => {
+  const day = {
+    athMobileCents: 0,
+    cardMachineCents: null,
+    designatedEnvelopeCents: 500,
+    entries: [
+      { amountCents: 1_000, paymentMethod: 'cash', serviceSlot: 'first' },
+    ],
+    entryDate: '2026-08-28',
+    notes: '',
+  };
+
+  it('accepts a complete daily entry and normalizes blank notes', () => {
+    expect(saveAnnualBookDayRequestSchema.parse(day)).toEqual({
+      ...day,
+      notes: undefined,
+    });
+  });
+
+  it('rejects duplicate payment methods in the same service slot', () => {
+    expect(
+      saveAnnualBookDayRequestSchema.safeParse({
+        ...day,
+        entries: [...day.entries, ...day.entries],
       }).success,
     ).toBe(false);
   });

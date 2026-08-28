@@ -6,19 +6,21 @@ export type ChurchPermission =
   | 'donations:delete'
   | 'donations:read'
   | 'donations:write'
+  | 'finance:read'
   | 'finance:write'
   | 'members:read'
   | 'members:write'
   | 'membership:manage';
 
 const rolePermissions: Record<ChurchRole, readonly ChurchPermission[]> = {
-  auditor: ['audit:read', 'church:read'],
+  auditor: ['audit:read', 'church:read', 'finance:read'],
   church_admin: [
     'audit:read',
     'church:read',
     'donations:delete',
     'donations:read',
     'donations:write',
+    'finance:read',
     'finance:write',
     'members:read',
     'members:write',
@@ -28,6 +30,7 @@ const rolePermissions: Record<ChurchRole, readonly ChurchPermission[]> = {
     'church:read',
     'donations:read',
     'donations:write',
+    'finance:read',
     'finance:write',
     'members:read',
   ],

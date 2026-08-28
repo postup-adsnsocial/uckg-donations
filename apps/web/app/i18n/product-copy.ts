@@ -161,6 +161,8 @@ export interface ProductCopy {
     view: string;
   };
   dashboard: {
+    annualBook: string;
+    annualBookDescription: string;
     churches: string;
     churchesDescription: string;
     donations: string;
@@ -178,6 +180,10 @@ export interface ProductCopy {
   reports: {
     archive: string;
     allMembers: string;
+    annualBook: string;
+    annualBookDescription: string;
+    annualBookFilterHint: string;
+    annualBookDays: string;
     annualMembers: string;
     annualMembersDescription: string;
     annualMembersFilterHint: string;
@@ -225,6 +231,10 @@ export interface ProductCopy {
     title: string;
     customPeriodHint: string;
     useEntireYear: string;
+    athMobile: string;
+    designated: string;
+    totalWithoutAth: string;
+    undesignated: string;
     withImages: string;
     withoutImages: string;
     yearLabel: string;
@@ -409,6 +419,9 @@ export const productCopies: Record<Locale, ProductCopy> = {
       view: 'Ver detalhes',
     },
     dashboard: {
+      annualBook: 'Livro Anual',
+      annualBookDescription:
+        'Registre o movimento diário, confira cartões e acompanhe os depósitos esperados.',
       churches: 'Igrejas',
       churchesDescription:
         'Cadastre, renomeie e organize as igrejas disponíveis na plataforma.',
@@ -430,6 +443,12 @@ export const productCopies: Record<Locale, ProductCopy> = {
     reports: {
       archive: 'Relatórios arquivados',
       allMembers: 'Todos os membros',
+      annualBook: 'Livro Anual',
+      annualBookDescription:
+        'Dinheiro, cheque, cartão, ATH Móvil, Designated e Undesignated do período.',
+      annualBookFilterHint:
+        'Este relatório utiliza os lançamentos diários do Livro Anual.',
+      annualBookDays: 'Dias lançados',
       annualMembers: 'Resumo anual por doador',
       annualMembersDescription:
         'Todos os doadores em linhas, com janeiro a dezembro e total anual.',
@@ -484,6 +503,10 @@ export const productCopies: Record<Locale, ProductCopy> = {
       title: 'Relatórios',
       customPeriodHint: 'Defina duas datas',
       useEntireYear: 'Usar o ano inteiro',
+      athMobile: 'ATH Móvil',
+      designated: 'Designated',
+      totalWithoutAth: 'Total sem ATH Móvil',
+      undesignated: 'Undesignated',
       withImages: 'Com imagens',
       withoutImages: 'Sem imagens',
       yearLabel: 'Selecione ou digite o ano',
@@ -661,6 +684,9 @@ export const productCopies: Record<Locale, ProductCopy> = {
       view: 'View details',
     },
     dashboard: {
+      annualBook: 'Annual Book',
+      annualBookDescription:
+        'Record daily activity, reconcile card totals and track expected deposits.',
       churches: 'Churches',
       churchesDescription:
         'Create, rename and organize the churches available on the platform.',
@@ -681,6 +707,12 @@ export const productCopies: Record<Locale, ProductCopy> = {
     reports: {
       archive: 'Archived reports',
       allMembers: 'All members',
+      annualBook: 'Annual Book',
+      annualBookDescription:
+        'Cash, checks, cards, ATH Móvil, Designated and Undesignated for the period.',
+      annualBookFilterHint:
+        'This report uses the daily entries from the Annual Book.',
+      annualBookDays: 'Recorded days',
       annualMembers: 'Annual donor summary',
       annualMembersDescription:
         'All donors in rows, with January through December and an annual total.',
@@ -734,6 +766,10 @@ export const productCopies: Record<Locale, ProductCopy> = {
       title: 'Reports',
       customPeriodHint: 'Set two dates',
       useEntireYear: 'Use the entire year',
+      athMobile: 'ATH Móvil',
+      designated: 'Designated',
+      totalWithoutAth: 'Total without ATH Móvil',
+      undesignated: 'Undesignated',
       withImages: 'With images',
       withoutImages: 'Without images',
       yearLabel: 'Select or type the year',
@@ -918,6 +954,9 @@ export const productCopies: Record<Locale, ProductCopy> = {
       view: 'Ver detalles',
     },
     dashboard: {
+      annualBook: 'Libro Anual',
+      annualBookDescription:
+        'Registra el movimiento diario, concilia tarjetas y controla los depósitos esperados.',
       churches: 'Iglesias',
       churchesDescription:
         'Crea, renombra y organiza las iglesias disponibles en la plataforma.',
@@ -940,6 +979,12 @@ export const productCopies: Record<Locale, ProductCopy> = {
     reports: {
       archive: 'Informes archivados',
       allMembers: 'Todos los miembros',
+      annualBook: 'Libro Anual',
+      annualBookDescription:
+        'Efectivo, cheques, tarjetas, ATH Móvil, Designated y Undesignated del período.',
+      annualBookFilterHint:
+        'Este informe utiliza los registros diarios del Libro Anual.',
+      annualBookDays: 'Días registrados',
       annualMembers: 'Resumen anual por donante',
       annualMembersDescription:
         'Todos los donantes en filas, con enero a diciembre y total anual.',
@@ -996,6 +1041,10 @@ export const productCopies: Record<Locale, ProductCopy> = {
       title: 'Informes',
       customPeriodHint: 'Define dos fechas',
       useEntireYear: 'Usar el año completo',
+      athMobile: 'ATH Móvil',
+      designated: 'Designated',
+      totalWithoutAth: 'Total sin ATH Móvil',
+      undesignated: 'Undesignated',
       withImages: 'Con imágenes',
       withoutImages: 'Sin imágenes',
       yearLabel: 'Selecciona o escribe el año',

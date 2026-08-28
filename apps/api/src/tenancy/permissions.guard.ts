@@ -17,6 +17,7 @@ export const churchPermissions: ReadonlySet<ChurchPermission> = new Set([
   'donations:delete',
   'donations:read',
   'donations:write',
+  'finance:read',
   'finance:write',
   'members:read',
   'members:write',

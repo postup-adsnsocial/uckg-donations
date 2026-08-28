@@ -43,6 +43,7 @@ interface AppSessionValue {
   canDeleteDonations: boolean;
   canManageUsers: boolean;
   canWriteDonations: boolean;
+  canWriteFinance: boolean;
   church: AppChurch | null;
   ensureSession: () => Promise<void>;
   loadChurch: (churchId: string) => Promise<boolean>;
@@ -242,12 +243,14 @@ export function AppSessionProvider({
     user?.isPlatformAdmin === true ||
     selectedRole === 'church_admin' ||
     selectedRole === 'financial_operator';
+  const canWriteFinance = canWriteDonations;
 
   const value = useMemo<AppSessionValue>(
     () => ({
       canDeleteDonations,
       canManageUsers,
       canWriteDonations,
+      canWriteFinance,
       church,
       ensureSession,
       loadChurch,
@@ -261,6 +264,7 @@ export function AppSessionProvider({
       canDeleteDonations,
       canManageUsers,
       canWriteDonations,
+      canWriteFinance,
       church,
       ensureSession,
       loadChurch,

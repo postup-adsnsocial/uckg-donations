@@ -26,6 +26,7 @@ interface ReportDownload {
 }
 
 type ReportType =
+  | 'annual_book'
   | 'annual_members'
   | 'detailed'
   | 'member_totals'
@@ -42,11 +43,19 @@ type PeriodMode = 'custom' | 'month' | 'year';
 
 const reportTypes: ReportType[] = [
   'detailed',
+  'annual_book',
   'annual_members',
   'member_totals',
 ];
 
 function ReportTypeIcon({ type }: { type: ReportType }) {
+  if (type === 'annual_book')
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H12v18H6.5A2.5 2.5 0 0 0 4 22zM20 4.5A2.5 2.5 0 0 0 17.5 2H12v18h5.5A2.5 2.5 0 0 1 20 22z" />
+        <path d="M7 7h2M15 7h2M7 11h2M15 11h2" />
+      </svg>
+    );
   if (type === 'annual_members')
     return (
       <svg aria-hidden="true" viewBox="0 0 24 24">
@@ -362,6 +371,19 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
     null,
   );
   const [items, setItems] = useState<EnvelopeRecord[]>([]);
+  const [annualBookSummary, setAnnualBookSummary] = useState<{
+    dayCount: number;
+    metrics: {
+      athMobileCents: number;
+      cardCents: number;
+      cashCents: number;
+      checkCents: number;
+      designatedEnvelopeCents: number;
+      totalWithAthCents: number;
+      totalWithoutAthCents: number;
+      undesignatedCents: number;
+    };
+  } | null>(null);
   const [hasGenerated, setHasGenerated] = useState(false);
   const [archive, setArchive] = useState<ReportRecord[]>([]);
   const [loading, setLoading] = useState(false);
@@ -395,6 +417,7 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
 
   useEffect(() => {
     setItems([]);
+    setAnnualBookSummary(null);
     setHasGenerated(false);
   }, [church.id, endDate, selectedMember, startDate]);
 
@@ -403,11 +426,23 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
     setLoading(true);
     const params = new URLSearchParams({ endDate, startDate });
     if (selectedMember) params.set('memberId', selectedMember.id);
-    const response = await apiRequest(`/donations?${params}`, {
+    const path =
+      reportType === 'annual_book'
+        ? `/annual-book/summary?${params}`
+        : `/donations?${params}`;
+    const response = await apiRequest(path, {
       headers: { 'x-church-id': church.id },
     });
     if (response.ok) {
-      setItems((await response.json()) as EnvelopeRecord[]);
+      if (reportType === 'annual_book') {
+        setAnnualBookSummary(
+          (await response.json()) as NonNullable<typeof annualBookSummary>,
+        );
+        setItems([]);
+      } else {
+        setItems((await response.json()) as EnvelopeRecord[]);
+        setAnnualBookSummary(null);
+      }
       setHasGenerated(true);
     }
     setLoading(false);
@@ -475,9 +510,14 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
 
   function chooseReportType(type: ReportType) {
     setReportType(type);
-    if (type === 'annual_members') {
+    setHasGenerated(false);
+    setAnnualBookSummary(null);
+    setItems([]);
+    if (type === 'annual_members' || type === 'annual_book') {
       setSelectedMember(null);
       setIncludeImages(false);
+    }
+    if (type === 'annual_members') {
       applyYear(selectedYear);
     }
   }
@@ -608,6 +648,10 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
     [locale],
   );
   const typeCopy = {
+    annual_book: {
+      description: copy.reports.annualBookDescription,
+      label: copy.reports.annualBook,
+    },
     annual_members: {
       description: copy.reports.annualMembersDescription,
       label: copy.reports.annualMembers,
@@ -703,12 +747,20 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
               <p>{copy.reports.memberFilterDescription}</p>
             </div>
           </header>
-          {reportType === 'annual_members' ? (
+          {reportType === 'annual_members' || reportType === 'annual_book' ? (
             <div className="report-fixed-selection">
               <span aria-hidden="true">✓</span>
               <div>
-                <strong>{copy.reports.allMembers}</strong>
-                <small>{copy.reports.annualMembersFilterHint}</small>
+                <strong>
+                  {reportType === 'annual_book'
+                    ? copy.reports.annualBook
+                    : copy.reports.allMembers}
+                </strong>
+                <small>
+                  {reportType === 'annual_book'
+                    ? copy.reports.annualBookFilterHint
+                    : copy.reports.annualMembersFilterHint}
+                </small>
               </div>
             </div>
           ) : (
@@ -746,7 +798,9 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
             </span>
             <input
               checked={includeImages}
-              disabled={reportType === 'annual_members'}
+              disabled={
+                reportType === 'annual_members' || reportType === 'annual_book'
+              }
               type="checkbox"
               onChange={(event) => setIncludeImages(event.target.checked)}
             />
@@ -959,7 +1013,89 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
         </p>
       ) : null}
 
-      {hasGenerated && items.length ? (
+      {hasGenerated && reportType === 'annual_book' && annualBookSummary ? (
+        <>
+          <div className="summary-grid summary-grid--compact report-summary">
+            <article>
+              <span>{copy.reports.annualBookDays}</span>
+              <strong>{annualBookSummary.dayCount}</strong>
+            </article>
+            <article>
+              <span>{copy.envelopes.total}</span>
+              <strong>
+                {formatMoney(
+                  annualBookSummary.metrics.totalWithAthCents,
+                  locale,
+                )}
+              </strong>
+            </article>
+          </div>
+          <section className="product-panel report-result">
+            <div className="panel-heading">
+              <div>
+                <small>{copy.reports.previewTitle}</small>
+                <h3>{selectedPeriodLabel}</h3>
+                <p>{copy.reports.annualBook}</p>
+              </div>
+              <button
+                className="product-primary-link"
+                disabled={loading}
+                type="button"
+                onClick={() => void download()}
+              >
+                ↓ {copy.reports.download}
+              </button>
+            </div>
+            <div className="product-table-wrap">
+              <table className="product-table">
+                <thead>
+                  <tr>
+                    <th>{copy.reports.reportType}</th>
+                    <th>{copy.envelopes.total}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    [copy.envelopes.cash, annualBookSummary.metrics.cashCents],
+                    [
+                      copy.envelopes.check,
+                      annualBookSummary.metrics.checkCents,
+                    ],
+                    [copy.envelopes.card, annualBookSummary.metrics.cardCents],
+                    [
+                      copy.reports.athMobile,
+                      annualBookSummary.metrics.athMobileCents,
+                    ],
+                    [
+                      copy.reports.designated,
+                      annualBookSummary.metrics.designatedEnvelopeCents,
+                    ],
+                    [
+                      copy.reports.undesignated,
+                      annualBookSummary.metrics.undesignatedCents,
+                    ],
+                    [
+                      copy.reports.totalWithoutAth,
+                      annualBookSummary.metrics.totalWithoutAthCents,
+                    ],
+                    [
+                      copy.envelopes.total,
+                      annualBookSummary.metrics.totalWithAthCents,
+                    ],
+                  ].map(([label, amount]) => (
+                    <tr key={label}>
+                      <td>
+                        <strong>{label}</strong>
+                      </td>
+                      <td>{formatMoney(amount as number, locale)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </>
+      ) : hasGenerated && items.length ? (
         <>
           <div className="summary-grid summary-grid--compact report-summary">
             <article>

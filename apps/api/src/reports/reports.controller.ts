@@ -29,7 +29,7 @@ export class ReportsController {
   ) {}
 
   @Get()
-  @DomainRoute('donations:read')
+  @DomainRoute('finance:read')
   list(
     @CurrentTenant() tenant: ResolvedTenantContext,
     @CurrentUser() user: AuthenticatedAdmin,
@@ -38,7 +38,7 @@ export class ReportsController {
   }
 
   @Get('pdf')
-  @DomainRoute('donations:read')
+  @DomainRoute('finance:read')
   async pdf(
     @CurrentTenant() tenant: ResolvedTenantContext,
     @CurrentUser() user: AuthenticatedAdmin,
@@ -64,6 +64,7 @@ export class ReportsController {
       (delivery !== undefined && delivery !== 'url') ||
       (memberId !== undefined && !churchIdSchema.safeParse(memberId).success) ||
       ![
+        'annual_book',
         'annual_members',
         'detailed',
         'member_totals',
@@ -84,7 +85,7 @@ export class ReportsController {
   }
 
   @Get(':reportId')
-  @DomainRoute('donations:read')
+  @DomainRoute('finance:read')
   async get(
     @CurrentTenant() tenant: ResolvedTenantContext,
     @CurrentUser() user: AuthenticatedAdmin,

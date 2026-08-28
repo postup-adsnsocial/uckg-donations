@@ -17,6 +17,7 @@ import {
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { AppModule } from '../app.module.js';
+import { AnnualBookService } from '../annual-book/annual-book.service.js';
 import { AuthService } from '../auth/auth.service.js';
 import { LoginAttemptLimiter } from '../auth/login-attempt-limiter.js';
 import { ChurchesService } from '../churches/churches.service.js';
@@ -71,6 +72,7 @@ const registeredControllers = collectControllers(AppModule);
   imports: [DiscoveryModule],
   providers: [
     { provide: AuthService, useValue: {} },
+    { provide: AnnualBookService, useValue: {} },
     { provide: LoginAttemptLimiter, useValue: {} },
     { provide: ChurchesService, useValue: {} },
     { provide: MembersService, useValue: {} },
@@ -144,6 +146,10 @@ describe('route policy inventory', () => {
 
   it('discovers every registered HTTP handler', () => {
     expect(routes.map(({ label }) => label).sort()).toEqual([
+      'AnnualBookController.comparison',
+      'AnnualBookController.month',
+      'AnnualBookController.saveDay',
+      'AnnualBookController.summary',
       'AuthController.changePassword',
       'AuthController.login',
       'AuthController.logout',
