@@ -1,0 +1,2235 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Proposta comercial da plataforma Universal Gestão Financeira, com licenciamento individual por igreja."
+    />
+    <title>Proposta Comercial · Universal Gestão Financeira</title>
+    <style>
+      :root {
+        --blue-950: #002a4d;
+        --blue-900: #003c6e;
+        --blue-800: #004b87;
+        --blue-700: #0864a8;
+        --blue-100: #dcebf6;
+        --blue-50: #eef6fb;
+        --red-600: #d9251c;
+        --red-700: #ba1e17;
+        --ink-950: #101828;
+        --ink-800: #1d2939;
+        --ink-700: #344054;
+        --ink-500: #667085;
+        --ink-400: #98a2b3;
+        --line: #d7dde5;
+        --canvas: #f3f6f8;
+        --surface: #ffffff;
+        --success: #177245;
+        --warning: #9a6700;
+        --shadow: 0 24px 70px rgba(0, 42, 77, 0.13);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        background: var(--canvas);
+      }
+
+      body {
+        min-width: 320px;
+        margin: 0;
+        color: var(--ink-950);
+        background: var(--canvas);
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        line-height: 1.55;
+        text-rendering: optimizeLegibility;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      img {
+        display: block;
+        max-width: 100%;
+      }
+
+      button {
+        font: inherit;
+      }
+
+      .topbar {
+        position: sticky;
+        z-index: 20;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 70px;
+        padding: 12px max(24px, calc((100vw - 1220px) / 2));
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(0, 42, 77, 0.96);
+        color: white;
+        backdrop-filter: blur(14px);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+      }
+
+      .brand__mark {
+        display: grid;
+        width: 42px;
+        height: 42px;
+        place-items: center;
+        padding: 7px;
+        border-radius: 11px;
+        background: white;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+      }
+
+      .brand__mark img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      .brand__copy {
+        display: grid;
+        gap: 1px;
+        line-height: 1;
+      }
+
+      .brand__copy strong {
+        font-size: 0.94rem;
+        letter-spacing: 0.08em;
+      }
+
+      .brand__copy small {
+        color: rgba(255, 255, 255, 0.67);
+        font-size: 0.67rem;
+        font-weight: 700;
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+      }
+
+      .topbar__actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .topbar__actions a,
+      .print-button {
+        display: inline-flex;
+        min-height: 42px;
+        align-items: center;
+        justify-content: center;
+        padding: 0 16px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        color: white;
+        background: transparent;
+        font-size: 0.82rem;
+        font-weight: 750;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .print-button {
+        border-color: white;
+        color: var(--blue-950);
+        background: white;
+      }
+
+      .page {
+        overflow: hidden;
+      }
+
+      .shell {
+        width: min(1220px, calc(100% - 48px));
+        margin: 0 auto;
+      }
+
+      .hero {
+        position: relative;
+        min-height: 480px;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 82% 16%, rgba(255, 255, 255, 0.14), transparent 27%),
+          linear-gradient(145deg, var(--blue-700) 0%, var(--blue-800) 42%, var(--blue-950) 100%);
+        color: white;
+      }
+
+      .hero::before {
+        position: absolute;
+        inset: 0;
+        opacity: 0.09;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.3) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.3) 1px, transparent 1px);
+        background-size: 76px 76px;
+        mask-image: linear-gradient(to bottom right, transparent 5%, black 85%);
+        content: "";
+      }
+
+      .hero::after {
+        position: absolute;
+        right: -120px;
+        bottom: -320px;
+        width: 720px;
+        height: 720px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        box-shadow:
+          0 0 0 92px rgba(255, 255, 255, 0.025),
+          0 0 0 184px rgba(255, 255, 255, 0.018);
+        content: "";
+      }
+
+      .hero__redline {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 7px;
+        background: var(--red-600);
+      }
+
+      .hero__content {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        min-height: 410px;
+        align-items: center;
+        padding: 70px 0;
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .eyebrow {
+        margin: 0 0 14px;
+        color: var(--blue-800);
+        font-size: 0.73rem;
+        font-weight: 850;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow--light {
+        color: rgba(255, 255, 255, 0.72);
+      }
+
+      .hero h1 {
+        max-width: 820px;
+        margin: 0;
+        font-size: clamp(3rem, 6vw, 6.5rem);
+        letter-spacing: -0.065em;
+        line-height: 0.91;
+      }
+
+      .hero__lead {
+        max-width: 940px;
+        margin: 0;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: clamp(1.5rem, 3.2vw, 2.7rem);
+        font-weight: 720;
+        letter-spacing: -0.035em;
+        line-height: 1.3;
+      }
+
+      .hero__pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 30px;
+        padding: 9px 13px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 999px;
+        color: white;
+        background: rgba(255, 255, 255, 0.09);
+        font-size: 0.78rem;
+        font-weight: 750;
+      }
+
+      .hero__pill::before {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #6ce9a6;
+        box-shadow: 0 0 0 5px rgba(108, 233, 166, 0.12);
+        content: "";
+      }
+
+      .proposal-card {
+        position: relative;
+        z-index: 2;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.17);
+        border-radius: 20px;
+        background: rgba(0, 30, 54, 0.5);
+        box-shadow: 0 28px 80px rgba(0, 26, 48, 0.36);
+        backdrop-filter: blur(18px);
+      }
+
+      .proposal-card__head {
+        padding: 26px 28px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.13);
+      }
+
+      .proposal-card__head small {
+        display: block;
+        color: rgba(255, 255, 255, 0.58);
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+      }
+
+      .proposal-card__head strong {
+        display: block;
+        margin-top: 7px;
+        font-size: 1.25rem;
+      }
+
+      .proposal-card dl {
+        margin: 0;
+      }
+
+      .proposal-card dl div {
+        display: grid;
+        padding: 17px 28px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        grid-template-columns: 1fr auto;
+        gap: 18px;
+      }
+
+      .proposal-card dl div:last-child {
+        border-bottom: 0;
+      }
+
+      .proposal-card dt {
+        color: rgba(255, 255, 255, 0.58);
+        font-size: 0.78rem;
+      }
+
+      .proposal-card dd {
+        margin: 0;
+        font-size: 0.78rem;
+        font-weight: 750;
+        text-align: right;
+      }
+
+      .section {
+        padding: 105px 0;
+      }
+
+      .section--white {
+        background: white;
+      }
+
+      .section--blue {
+        background: var(--blue-950);
+        color: white;
+      }
+
+      .section-heading {
+        display: grid;
+        align-items: end;
+        margin-bottom: 48px;
+        grid-template-columns: minmax(0, 0.92fr) minmax(300px, 0.58fr);
+        gap: 70px;
+      }
+
+      .section-heading h2 {
+        max-width: 850px;
+        margin: 0;
+        font-size: clamp(2.25rem, 4vw, 4rem);
+        letter-spacing: -0.055em;
+        line-height: 1;
+      }
+
+      .section-heading > p {
+        margin: 0;
+        color: var(--ink-500);
+        font-size: 1rem;
+        line-height: 1.72;
+      }
+
+      .section--blue .section-heading > p {
+        color: rgba(255, 255, 255, 0.68);
+      }
+
+      .intro-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .intro-card {
+        padding: 30px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: white;
+      }
+
+      .intro-card__number {
+        display: grid;
+        width: 38px;
+        height: 38px;
+        place-items: center;
+        border-radius: 9px;
+        color: var(--blue-800);
+        background: var(--blue-50);
+        font-size: 0.74rem;
+        font-weight: 850;
+      }
+
+      .intro-card h3 {
+        margin: 22px 0 8px;
+        font-size: 1.18rem;
+        letter-spacing: -0.025em;
+      }
+
+      .intro-card p {
+        margin: 0;
+        color: var(--ink-500);
+        font-size: 0.9rem;
+      }
+
+      .feature-list {
+        display: grid;
+        margin: 0;
+        padding: 0;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        list-style: none;
+        gap: 1px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        overflow: hidden;
+        background: var(--line);
+      }
+
+      .feature-list li {
+        display: grid;
+        min-height: 165px;
+        padding: 30px;
+        background: white;
+        grid-template-columns: 46px 1fr;
+        gap: 18px;
+      }
+
+      .feature-icon {
+        display: grid;
+        width: 46px;
+        height: 46px;
+        place-items: center;
+        border-radius: 12px;
+        color: var(--blue-800);
+        background: var(--blue-50);
+        font-size: 1.1rem;
+        font-weight: 850;
+      }
+
+      .feature-list h3 {
+        margin: 2px 0 7px;
+        font-size: 1.05rem;
+      }
+
+      .feature-list p {
+        margin: 0;
+        color: var(--ink-500);
+        font-size: 0.87rem;
+      }
+
+      .screen-stage {
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.13);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.04);
+        box-shadow: 0 30px 90px rgba(0, 18, 34, 0.42);
+      }
+
+      .screen-stage__chrome {
+        display: flex;
+        height: 46px;
+        align-items: center;
+        gap: 7px;
+        padding: 0 17px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .screen-stage__chrome i {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.28);
+      }
+
+      .screen-stage img {
+        width: 100%;
+      }
+
+      .screen-caption {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 17px 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.66);
+        font-size: 0.78rem;
+      }
+
+      .screen-caption strong {
+        color: white;
+      }
+
+      .screen-grid {
+        display: grid;
+        margin-top: 22px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 22px;
+      }
+
+      .screen-card {
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.13);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .screen-card__image {
+        height: 340px;
+        overflow: hidden;
+        background: white;
+      }
+
+      .screen-card__image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top center;
+      }
+
+      .screen-card__image--tall img {
+        object-position: top center;
+      }
+
+      .screen-card figcaption {
+        padding: 19px 20px 21px;
+      }
+
+      .screen-card figcaption strong {
+        display: block;
+        font-size: 0.98rem;
+      }
+
+      .screen-card figcaption span {
+        display: block;
+        margin-top: 5px;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.79rem;
+      }
+
+      .workflow {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .workflow article {
+        position: relative;
+        min-height: 185px;
+        padding: 27px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: white;
+      }
+
+      .workflow article:not(:last-child)::after {
+        position: absolute;
+        z-index: 2;
+        top: 35px;
+        right: -19px;
+        display: grid;
+        width: 26px;
+        height: 26px;
+        place-items: center;
+        border: 1px solid var(--line);
+        border-radius: 50%;
+        color: var(--blue-800);
+        background: white;
+        font-size: 0.78rem;
+        content: "→";
+      }
+
+      .workflow small {
+        color: var(--blue-800);
+        font-weight: 850;
+        letter-spacing: 0.1em;
+      }
+
+      .workflow h3 {
+        margin: 18px 0 7px;
+        font-size: 1rem;
+      }
+
+      .workflow p {
+        margin: 0;
+        color: var(--ink-500);
+        font-size: 0.84rem;
+      }
+
+      .report-showcase {
+        display: grid;
+        align-items: center;
+        padding: 28px;
+        border: 1px solid var(--line);
+        border-radius: 19px;
+        background: white;
+        box-shadow: var(--shadow);
+        grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.55fr);
+        gap: 38px;
+      }
+
+      .report-showcase__image {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        background: var(--canvas);
+      }
+
+      .report-showcase__copy h3 {
+        margin: 0;
+        font-size: 1.65rem;
+        letter-spacing: -0.035em;
+      }
+
+      .report-showcase__copy > p {
+        color: var(--ink-500);
+      }
+
+      .report-examples {
+        margin-top: 54px;
+      }
+
+      .report-examples__heading {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        margin-bottom: 22px;
+        gap: 28px;
+      }
+
+      .report-examples__heading h3 {
+        margin: 0;
+        font-size: 1.65rem;
+        letter-spacing: -0.035em;
+      }
+
+      .report-examples__heading p {
+        max-width: 560px;
+        margin: 0;
+        color: var(--ink-500);
+        font-size: 0.86rem;
+      }
+
+      .report-gallery {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .report-example {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: white;
+        box-shadow: 0 18px 44px rgba(0, 42, 77, 0.08);
+      }
+
+      .report-example__preview {
+        display: grid;
+        height: 330px;
+        place-items: center;
+        overflow: hidden;
+        padding: 16px;
+        border-bottom: 1px solid var(--line);
+        background: var(--canvas);
+      }
+
+      .report-example__preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 10px 20px rgba(0, 42, 77, 0.12));
+      }
+
+      .report-example__body {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        padding: 23px;
+      }
+
+      .report-example__body small {
+        color: var(--blue-800);
+        font-size: 0.67rem;
+        font-weight: 850;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .report-example__body h4 {
+        margin: 12px 0 7px;
+        font-size: 1rem;
+      }
+
+      .report-example__body p {
+        margin: 0 0 20px;
+        color: var(--ink-500);
+        font-size: 0.8rem;
+      }
+
+      .report-example__body a {
+        display: inline-flex;
+        min-height: 42px;
+        align-items: center;
+        justify-content: center;
+        margin-top: auto;
+        padding: 0 14px;
+        border-radius: 9px;
+        color: white;
+        background: var(--blue-800);
+        font-size: 0.78rem;
+        font-weight: 800;
+        text-decoration: none;
+      }
+
+      .check-list {
+        display: grid;
+        margin: 24px 0 0;
+        padding: 0;
+        list-style: none;
+        gap: 12px;
+      }
+
+      .check-list li {
+        display: grid;
+        align-items: start;
+        color: var(--ink-700);
+        font-size: 0.88rem;
+        grid-template-columns: 24px 1fr;
+        gap: 8px;
+      }
+
+      .check-list li::before {
+        display: grid;
+        width: 20px;
+        height: 20px;
+        place-items: center;
+        border-radius: 50%;
+        color: var(--success);
+        background: #e7f6ee;
+        font-size: 0.68rem;
+        font-weight: 900;
+        content: "✓";
+      }
+
+      .security-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 15px;
+      }
+
+      .security-card {
+        padding: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .security-card__status {
+        display: inline-flex;
+        padding: 5px 8px;
+        border-radius: 999px;
+        color: #a6f4c5;
+        background: rgba(23, 114, 69, 0.25);
+        font-size: 0.65rem;
+        font-weight: 850;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .security-card h3 {
+        margin: 20px 0 8px;
+        font-size: 1rem;
+      }
+
+      .security-card p {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.64);
+        font-size: 0.83rem;
+      }
+
+      .security-note {
+        display: grid;
+        align-items: center;
+        margin-top: 20px;
+        padding: 22px 24px;
+        border-left: 4px solid var(--red-600);
+        border-radius: 0 12px 12px 0;
+        background: rgba(255, 255, 255, 0.06);
+        grid-template-columns: 1fr auto;
+        gap: 28px;
+      }
+
+      .security-note strong {
+        display: block;
+      }
+
+      .security-note p {
+        margin: 4px 0 0;
+        color: rgba(255, 255, 255, 0.62);
+        font-size: 0.83rem;
+      }
+
+      .security-note span {
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+      }
+
+      .tenant-banner {
+        display: grid;
+        align-items: center;
+        margin-bottom: 26px;
+        padding: 24px 28px;
+        border: 1px solid #b9d6e9;
+        border-radius: 14px;
+        background: var(--blue-50);
+        grid-template-columns: 1fr auto;
+        gap: 20px;
+      }
+
+      .tenant-banner strong {
+        color: var(--blue-950);
+        font-size: 1.12rem;
+      }
+
+      .tenant-banner p {
+        margin: 4px 0 0;
+        color: var(--ink-500);
+        font-size: 0.85rem;
+      }
+
+      .tenant-banner span {
+        padding: 8px 11px;
+        border-radius: 999px;
+        color: var(--blue-800);
+        background: white;
+        font-size: 0.7rem;
+        font-weight: 850;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 22px;
+      }
+
+      .price-card {
+        position: relative;
+        display: flex;
+        min-height: 720px;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: white;
+        box-shadow: 0 20px 50px rgba(0, 42, 77, 0.07);
+      }
+
+      .price-card--featured {
+        border: 2px solid var(--blue-800);
+        box-shadow: 0 28px 70px rgba(0, 75, 135, 0.16);
+      }
+
+      .price-card__recommended {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        padding: 6px 9px;
+        border-radius: 999px;
+        color: white;
+        background: var(--red-600);
+        font-size: 0.65rem;
+        font-weight: 850;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .price-card__head {
+        min-height: 255px;
+        padding: 34px 34px 30px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .price-card__head h3 {
+        margin: 8px 0 6px;
+        font-size: 1.45rem;
+        letter-spacing: -0.035em;
+      }
+
+      .price-card__head > p {
+        margin: 0;
+        color: var(--ink-500);
+        font-size: 0.87rem;
+      }
+
+      .price {
+        display: flex;
+        align-items: flex-end;
+        margin-top: 23px;
+        gap: 8px;
+      }
+
+      .price strong {
+        color: var(--blue-950);
+        font-size: clamp(2.5rem, 4vw, 4rem);
+        letter-spacing: -0.06em;
+        line-height: 0.94;
+      }
+
+      .price span {
+        padding-bottom: 5px;
+        color: var(--ink-500);
+        font-size: 0.76rem;
+        font-weight: 700;
+      }
+
+      .setup-price {
+        margin: 11px 0 0;
+        color: var(--ink-700);
+        font-size: 0.79rem;
+        font-weight: 750;
+      }
+
+      .price-card__body {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        padding: 30px 34px 34px;
+      }
+
+      .price-card__body h4 {
+        margin: 0 0 13px;
+        font-size: 0.78rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .price-card__body .check-list {
+        margin-top: 0;
+      }
+
+      .price-card__footer {
+        margin-top: auto;
+        padding-top: 30px;
+      }
+
+      .payment-box {
+        padding: 16px 18px;
+        border-radius: 11px;
+        background: var(--canvas);
+      }
+
+      .payment-box strong {
+        display: block;
+        color: var(--blue-950);
+        font-size: 0.82rem;
+      }
+
+      .payment-box p {
+        margin: 5px 0 0;
+        color: var(--ink-500);
+        font-size: 0.76rem;
+      }
+
+      .comparison {
+        width: 100%;
+        margin-top: 34px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 14px;
+        background: white;
+      }
+
+      .comparison th,
+      .comparison td {
+        padding: 16px 18px;
+        border-right: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        font-size: 0.81rem;
+        text-align: left;
+      }
+
+      .comparison th:last-child,
+      .comparison td:last-child {
+        border-right: 0;
+      }
+
+      .comparison tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .comparison th {
+        color: var(--blue-950);
+        background: var(--blue-50);
+        font-size: 0.72rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .comparison td:first-child {
+        color: var(--ink-700);
+        font-weight: 750;
+      }
+
+      .commercial-note {
+        margin-top: 22px;
+        padding: 21px 24px;
+        border-left: 4px solid var(--red-600);
+        border-radius: 0 12px 12px 0;
+        background: white;
+        color: var(--ink-500);
+        font-size: 0.82rem;
+      }
+
+      .commercial-note strong {
+        color: var(--ink-950);
+      }
+
+      .timeline {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 15px;
+        background: var(--line);
+      }
+
+      .timeline article {
+        min-height: 220px;
+        padding: 28px;
+        background: white;
+      }
+
+      .timeline__week {
+        color: var(--red-600);
+        font-size: 0.7rem;
+        font-weight: 850;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .timeline h3 {
+        margin: 18px 0 7px;
+        font-size: 1rem;
+      }
+
+      .timeline p {
+        margin: 0;
+        color: var(--ink-500);
+        font-size: 0.82rem;
+      }
+
+      .two-columns {
+        display: grid;
+        margin-top: 26px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+      }
+
+      .terms-card {
+        padding: 28px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: white;
+      }
+
+      .terms-card h3 {
+        margin: 0 0 12px;
+        font-size: 1rem;
+      }
+
+      .terms-card ul {
+        display: grid;
+        margin: 0;
+        padding-left: 18px;
+        color: var(--ink-500);
+        font-size: 0.83rem;
+        gap: 9px;
+      }
+
+      .contact-section {
+        position: relative;
+        overflow: hidden;
+        padding: 90px 0;
+        background: var(--blue-950);
+        color: white;
+      }
+
+      .contact-section::after {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 7px;
+        height: 100%;
+        background: var(--red-600);
+        content: "";
+      }
+
+      .contact-grid {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        align-items: center;
+        grid-template-columns: minmax(0, 1fr) minmax(300px, 0.65fr);
+        gap: 70px;
+      }
+
+      .contact-section h2 {
+        max-width: 760px;
+        margin: 0;
+        font-size: clamp(2.25rem, 4.6vw, 4.8rem);
+        letter-spacing: -0.055em;
+        line-height: 0.98;
+      }
+
+      .contact-section p {
+        max-width: 720px;
+        margin: 22px 0 0;
+        color: rgba(255, 255, 255, 0.66);
+      }
+
+      .contact-card {
+        display: grid;
+        padding: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.06);
+        gap: 14px;
+      }
+
+      .contact-card a {
+        display: grid;
+        padding: 15px 17px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 10px;
+        color: white;
+        background: rgba(255, 255, 255, 0.05);
+        text-decoration: none;
+      }
+
+      .contact-card small {
+        color: rgba(255, 255, 255, 0.52);
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .contact-card strong {
+        margin-top: 4px;
+        font-size: 0.95rem;
+      }
+
+      .cta {
+        position: relative;
+        overflow: hidden;
+        padding: 100px 0;
+        background: var(--blue-950);
+        color: white;
+      }
+
+      .cta::after {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 7px;
+        height: 100%;
+        background: var(--red-600);
+        content: "";
+      }
+
+      .cta__grid {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        align-items: end;
+        grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.55fr);
+        gap: 80px;
+      }
+
+      .cta h2 {
+        max-width: 800px;
+        margin: 0;
+        font-size: clamp(2.5rem, 5vw, 5rem);
+        letter-spacing: -0.06em;
+        line-height: 0.96;
+      }
+
+      .cta p {
+        max-width: 690px;
+        margin: 24px 0 0;
+        color: rgba(255, 255, 255, 0.66);
+      }
+
+      .signature {
+        display: grid;
+        padding: 26px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.05);
+        gap: 26px;
+      }
+
+      .signature div {
+        padding-top: 36px;
+        border-top: 1px solid rgba(255, 255, 255, 0.36);
+      }
+
+      .signature strong {
+        display: block;
+        font-size: 0.79rem;
+      }
+
+      .signature span {
+        display: block;
+        margin-top: 4px;
+        color: rgba(255, 255, 255, 0.55);
+        font-size: 0.72rem;
+      }
+
+      .footer {
+        padding: 24px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        background: var(--blue-950);
+        color: rgba(255, 255, 255, 0.48);
+        font-size: 0.7rem;
+      }
+
+      .footer .shell {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      @media (max-width: 900px) {
+        .topbar__actions a {
+          display: none;
+        }
+
+        .hero__content,
+        .section-heading,
+        .report-showcase,
+        .contact-grid,
+        .cta__grid {
+          grid-template-columns: 1fr;
+          gap: 42px;
+        }
+
+        .hero__content {
+          padding-top: 72px;
+        }
+
+        .proposal-card {
+          max-width: 520px;
+        }
+
+        .intro-grid,
+        .security-grid,
+        .report-gallery {
+          grid-template-columns: 1fr;
+        }
+
+        .workflow,
+        .timeline {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .workflow article:not(:last-child)::after {
+          display: none;
+        }
+
+        .pricing-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .price-card {
+          min-height: auto;
+        }
+      }
+
+      @media (max-width: 620px) {
+        .shell {
+          width: min(100% - 28px, 1220px);
+        }
+
+        .topbar {
+          padding-right: 14px;
+          padding-left: 14px;
+        }
+
+        .brand__copy small {
+          display: none;
+        }
+
+        .print-button {
+          min-height: 40px;
+          padding: 0 11px;
+          font-size: 0.74rem;
+        }
+
+        .hero {
+          min-height: auto;
+        }
+
+        .hero h1 {
+          font-size: clamp(2.8rem, 15vw, 4.2rem);
+        }
+
+        .section {
+          padding: 75px 0;
+        }
+
+        .feature-list,
+        .screen-grid,
+        .report-gallery,
+        .workflow,
+        .timeline,
+        .two-columns {
+          grid-template-columns: 1fr;
+        }
+
+        .screen-card__image {
+          height: 250px;
+        }
+
+        .tenant-banner,
+        .security-note {
+          grid-template-columns: 1fr;
+        }
+
+        .report-examples__heading {
+          display: grid;
+        }
+
+        .comparison {
+          display: block;
+          overflow-x: auto;
+        }
+
+        .comparison th,
+        .comparison td {
+          min-width: 170px;
+        }
+
+        .footer .shell {
+          flex-direction: column;
+        }
+      }
+
+      @page {
+        size: A4;
+        margin: 14mm;
+      }
+
+      @media print {
+        html,
+        body {
+          background: white;
+          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact;
+        }
+
+        .topbar {
+          display: none;
+        }
+
+        .hero {
+          min-height: 90mm;
+        }
+
+        .hero__content {
+          min-height: 80mm;
+        }
+
+        .section,
+        .cta,
+        .contact-section {
+          padding: 18mm 0;
+        }
+
+        .section-heading {
+          margin-bottom: 9mm;
+        }
+
+        .screen-stage,
+        .screen-card,
+        .intro-card,
+        .price-card,
+        .terms-card,
+        .report-showcase,
+        .report-example,
+        .security-card,
+        .timeline article,
+        .workflow article {
+          break-inside: avoid;
+        }
+
+        .screen-card__image {
+          height: 62mm;
+        }
+
+        .price-card {
+          min-height: 215mm;
+        }
+
+        .screen-grid,
+        .pricing-grid {
+          gap: 5mm;
+        }
+
+        .cta {
+          break-before: page;
+          min-height: 250mm;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#inicio" aria-label="Voltar ao início">
+        <span class="brand__mark">
+          <img src="assets/universal-logo.png" alt="Universal" />
+        </span>
+        <span class="brand__copy">
+          <strong>UNIVERSAL</strong>
+          <small>Gestão Financeira</small>
+        </span>
+      </a>
+      <div class="topbar__actions">
+        <a href="#solucao">A solução</a>
+        <a href="#seguranca">Segurança</a>
+        <a href="#investimento">Investimento</a>
+        <button class="print-button" type="button" onclick="window.print()">
+          Imprimir / Salvar PDF
+        </button>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="hero" id="inicio">
+        <span class="hero__redline" aria-hidden="true"></span>
+        <div class="shell hero__content">
+          <div>
+            <p class="eyebrow eyebrow--light">Proposta comercial · 2026</p>
+            <p class="hero__lead">
+              Plataforma de gestão de membros, envelopes e relatórios,
+              preparada para organizar a operação financeira de cada igreja com
+              rastreabilidade, privacidade e visão centralizada.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="solucao">
+        <div class="shell">
+          <header class="section-heading">
+            <div>
+              <p class="eyebrow">Visão executiva</p>
+              <h2>Uma operação mais simples, verificável e responsável.</h2>
+            </div>
+            <p>
+              O sistema reúne em uma única experiência o cadastro de membros,
+              o lançamento de envelopes, as imagens dos comprovantes e a
+              emissão de relatórios. Cada igreja decide individualmente se
+              deseja contratar, sem depender da adesão de outras unidades.
+            </p>
+          </header>
+
+          <div class="intro-grid">
+            <article class="intro-card">
+              <span class="intro-card__number">01</span>
+              <h3>Menos trabalho manual</h3>
+              <p>
+                Cadastro, busca, lançamentos e relatórios seguem um fluxo único,
+                reduzindo planilhas paralelas e retrabalho administrativo.
+              </p>
+            </article>
+            <article class="intro-card">
+              <span class="intro-card__number">02</span>
+              <h3>Mais rastreabilidade</h3>
+              <p>
+                Cada lançamento registra data, valor, forma de pagamento,
+                membro relacionado, operador e imagem do envelope quando
+                aplicável.
+              </p>
+            </article>
+            <article class="intro-card">
+              <span class="intro-card__number">03</span>
+              <h3>Dados separados por igreja</h3>
+              <p>
+                A arquitetura foi desenhada para que cada igreja visualize
+                somente seus próprios membros, registros, imagens e relatórios.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section--white">
+        <div class="shell">
+          <header class="section-heading">
+            <div>
+              <p class="eyebrow">Escopo funcional</p>
+              <h2>Tudo o que a igreja precisa para a rotina de gestão.</h2>
+            </div>
+            <p>
+              A plataforma já contempla os principais fluxos administrativos e
+              financeiros do projeto, com experiência responsiva em português,
+              inglês e espanhol.
+            </p>
+          </header>
+
+          <ul class="feature-list">
+            <li>
+              <span class="feature-icon">01</span>
+              <div>
+                <h3>Acesso e perfis</h3>
+                <p>
+                  Login protegido, igreja ativa, administrador da plataforma,
+                  administrador da igreja, operador financeiro e auditor, com
+                  permissões adequadas a cada função.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span class="feature-icon">02</span>
+              <div>
+                <h3>Gestão de igrejas e usuários</h3>
+                <p>
+                  Cadastro e organização das unidades disponíveis, seleção da
+                  igreja ativa e administração dos usuários autorizados.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span class="feature-icon">03</span>
+              <div>
+                <h3>Cadastro de membros</h3>
+                <p>
+                  Lista, pesquisa, inclusão, edição, status, contatos, endereço,
+                  observações, detalhe individual e histórico de lançamentos.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span class="feature-icon">04</span>
+              <div>
+                <h3>Lançamento de envelopes</h3>
+                <p>
+                  Registro do valor, data, forma de pagamento, membro, notas e
+                  fotografia privada do envelope pelo computador ou celular.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span class="feature-icon">05</span>
+              <div>
+                <h3>Relatórios e PDFs</h3>
+                <p>
+                  Relatório detalhado, resumo anual por doador, total por
+                  membro, filtros por período e opção de incluir as imagens dos
+                  envelopes no PDF.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span class="feature-icon">06</span>
+              <div>
+                <h3>Experiência multilíngue</h3>
+                <p>
+                  Interface disponível em português, inglês e espanhol, com
+                  navegação responsiva para desktop, tablet e celular.
+                </p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section section--blue" id="telas">
+        <div class="shell">
+          <header class="section-heading">
+            <div>
+              <p class="eyebrow eyebrow--light">Experiência do produto</p>
+              <h2>Uma interface clara para quem opera todos os dias.</h2>
+            </div>
+            <p>
+              As telas abaixo são registros reais da aplicação executada com
+              dados demonstrativos. Nenhuma informação pessoal de membros reais
+              foi utilizada nesta proposta.
+            </p>
+          </header>
+
+          <article class="screen-stage">
+            <div class="screen-stage__chrome" aria-hidden="true">
+              <i></i><i></i><i></i>
+            </div>
+            <img
+              src="assets/screens/dashboard.png"
+              alt="Tela de visão geral da plataforma"
+            />
+            <div class="screen-caption">
+              <strong>Visão geral</strong>
+              <span>Acesso rápido aos módulos da igreja ativa</span>
+            </div>
+          </article>
+
+          <div class="screen-grid">
+            <figure class="screen-card">
+              <div class="screen-card__image">
+                <img
+                  src="assets/screens/login.png"
+                  alt="Tela de acesso seguro ao sistema"
+                />
+              </div>
+              <figcaption>
+                <strong>Acesso protegido</strong>
+                <span>Login institucional e seleção de idioma.</span>
+              </figcaption>
+            </figure>
+
+            <figure class="screen-card">
+              <div class="screen-card__image">
+                <img
+                  src="assets/screens/members.png"
+                  alt="Tela de listagem e pesquisa de membros"
+                />
+              </div>
+              <figcaption>
+                <strong>Gestão de membros</strong>
+                <span>Busca, situação cadastral e ações administrativas.</span>
+              </figcaption>
+            </figure>
+
+            <figure class="screen-card">
+              <div class="screen-card__image screen-card__image--tall">
+                <img
+                  src="assets/screens/envelope-launch.png"
+                  alt="Tela de lançamento de envelope"
+                />
+              </div>
+              <figcaption>
+                <strong>Lançamento de envelope</strong>
+                <span>Valor, pagamento, membro e imagem em um único fluxo.</span>
+              </figcaption>
+            </figure>
+
+            <figure class="screen-card">
+              <div class="screen-card__image screen-card__image--tall">
+                <img
+                  src="assets/screens/reports-builder.png"
+                  alt="Tela para configuração dos relatórios"
+                />
+              </div>
+              <figcaption>
+                <strong>Construtor de relatórios</strong>
+                <span>Conteúdo, membro, imagens e período configuráveis.</span>
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section--white" id="relatorios">
+        <div class="shell">
+          <header class="section-heading">
+            <div>
+              <p class="eyebrow">Prestação de contas</p>
+              <h2>Relatórios prontos para consultar, arquivar e compartilhar.</h2>
+            </div>
+            <p>
+              A igreja pode visualizar os resultados na tela, baixar o PDF e,
+              quando necessário, incluir as imagens vinculadas a cada
+              lançamento para conferência documental.
+            </p>
+          </header>
+
+          <article class="report-showcase">
+            <div class="report-showcase__image">
+              <img
+                src="assets/screens/reports-result.png"
+                alt="Resultado demonstrativo de um relatório de doações"
+              />
+            </div>
+            <div class="report-showcase__copy">
+              <p class="eyebrow">Resultado demonstrativo</p>
+              <h3>Informação organizada para decisões e auditoria.</h3>
+              <p>
+                Os dados são apresentados com período, membro, valor, método de
+                pagamento e indicação da existência da imagem do envelope.
+              </p>
+              <ul class="check-list">
+                <li>Filtros por período e por membro.</li>
+                <li>Consolidação individual e anual.</li>
+                <li>PDFs arquivados e disponíveis para recuperação.</li>
+                <li>Inclusão opcional das imagens dos comprovantes.</li>
+              </ul>
+            </div>
+          </article>
+
+          <section class="report-examples" aria-labelledby="report-examples-title">
+            <header class="report-examples__heading">
+              <div>
+                <p class="eyebrow">Exemplos gerados pelo sistema</p>
+                <h3 id="report-examples-title">Abra e consulte os relatórios completos.</h3>
+              </div>
+              <p>
+                Os documentos abaixo foram gerados pela própria plataforma e
+                demonstram diferentes formatos de consolidação e conferência.
+              </p>
+            </header>
+
+            <div class="report-gallery">
+              <article class="report-example">
+                <div class="report-example__preview">
+                  <img
+                    src="assets/report-previews/annual-donor-report.png"
+                    alt="Prévia do relatório anual por doador"
+                  />
+                </div>
+                <div class="report-example__body">
+                  <small>Relatório anual</small>
+                  <h4>Resumo anual por doador</h4>
+                  <p>
+                    Tabela consolidada com os valores mensais e o total de cada
+                    membro no período selecionado.
+                  </p>
+                  <a
+                    href="assets/reports/annual-donor-report-2026.pdf"
+                    target="_blank"
+                    rel="noopener"
+                    >Abrir PDF completo</a
+                  >
+                </div>
+              </article>
+
+              <article class="report-example">
+                <div class="report-example__preview">
+                  <img
+                    src="assets/report-previews/detailed-donations-with-images.png"
+                    alt="Prévia do relatório detalhado com imagens dos envelopes"
+                  />
+                </div>
+                <div class="report-example__body">
+                  <small>Relatório detalhado · 2 páginas</small>
+                  <h4>Lançamentos com imagens</h4>
+                  <p>
+                    Cada registro apresenta membro, data, valor, operador e a
+                    fotografia privada do envelope quando disponível.
+                  </p>
+                  <a
+                    href="assets/reports/detailed-donations-with-images-2026.pdf"
+                    target="_blank"
+                    rel="noopener"
+                    >Abrir PDF completo</a
+                  >
+                </div>
+              </article>
+
+              <article class="report-example">
+                <div class="report-example__preview">
+                  <img
+                    src="assets/report-previews/donation-totals-by-member.png"
+                    alt="Prévia do relatório de totais por membro"
+                  />
+                </div>
+                <div class="report-example__body">
+                  <small>Consolidação por membro</small>
+                  <h4>Totais de contribuições</h4>
+                  <p>
+                    Visão objetiva da quantidade de lançamentos e do valor total
+                    atribuído a cada membro.
+                  </p>
+                  <a
+                    href="assets/reports/donation-totals-by-member-2026.pdf"
+                    target="_blank"
+                    rel="noopener"
+                    >Abrir PDF completo</a
+                  >
+                </div>
+              </article>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="shell">
+          <header class="section-heading">
+            <div>
+              <p class="eyebrow">Fluxo operacional</p>
+              <h2>Do cadastro ao relatório em quatro etapas.</h2>
+            </div>
+            <p>
+              A jornada foi desenhada para reduzir dúvidas e tornar a operação
+              consistente mesmo entre equipes com níveis diferentes de
+              familiaridade tecnológica.
+            </p>
+          </header>
+
+          <div class="workflow">
+            <article>
+              <small>Passo 01</small>
+              <h3>Selecionar a igreja</h3>
+              <p>O usuário autorizado trabalha dentro da igreja ativa.</p>
+            </article>
+            <article>
+              <small>Passo 02</small>
+              <h3>Localizar o membro</h3>
+              <p>Busca rápida por nome, e-mail ou telefone.</p>
+            </article>
+            <article>
+              <small>Passo 03</small>
+              <h3>Registrar o envelope</h3>
+              <p>Valor, método, data e imagem são salvos juntos.</p>
+            </article>
+            <article>
+              <small>Passo 04</small>
+              <h3>Emitir o relatório</h3>
+              <p>A equipe visualiza, baixa e arquiva o documento gerado.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section--blue" id="seguranca">
+        <div class="shell">
+          <header class="section-heading">
+            <div>
+              <p class="eyebrow eyebrow--light">Segurança e privacidade</p>
+              <h2>Proteção em camadas para reduzir o risco de vazamento.</h2>
+            </div>
+            <p>
+              A segurança não depende de uma única barreira. A plataforma
+              combina proteção de credenciais, sessão, autorização, banco de
+              dados e arquivos privados, preservando o princípio do menor
+              acesso possível.
+            </p>
+          </header>
+
+          <div class="security-grid">
+            <article class="security-card">
+              <span class="security-card__status">Implementado</span>
+              <h3>Senhas protegidas</h3>
+              <p>
+                Senhas são transformadas por algoritmo de derivação com sal
+                individual; a senha original não é armazenada no banco.
+              </p>
+            </article>
+            <article class="security-card">
+              <span class="security-card__status">Implementado</span>
+              <h3>Sessões seguras</h3>
+              <p>
+                Tokens opacos de alta entropia, somente o hash persistido,
+                cookies HTTP-only, SameSite Strict e Secure em produção.
+              </p>
+            </article>
+            <article class="security-card">
+              <span class="security-card__status">Implementado</span>
+              <h3>Isolamento por igreja</h3>
+              <p>
+                Contexto de igreja aplicado nas transações, políticas no banco
+                e verificações para impedir acesso cruzado entre igrejas.
+              </p>
+            </article>
+            <article class="security-card">
+              <span class="security-card__status">Implementado</span>
+              <h3>Permissões por função</h3>
+              <p>
+                Rotas e operações são liberadas conforme o papel do usuário e
+                sua associação válida com a igreja ativa.
+              </p>
+            </article>
+            <article class="security-card">
+              <span class="security-card__status">Implementado</span>
+              <h3>Arquivos privados</h3>
+              <p>
+                Imagens e PDFs ficam em armazenamento privado. O acesso usa links
+                temporários, com validade padrão de cinco minutos.
+              </p>
+            </article>
+            <article class="security-card">
+              <span class="security-card__status">Implementado</span>
+              <h3>Limites e validação</h3>
+              <p>
+                Upload restrito a JPEG ou PNG com até 4 MB, políticas de origem,
+                cabeçalhos de segurança e limites para o corpo das requisições.
+              </p>
+            </article>
+          </div>
+
+          <div class="security-note">
+            <div>
+              <strong>Pacote de preparação para produção</strong>
+              <p>
+                Antes da entrada em operação serão configurados e testados:
+                limitação de tentativas de login, cópia e restauração de backup,
+                monitoramento com dados sensíveis removidos, rotação de segredos
+                e procedimento de resposta a incidentes.
+              </p>
+            </div>
+            <span>Incluído na implantação</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="investimento">
+        <div class="shell">
+          <header class="section-heading">
+            <div>
+              <p class="eyebrow">Investimento por igreja</p>
+              <h2>Duas formas de contratar. Uma decisão por igreja.</h2>
+            </div>
+            <p>
+              Não existe compromisso mínimo para a rede. Uma igreja pode aderir
+              e outra não; cada contratação possui implantação, ambiente, dados
+              e cobrança individualizados.
+            </p>
+          </header>
+
+          <div class="tenant-banner">
+            <div>
+              <strong>Todos os valores abaixo são para 1 igreja.</strong>
+              <p>
+                Novas igrejas recebem sua própria proposta e escolhem a
+                modalidade mais adequada à realidade local.
+              </p>
+              <p>
+                <strong>Valores sujeitos a negociação.</strong> As condições
+                comerciais podem ser ajustadas conforme o escopo, o prazo e as
+                necessidades específicas de cada igreja.
+              </p>
+            </div>
+          </div>
+
+          <div class="pricing-grid">
+            <article class="price-card">
+              <div class="price-card__head">
+                <p class="eyebrow">Modalidade 01</p>
+                <h3>Aquisição do código completo</h3>
+                <p>
+                  Para a igreja que deseja manter uma cópia própria do sistema
+                  e assumir a infraestrutura após a entrega.
+                </p>
+                <div class="price">
+                  <strong>US$ 14.900</strong>
+                  <span>pagamento único<br />por igreja</span>
+                </div>
+              </div>
+              <div class="price-card__body">
+                <h4>Inclui</h4>
+                <ul class="check-list">
+                  <li>Código-fonte completo da aplicação.</li>
+                  <li>Licença perpétua e não exclusiva para uma igreja.</li>
+                  <li>Configuração de um ambiente de produção.</li>
+                  <li>Importação inicial de até 500 membros.</li>
+                  <li>Duas sessões remotas de treinamento.</li>
+                  <li>Documentação técnica e operacional.</li>
+                  <li>Garantia corretiva de 90 dias após o aceite.</li>
+                </ul>
+                <div class="price-card__footer">
+                  <div class="payment-box">
+                    <strong>Pagamento sugerido</strong>
+                    <p>
+                      40% na contratação (US$ 5.960), 30% na homologação
+                      (US$ 4.470) e 30% na entrega (US$ 4.470). À vista:
+                      US$ 14.155, com 5% de desconto.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <article class="price-card price-card--featured">
+              <span class="price-card__recommended">Recomendado</span>
+              <div class="price-card__head">
+                <p class="eyebrow">Modalidade 02</p>
+                <h3>Implementação + mensalidade</h3>
+                <p>
+                  Para a igreja que prefere utilizar o sistema sem administrar
+                  servidores, atualizações e rotina técnica.
+                </p>
+                <div class="price">
+                  <strong>US$ 189</strong>
+                  <span>por mês<br />por igreja</span>
+                </div>
+                <p class="setup-price">Implantação inicial: US$ 1.290</p>
+              </div>
+              <div class="price-card__body">
+                <h4>Inclui</h4>
+                <ul class="check-list">
+                  <li>Ambiente hospedado e administrado.</li>
+                  <li>Configuração e importação de até 500 membros.</li>
+                  <li>Atualizações funcionais e de segurança.</li>
+                  <li>Backups, monitoramento e manutenção técnica.</li>
+                  <li>Duas sessões remotas de treinamento.</li>
+                  <li>Suporte remoto em horário comercial.</li>
+                  <li>Até 10 usuários administrativos e 10 GB de arquivos.</li>
+                </ul>
+                <div class="price-card__footer">
+                  <div class="payment-box">
+                    <strong>Pagamento sugerido</strong>
+                    <p>
+                      Implantação: 50% no início e 50% no aceite. Mensalidade a
+                      partir da entrada em produção, com permanência mínima de
+                      12 meses. Anuidade antecipada: US$ 2.041,20, com 10% de
+                      desconto.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <table class="comparison">
+            <thead>
+              <tr>
+                <th>Comparação</th>
+                <th>Aquisição do código</th>
+                <th>Implementação + mensalidade</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Investimento inicial</td>
+                <td>US$ 14.900</td>
+                <td>US$ 1.290</td>
+              </tr>
+              <tr>
+                <td>Recorrência obrigatória</td>
+                <td>Não</td>
+                <td>US$ 189/mês</td>
+              </tr>
+              <tr>
+                <td>Infraestrutura</td>
+                <td>Responsabilidade da igreja após a entrega</td>
+                <td>Administrada e incluída</td>
+              </tr>
+              <tr>
+                <td>Atualizações contínuas</td>
+                <td>Plano opcional</td>
+                <td>Incluídas</td>
+              </tr>
+              <tr>
+                <td>Melhor para</td>
+                <td>Autonomia técnica e investimento de capital</td>
+                <td>Previsibilidade e operação sem equipe técnica</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="commercial-note">
+            <strong>Nota sobre a aquisição:</strong> “código completo” significa
+            licença perpétua, irrevogável e não exclusiva para uso por uma
+            igreja. A propriedade intelectual original permanece com o
+            fornecedor, permitindo a contratação individual por outras igrejas.
+            Cessão exclusiva dos direitos sobre o produto, que impediria sua
+            comercialização para outras unidades, não está incluída e exige
+            negociação específica. Suporte e atualizações após os 90 dias podem
+            ser contratados por US$ 2.490/ano ou US$ 249/mês. Na modalidade de
+            aquisição, custos de nuvem e serviços de terceiros são pagos pela
+            igreja e estimados inicialmente entre US$ 25 e US$ 100/mês, conforme
+            uso.
+          </div>
+        </div>
+      </section>
+
+      <section class="section section--white" id="implantacao">
+        <div class="shell">
+          <header class="section-heading">
+            <div>
+              <p class="eyebrow">Plano de implantação</p>
+              <h2>Entrada em produção em 10 a 15 dias úteis.</h2>
+            </div>
+            <p>
+              O prazo começa após a assinatura, o pagamento inicial e o
+              recebimento dos dados e responsáveis indicados pela igreja.
+            </p>
+          </header>
+
+          <div class="timeline">
+            <article>
+              <span class="timeline__week">Etapa 01 · 2 dias</span>
+              <h3>Kick-off e diagnóstico</h3>
+              <p>
+                Definição dos responsáveis, igreja, usuários, idioma, domínio e
+                formato dos dados existentes.
+              </p>
+            </article>
+            <article>
+              <span class="timeline__week">Etapa 02 · 5 dias</span>
+              <h3>Configuração e importação</h3>
+              <p>
+                Preparação do ambiente, segurança, perfis e carga inicial dos
+                membros fornecidos pela igreja.
+              </p>
+            </article>
+            <article>
+              <span class="timeline__week">Etapa 03 · 3 dias</span>
+              <h3>Homologação e treinamento</h3>
+              <p>
+                Validação dos fluxos, testes com responsáveis e treinamento da
+                equipe administrativa.
+              </p>
+            </article>
+            <article>
+              <span class="timeline__week">Etapa 04 · 2 dias</span>
+              <h3>Entrada em produção</h3>
+              <p>
+                Publicação, acompanhamento assistido e correção de eventuais
+                ajustes de configuração.
+              </p>
+            </article>
+          </div>
+
+          <div class="two-columns">
+            <article class="terms-card">
+              <h3>Responsabilidades do fornecedor</h3>
+              <ul>
+                <li>Configurar e validar o ambiente contratado.</li>
+                <li>Importar os dados recebidos no formato acordado.</li>
+                <li>Treinar os responsáveis e fornecer documentação.</li>
+                <li>Aplicar os controles técnicos descritos nesta proposta.</li>
+                <li>Corrigir defeitos cobertos pela garantia ou assinatura.</li>
+              </ul>
+            </article>
+            <article class="terms-card">
+              <h3>Responsabilidades da igreja</h3>
+              <ul>
+                <li>Indicar um responsável pela implantação e aceite.</li>
+                <li>Fornecer dados corretos e autorização para importação.</li>
+                <li>Gerenciar quem terá acesso administrativo ao sistema.</li>
+                <li>Orientar sua equipe sobre sigilo e uso adequado.</li>
+                <li>Validar os resultados dentro do período de homologação.</li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="two-columns">
+            <article class="terms-card">
+              <h3>Premissas e itens não incluídos</h3>
+              <ul>
+                <li>
+                  O sistema registra contribuições; não processa pagamentos e
+                  não substitui software contábil.
+                </li>
+                <li>
+                  Integrações bancárias, gateways, aplicativos móveis nativos e
+                  conciliação automática exigem orçamento adicional.
+                </li>
+                <li>
+                  Migrações acima de 500 membros ou dados com tratamento
+                  especial serão estimadas após análise.
+                </li>
+                <li>
+                  Domínio, taxas de terceiros e impostos aplicáveis não estão
+                  incluídos, salvo indicação expressa.
+                </li>
+              </ul>
+            </article>
+            <article class="terms-card">
+              <h3>Suporte e nível de serviço</h3>
+              <ul>
+                <li>
+                  Atendimento remoto em dias úteis, dentro do horário comercial
+                  acordado com a igreja.
+                </li>
+                <li>
+                  Incidente crítico: primeira resposta em até 4 horas úteis.
+                </li>
+                <li>
+                  Meta de disponibilidade na modalidade mensal: 99,5%, excluindo
+                  manutenções programadas e falhas de terceiros.
+                </li>
+                <li>
+                  Ajustes evolutivos específicos são avaliados e orçados antes
+                  da execução.
+                </li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="contact-section" id="contato">
+        <div class="shell contact-grid">
+          <div>
+            <p class="eyebrow eyebrow--light">Contato</p>
+            <h2>Em caso de dúvidas, estou à disposição.</h2>
+            <p>
+              Entre em contato para conversar sobre o sistema, condições
+              comerciais, implantação ou qualquer necessidade específica da
+              igreja.
+            </p>
+          </div>
+          <div class="contact-card">
+            <a href="mailto:post.assessoria@gmail.com">
+              <small>E-mail</small>
+              <strong>post.assessoria@gmail.com</strong>
+            </a>
+            <a href="https://wa.me/5541991828466" target="_blank" rel="noopener">
+              <small>Telefone / WhatsApp</small>
+              <strong>+55 41 99182-8466</strong>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="shell">
+        <span>Universal · Sistema de Gestão Financeira</span>
+        <span>Valores individuais por igreja · sujeitos a negociação</span>
+      </div>
+    </footer>
+  </body>
+</html>
