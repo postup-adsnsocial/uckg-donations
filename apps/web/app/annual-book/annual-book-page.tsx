@@ -75,6 +75,23 @@ interface AnnualBookComparison {
   periodB: PeriodSummary;
 }
 
+interface AnnualBookWeek {
+  days: AnnualBookDay[];
+  deposits: ExpectedDeposit[];
+  endDate: string;
+  metrics: Pick<
+    AnnualBookMetrics,
+    | 'athMobileCents'
+    | 'cardCents'
+    | 'cashCents'
+    | 'checkCents'
+    | 'designatedEnvelopeCents'
+    | 'totalWithAthCents'
+    | 'undesignatedCents'
+  >;
+  startDate: string;
+}
+
 const serviceSlots: ServiceSlot[] = [
   'first',
   'second',
@@ -132,6 +149,8 @@ const copies = {
     totalWithoutAth: 'Total sem ATH Móvil',
     undesignated: 'Undesignated',
     viewOnly: 'Seu acesso permite consulta, mas não alteração.',
+    weeklyClosing: 'Fechamento semanal',
+    weeklyDeposits: 'Depósitos esperados na semana',
   },
   en: {
     ath: 'ATH Móvil',
@@ -179,6 +198,8 @@ const copies = {
     totalWithoutAth: 'Total without ATH Móvil',
     undesignated: 'Undesignated',
     viewOnly: 'Your access allows viewing, but not editing.',
+    weeklyClosing: 'Weekly closing',
+    weeklyDeposits: 'Expected deposits for the week',
   },
   es: {
     ath: 'ATH Móvil',
@@ -227,6 +248,8 @@ const copies = {
     totalWithoutAth: 'Total sin ATH Móvil',
     undesignated: 'Undesignated',
     viewOnly: 'Tu acceso permite consultar, pero no modificar.',
+    weeklyClosing: 'Cierre semanal',
+    weeklyDeposits: 'Depósitos esperados de la semana',
   },
 } as const;
 
@@ -255,6 +278,53 @@ function shiftMonth(month: string, offset: number) {
   const [year, monthNumber] = month.split('-').map(Number);
   const date = new Date(Date.UTC(year!, monthNumber! - 1 + offset, 1));
   return date.toISOString().slice(0, 7);
+}
+
+function isoWeekStart(entryDate: string) {
+  const date = new Date(`${entryDate}T12:00:00Z`);
+  const daysSinceMonday = (date.getUTCDay() + 6) % 7;
+  date.setUTCDate(date.getUTCDate() - daysSinceMonday);
+  return date.toISOString().slice(0, 10);
+}
+
+function addDays(entryDate: string, days: number) {
+  const date = new Date(`${entryDate}T12:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+function groupWeeks(data: AnnualBookMonth): AnnualBookWeek[] {
+  const weeks = new Map<string, AnnualBookWeek>();
+  for (const day of data.days) {
+    const startDate = isoWeekStart(day.entryDate);
+    const week = weeks.get(startDate) ?? {
+      days: [],
+      deposits: [],
+      endDate: addDays(startDate, 6),
+      metrics: {
+        athMobileCents: 0,
+        cardCents: 0,
+        cashCents: 0,
+        checkCents: 0,
+        designatedEnvelopeCents: 0,
+        totalWithAthCents: 0,
+        undesignatedCents: 0,
+      },
+      startDate,
+    };
+    week.days.push(day);
+    for (const key of Object.keys(week.metrics) as Array<
+      keyof typeof week.metrics
+    >) {
+      week.metrics[key] += day.metrics[key];
+    }
+    weeks.set(startDate, week);
+  }
+  for (const deposit of data.expectedDeposits) {
+    const week = weeks.get(isoWeekStart(deposit.depositDate));
+    if (week) week.deposits.push(deposit);
+  }
+  return [...weeks.values()];
 }
 
 function comparisonDates(month: string) {
@@ -381,6 +451,7 @@ function AnnualBook({
         [copy.undesignated, data.summary.undesignatedCents],
       ]
     : [];
+  const weeks = data ? groupWeeks(data) : [];
 
   return (
     <>
@@ -456,20 +527,39 @@ function AnnualBook({
                 <p>{copy.dailyIntro}</p>
               </div>
             </div>
-            <div className="annual-book-days">
-              {data.days.map((day) => (
-                <DayEditor
-                  canWrite={canWrite}
-                  churchId={church.id}
-                  copy={copy}
-                  day={day}
-                  key={`${day.entryDate}-${day.saved}-${day.entries.length}`}
-                  locale={locale}
-                  onSaved={async () => {
-                    setSuccessDate(day.entryDate);
-                    await loadMonth();
-                  }}
-                />
+            <div className="annual-book-weeks">
+              {weeks.map((week) => (
+                <section className="annual-book-week" key={week.startDate}>
+                  <header className="annual-book-week__heading">
+                    <div>
+                      <span>{copy.weeklyClosing}</span>
+                      <strong>
+                        {dateLabel(week.startDate, locale, false)} —{' '}
+                        {dateLabel(week.endDate, locale, false)}
+                      </strong>
+                    </div>
+                    <strong>
+                      {formatMoney(week.metrics.totalWithAthCents, locale)}
+                    </strong>
+                  </header>
+                  <div className="annual-book-days">
+                    {week.days.map((day) => (
+                      <DayEditor
+                        canWrite={canWrite}
+                        churchId={church.id}
+                        copy={copy}
+                        day={day}
+                        key={`${day.entryDate}-${day.saved}-${day.entries.length}`}
+                        locale={locale}
+                        onSaved={async () => {
+                          setSuccessDate(day.entryDate);
+                          await loadMonth();
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <WeeklyClosing copy={copy} locale={locale} week={week} />
+                </section>
               ))}
             </div>
             {successDate ? (
@@ -477,53 +567,6 @@ function AnnualBook({
                 {dateLabel(successDate, locale)} — {copy.daySaved}
               </p>
             ) : null}
-          </section>
-
-          <section className="product-panel annual-book-section">
-            <div className="panel-heading">
-              <div>
-                <h3>{copy.expectedDeposits}</h3>
-                <p>{copy.expectedIntro}</p>
-              </div>
-            </div>
-            <div className="product-table-wrap">
-              <table className="product-table annual-book-deposits">
-                <thead>
-                  <tr>
-                    <th>{copy.expectedDeposit}</th>
-                    <th>{copy.sourceDates}</th>
-                    <th>{copy.cash}</th>
-                    <th>{copy.check}</th>
-                    <th>{copy.totalWithoutAth}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.expectedDeposits.map((deposit) => (
-                    <tr key={deposit.depositDate}>
-                      <td>
-                        <strong>
-                          {dateLabel(deposit.depositDate, locale)}
-                        </strong>
-                      </td>
-                      <td>
-                        {deposit.sourceDates.length
-                          ? deposit.sourceDates
-                              .map((date) => dateLabel(date, locale, false))
-                              .join(', ')
-                          : copy.noSources}
-                      </td>
-                      <td>{formatMoney(deposit.cashCents, locale)}</td>
-                      <td>{formatMoney(deposit.checkCents, locale)}</td>
-                      <td>
-                        <strong>
-                          {formatMoney(deposit.totalCents, locale)}
-                        </strong>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
           </section>
 
           <section className="product-panel annual-book-section">
@@ -593,6 +636,76 @@ function AnnualBook({
         </>
       ) : null}
     </>
+  );
+}
+
+function WeeklyClosing({
+  copy,
+  locale,
+  week,
+}: {
+  copy: (typeof copies)[Locale];
+  locale: Locale;
+  week: AnnualBookWeek;
+}) {
+  const closingMetrics: Array<[string, number]> = [
+    [copy.cash, week.metrics.cashCents],
+    [copy.check, week.metrics.checkCents],
+    [copy.card, week.metrics.cardCents],
+    [copy.ath, week.metrics.athMobileCents],
+    [copy.designated, week.metrics.designatedEnvelopeCents],
+    [copy.undesignated, week.metrics.undesignatedCents],
+  ];
+
+  return (
+    <footer className="annual-book-week__closing">
+      <div className="annual-book-week__metrics">
+        {closingMetrics.map(([label, value]) => (
+          <div key={label}>
+            <span>{label}</span>
+            <strong>{formatMoney(value, locale)}</strong>
+          </div>
+        ))}
+      </div>
+      <div className="annual-book-week__deposits">
+        <strong>{copy.weeklyDeposits}</strong>
+        <p>{copy.expectedIntro}</p>
+        <div className="product-table-wrap">
+          <table className="product-table annual-book-deposits">
+            <thead>
+              <tr>
+                <th>{copy.expectedDeposit}</th>
+                <th>{copy.sourceDates}</th>
+                <th>{copy.cash}</th>
+                <th>{copy.check}</th>
+                <th>{copy.totalWithoutAth}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {week.deposits.map((deposit) => (
+                <tr key={deposit.depositDate}>
+                  <td>
+                    <strong>{dateLabel(deposit.depositDate, locale)}</strong>
+                  </td>
+                  <td>
+                    {deposit.sourceDates.length
+                      ? deposit.sourceDates
+                          .map((date) => dateLabel(date, locale, false))
+                          .join(', ')
+                      : copy.noSources}
+                  </td>
+                  <td>{formatMoney(deposit.cashCents, locale)}</td>
+                  <td>{formatMoney(deposit.checkCents, locale)}</td>
+                  <td>
+                    <strong>{formatMoney(deposit.totalCents, locale)}</strong>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </footer>
   );
 }
 

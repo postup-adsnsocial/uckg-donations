@@ -4786,6 +4786,48 @@ input[type='week'] {
   max-width: 760px;
 }
 
+.annual-book-weeks {
+  display: grid;
+  gap: 22px;
+  padding: 22px;
+  background: #f7f9fb;
+}
+
+.annual-book-week {
+  overflow: hidden;
+  border: 1px solid #dbe5ec;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 7px 18px rgba(0, 42, 77, 0.04);
+}
+
+.annual-book-week__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 15px 18px;
+  background: var(--blue-800);
+  color: #ffffff;
+}
+
+.annual-book-week__heading > div {
+  display: grid;
+  gap: 3px;
+}
+
+.annual-book-week__heading span {
+  color: #cfe6f8;
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.annual-book-week__heading strong {
+  font-size: 0.88rem;
+}
+
 .annual-book-days {
   display: grid;
   gap: 0;
@@ -4798,6 +4840,53 @@ input[type='week'] {
 
 .annual-book-day:last-child {
   border-bottom: 0;
+}
+
+.annual-book-week__closing {
+  border-top: 2px solid #a8cbe3;
+  background: #f2f8fc;
+}
+
+.annual-book-week__metrics {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  border-bottom: 1px solid #d9e6ef;
+}
+
+.annual-book-week__metrics > div {
+  display: grid;
+  gap: 5px;
+  padding: 14px;
+  border-right: 1px solid #d9e6ef;
+}
+
+.annual-book-week__metrics > div:last-child {
+  border-right: 0;
+  background: #e5f1f9;
+}
+
+.annual-book-week__metrics span,
+.annual-book-week__deposits > strong {
+  color: var(--blue-800);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.annual-book-week__metrics strong {
+  color: var(--ink-950);
+  font-size: 0.84rem;
+}
+
+.annual-book-week__deposits {
+  padding: 16px 18px 18px;
+}
+
+.annual-book-week__deposits > p {
+  margin: 5px 0 13px;
+  color: var(--ink-500);
+  font-size: 0.76rem;
 }
 
 .annual-book-day__heading {
@@ -4980,6 +5069,14 @@ input[type='week'] {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .annual-book-week__metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .annual-book-week__metrics > div:nth-child(3) {
+    border-right: 0;
+  }
+
   .annual-book-comparison-form {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -5002,6 +5099,16 @@ input[type='week'] {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .annual-book-weeks {
+    gap: 14px;
+    padding: 14px;
+  }
+
+  .annual-book-week__heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .annual-book-day__body {
     padding: 2px 14px 20px;
   }
@@ -5017,6 +5124,18 @@ input[type='week'] {
   .annual-book-day__extras,
   .annual-book-comparison-form fieldset {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .annual-book-week__metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .annual-book-week__metrics > div:nth-child(3) {
+    border-right: 1px solid #d9e6ef;
+  }
+
+  .annual-book-week__metrics > div:nth-child(even) {
+    border-right: 0;
   }
 }
 
