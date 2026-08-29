@@ -495,10 +495,8 @@ function AnnualBook({
 
   const summaryCards: Array<[string, number]> = data
     ? [
+        [copy.totalByCategory, data.summary.totalWithoutAthCents],
         [copy.total, data.summary.totalWithAthCents],
-        [copy.cash, data.summary.cashCents],
-        [copy.check, data.summary.checkCents],
-        [copy.card, data.summary.cardCents],
         [copy.undesignated, data.summary.undesignatedCents],
       ]
     : [];
