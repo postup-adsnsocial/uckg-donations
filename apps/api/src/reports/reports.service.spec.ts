@@ -58,7 +58,11 @@ describe('ReportsService detailed PDF', () => {
       createSignedDownloadUrl: vi.fn().mockResolvedValue(null),
       upload: vi.fn().mockResolvedValue(undefined),
     } as unknown as PrivateObjectStorage;
-    const annualBook = {} as AnnualBookService;
+    const annualBook = {
+      summary: vi.fn().mockResolvedValue({
+        metrics: { undesignatedCents: 0 },
+      }),
+    } as unknown as AnnualBookService;
     const service = new ReportsService(
       donations,
       annualBook,
@@ -125,7 +129,11 @@ describe('ReportsService detailed PDF', () => {
     } as unknown as PrivateObjectStorage;
     const service = new ReportsService(
       donations,
-      {} as AnnualBookService,
+      {
+        summary: vi.fn().mockResolvedValue({
+          metrics: { undesignatedCents: 0 },
+        }),
+      } as unknown as AnnualBookService,
       tenantUnitOfWork,
       storage,
     );

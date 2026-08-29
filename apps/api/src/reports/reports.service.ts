@@ -387,6 +387,21 @@ export class ReportsService {
         const value = day.metrics[key];
         return sum + (typeof value === 'number' ? value : 0);
       }, 0);
+    const expectedDepositsBySourceDate = new Map<
+      string,
+      typeof month.expectedDeposits
+    >();
+    const availableDates = new Set(month.days.map((day) => day.entryDate));
+    month.expectedDeposits.forEach((deposit) => {
+      const sourceDate = deposit.sourceDates
+        .filter((date) => availableDates.has(date))
+        .sort()
+        .at(-1);
+      if (!sourceDate) return;
+      const current = expectedDepositsBySourceDate.get(sourceDate) ?? [];
+      current.push(deposit);
+      expectedDepositsBySourceDate.set(sourceDate, current);
+    });
 
     let pageNumber = 0;
     const addPage = () => {
@@ -825,6 +840,38 @@ export class ReportsService {
       });
       top = totalsTop - totalRowHeight - 10;
 
+      for (const deposit of expectedDepositsBySourceDate.get(day.entryDate) ??
+        []) {
+        const depositHeight = 28;
+        page.drawRectangle({
+          x: startX,
+          y: top - depositHeight,
+          width: tableWidth,
+          height: depositHeight,
+          color: rgb(0.88, 0.94, 0.97),
+          borderColor: rgb(0.02, 0.42, 0.72),
+          borderWidth: 0.5,
+        });
+        const dueDate = `${deposit.depositDate.slice(8, 10)}/${deposit.depositDate.slice(5, 7)}`;
+        page.drawText(`DEPÓSITO ESPERADO — ${dueDate}`, {
+          x: startX + 8,
+          y: top - 11,
+          font: bold,
+          size: 7,
+          color: rgb(0.02, 0.28, 0.5),
+        });
+        const depositTotal = money(deposit.totalCents);
+        const depositTotalWidth = bold.widthOfTextAtSize(depositTotal, 9);
+        page.drawText(depositTotal, {
+          x: startX + tableWidth - depositTotalWidth - 8,
+          y: top - 19,
+          font: bold,
+          size: 9,
+          color: rgb(0.02, 0.28, 0.5),
+        });
+        top -= depositHeight + 8;
+      }
+
       const isWeekEnd =
         currentWeekday === 0 || dayIndex === month.days.length - 1;
       if (isWeekEnd) {
@@ -939,40 +986,6 @@ export class ReportsService {
       });
       closingY -= 22;
     });
-    if (month.expectedDeposits.length) {
-      page.drawText('Depósitos esperados', {
-        x: startX,
-        y: closingY - 12,
-        font: bold,
-        size: 10,
-        color: rgb(0.02, 0.28, 0.5),
-      });
-      closingY -= 32;
-      month.expectedDeposits.forEach((deposit) => {
-        if (closingY < 38) {
-          ({ page, top } = addPage());
-          page.drawText('Depósitos esperados', {
-            x: startX,
-            y: top - 18,
-            font: bold,
-            size: 10,
-            color: rgb(0.02, 0.28, 0.5),
-          });
-          closingY = top - 40;
-        }
-        page.drawText(
-          `${deposit.depositDate}  |  USD ${(deposit.totalCents / 100).toFixed(2)}`,
-          {
-            x: startX + 8,
-            y: closingY,
-            font: regular,
-            size: 8,
-            color: rgb(0.18, 0.22, 0.27),
-          },
-        );
-        closingY -= 18;
-      });
-    }
     return Buffer.from(await document.save());
   }
 
