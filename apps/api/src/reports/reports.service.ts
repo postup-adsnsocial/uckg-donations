@@ -917,19 +917,20 @@ export class ReportsService {
       'DEC',
     ];
     const startX = 24;
-    const nameWidth = 120;
     const churchWidth = 80;
+    const contributorWidth = 120;
     const monthWidth = 39;
     const totalWidth = 70;
-    const tableWidth = nameWidth + churchWidth + monthWidth * 12 + totalWidth;
+    const tableWidth =
+      churchWidth + contributorWidth + monthWidth * 12 + totalWidth;
     const columnBoundaries = [
       startX,
-      startX + nameWidth,
-      startX + nameWidth + churchWidth,
+      startX + churchWidth,
+      startX + churchWidth + contributorWidth,
       ...Array.from(
         { length: 12 },
         (_, index) =>
-          startX + nameWidth + churchWidth + (index + 1) * monthWidth,
+          startX + churchWidth + contributorWidth + (index + 1) * monthWidth,
       ),
       startX + tableWidth,
     ];
@@ -1000,12 +1001,12 @@ export class ReportsService {
         });
       };
 
-      drawHeaderLabel('DONOR', startX, nameWidth);
-      drawHeaderLabel('CHURCH', startX + nameWidth, churchWidth);
+      drawHeaderLabel('CHURCH', startX, churchWidth);
+      drawHeaderLabel('CONTRIBUTOR', startX + churchWidth, contributorWidth);
       monthLabels.forEach((label, index) => {
         drawHeaderLabel(
           label,
-          startX + nameWidth + churchWidth + index * monthWidth,
+          startX + churchWidth + contributorWidth + index * monthWidth,
           monthWidth,
         );
       });
@@ -1033,8 +1034,8 @@ export class ReportsService {
     const displayRows = [
       ...rows.map((row) => ({ ...row, churchName, totalRow: false })),
       {
-        churchName: '',
-        label: 'TOTAL',
+        churchName: 'TOTAL',
+        label: '',
         months: monthlyGrandTotals,
         totalCents,
         totalRow: true,
@@ -1056,18 +1057,18 @@ export class ReportsService {
         });
       }
       const rowFont = row.totalRow ? bold : regular;
-      page.drawText(this.clean(row.label).slice(0, 21), {
+      page.drawText(this.clean(row.churchName).slice(0, 14), {
         x: startX + 6,
         y,
         font: rowFont,
-        size: 7.2,
+        size: 6.3,
         color: rgb(0.05, 0.12, 0.22),
       });
-      page.drawText(this.clean(row.churchName).slice(0, 14), {
-        x: startX + nameWidth + 6,
+      page.drawText(this.clean(row.label).slice(0, 21), {
+        x: startX + churchWidth + 6,
         y,
         font: rowFont,
-        size: 6.3,
+        size: 7.2,
         color: rgb(0.05, 0.12, 0.22),
       });
       row.months.forEach((amount, month) => {
@@ -1076,8 +1077,8 @@ export class ReportsService {
         page.drawText(text, {
           x:
             startX +
-            nameWidth +
             churchWidth +
+            contributorWidth +
             month * monthWidth +
             monthWidth -
             textWidth -
