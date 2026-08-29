@@ -146,6 +146,7 @@ const copies = {
     third: '3º culto',
     title: 'Livro Anual',
     total: 'Total + Online',
+    totalByCategory: 'Total',
     totalByService: 'Total por reunião',
     totalWithoutAth: 'Total sem Online',
     undesignated: 'Undesignated',
@@ -198,6 +199,7 @@ const copies = {
     third: '3rd service',
     title: 'Annual Book',
     total: 'Total + Online',
+    totalByCategory: 'Total',
     totalByService: 'Total by service',
     totalWithoutAth: 'Total without Online',
     undesignated: 'Undesignated',
@@ -251,6 +253,7 @@ const copies = {
     third: '3.er servicio',
     title: 'Libro Anual',
     total: 'Total + Online',
+    totalByCategory: 'Total',
     totalByService: 'Total por reunión',
     totalWithoutAth: 'Total sin Online',
     undesignated: 'Undesignated',
@@ -891,6 +894,9 @@ function DayEditor({
                 {serviceSlots.map((slot) => (
                   <th key={slot}>{copy[slot]}</th>
                 ))}
+                <th className="annual-book-entry-grid__total">
+                  {copy.totalByCategory}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -918,6 +924,16 @@ function DayEditor({
                       />
                     </td>
                   ))}
+                  <td className="annual-book-entry-grid__total">
+                    {formatMoney(
+                      serviceSlots.reduce(
+                        (total, slot) =>
+                          total + toCents(amounts[`${slot}:${method}`] ?? ''),
+                        0,
+                      ),
+                      locale,
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
