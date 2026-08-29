@@ -146,6 +146,7 @@ const copies = {
     third: '3º culto',
     title: 'Livro Anual',
     total: 'Total + Online',
+    totalByService: 'Total por reunião',
     totalWithoutAth: 'Total sem Online',
     undesignated: 'Undesignated',
     viewOnly: 'Seu acesso permite consulta, mas não alteração.',
@@ -197,6 +198,7 @@ const copies = {
     third: '3rd service',
     title: 'Annual Book',
     total: 'Total + Online',
+    totalByService: 'Total by service',
     totalWithoutAth: 'Total without Online',
     undesignated: 'Undesignated',
     viewOnly: 'Your access allows viewing, but not editing.',
@@ -249,6 +251,7 @@ const copies = {
     third: '3.er servicio',
     title: 'Libro Anual',
     total: 'Total + Online',
+    totalByService: 'Total por reunión',
     totalWithoutAth: 'Total sin Online',
     undesignated: 'Undesignated',
     viewOnly: 'Tu acceso permite consultar, pero no modificar.',
@@ -822,6 +825,17 @@ function DayEditor({
   const [notes, setNotes] = useState(day.notes ?? '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const serviceTotals = serviceSlots.map(
+    (slot) =>
+      [
+        slot,
+        paymentMethods.reduce(
+          (total, method) =>
+            total + toCents(amounts[`${slot}:${method}`] ?? ''),
+          0,
+        ),
+      ] as const,
+  );
 
   async function save() {
     setSaving(true);
@@ -952,6 +966,17 @@ function DayEditor({
           </button>
         ) : null}
       </div>
+      <aside className="annual-book-service-totals">
+        <span>{copy.totalByService}</span>
+        <dl>
+          {serviceTotals.map(([slot, total]) => (
+            <div key={slot}>
+              <dt>{copy[slot]}</dt>
+              <dd>{formatMoney(total, locale)}</dd>
+            </div>
+          ))}
+        </dl>
+      </aside>
       {expectedDeposits.map((deposit) => (
         <aside
           aria-label={`${copy.expectedDeposit}: ${dateLabel(
