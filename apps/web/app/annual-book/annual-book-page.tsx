@@ -983,16 +983,36 @@ function DayEditor({
                   </label>
                 </td>
               </tr>
+              <tr className="annual-book-entry-grid__online">
+                <th>{copy.ath}</th>
+                <td colSpan={5}>
+                  <span aria-hidden="true">$</span>
+                  <input
+                    aria-label={copy.ath}
+                    disabled={!canWrite}
+                    inputMode="decimal"
+                    min="0"
+                    placeholder="0.00"
+                    step="0.01"
+                    type="number"
+                    value={ath}
+                    onChange={(event) => setAth(event.target.value)}
+                  />
+                </td>
+                <td
+                  className="annual-book-entry-grid__online-total"
+                  colSpan={2}
+                >
+                  <small>{copy.total}</small>
+                  <strong>
+                    {formatMoney(dailyEntriesTotal + toCents(ath), locale)}
+                  </strong>
+                </td>
+              </tr>
             </tfoot>
           </table>
         </div>
         <div className="annual-book-day__extras">
-          <MoneyField
-            disabled={!canWrite}
-            label={copy.ath}
-            onChange={setAth}
-            value={ath}
-          />
           <MoneyField
             disabled={!canWrite}
             label={copy.cardMachine}

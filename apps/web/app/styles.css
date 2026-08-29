@@ -5127,7 +5127,7 @@ td.annual-book-entry-grid__grand-total {
 
 .annual-book-day__extras {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(180px, 1.4fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
 }
 
@@ -5208,6 +5208,34 @@ td.annual-book-entry-grid__grand-total {
   padding-left: 21px;
   color: var(--ink-950);
   font-size: 0.78rem;
+}
+
+.annual-book-entry-grid__online th {
+  color: var(--ink-500);
+}
+
+td.annual-book-entry-grid__online-total {
+  padding: 5px 12px;
+  border-radius: 7px;
+  background: var(--blue-950);
+  color: #ffffff;
+  text-align: right;
+  vertical-align: middle;
+}
+
+.annual-book-entry-grid__online-total small {
+  display: block;
+  color: #b9dcf4;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.annual-book-entry-grid__online-total strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.9rem;
 }
 
 .annual-book-expected-deposit {
@@ -5315,7 +5343,7 @@ td.annual-book-entry-grid__grand-total {
   }
 
   .annual-book-day__extras {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .annual-book-expected-deposit {
