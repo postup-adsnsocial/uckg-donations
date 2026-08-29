@@ -120,7 +120,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
         },
       ],
       featuresLabel: 'Características da plataforma',
-      footer: 'Universal • Sistema de Gestão Financeira',
+      footer: 'Sistema de Gestão Financeira',
       productName: 'Gestão Financeira',
       title: 'Clareza para cuidar. Segurança para servir.',
     },
@@ -173,7 +173,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       apiUnavailable:
         'A API não está disponível. Confirme se o ambiente local está em execução.',
       emailLabel: 'E-mail',
-      emailPlaceholder: 'nome@universal.org',
+      emailPlaceholder: 'nome@exemplo.org',
       environmentProtected: 'Ambiente protegido',
       genericError:
         'Não foi possível entrar agora. Tente novamente em instantes.',
@@ -238,7 +238,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
         { description: 'Role-based permissions', title: 'Protected access' },
       ],
       featuresLabel: 'Platform features',
-      footer: 'Universal • Financial Management System',
+      footer: 'Financial Management System',
       productName: 'Financial Management',
       title: 'Clarity to care. Security to serve.',
     },
@@ -291,7 +291,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       apiUnavailable:
         'The API is unavailable. Confirm that the local environment is running.',
       emailLabel: 'Email',
-      emailPlaceholder: 'name@universal.org',
+      emailPlaceholder: 'name@example.org',
       environmentProtected: 'Protected environment',
       genericError: 'Unable to sign in right now. Please try again shortly.',
       hidePassword: 'Hide password',
@@ -357,7 +357,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
         },
       ],
       featuresLabel: 'Características de la plataforma',
-      footer: 'Universal • Sistema de Gestión Financiera',
+      footer: 'Sistema de Gestión Financiera',
       productName: 'Gestión Financiera',
       title: 'Claridad para cuidar. Seguridad para servir.',
     },
@@ -410,7 +410,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       apiUnavailable:
         'La API no está disponible. Confirma que el entorno local esté en ejecución.',
       emailLabel: 'Correo electrónico',
-      emailPlaceholder: 'nombre@universal.org',
+      emailPlaceholder: 'nombre@ejemplo.org',
       environmentProtected: 'Entorno protegido',
       genericError:
         'No fue posible iniciar sesión ahora. Inténtalo nuevamente en unos instantes.',

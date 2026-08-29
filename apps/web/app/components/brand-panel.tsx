@@ -7,7 +7,7 @@ interface BrandPanelProps {
 
 export function BrandPanel({ copy }: BrandPanelProps) {
   return (
-    <aside className="brand-panel" aria-label={`Universal ${copy.productName}`}>
+    <aside className="brand-panel" aria-label={copy.productName}>
       <div className="brand-panel__grid" aria-hidden="true" />
 
       <BrandWordmark priority productName={copy.productName} />

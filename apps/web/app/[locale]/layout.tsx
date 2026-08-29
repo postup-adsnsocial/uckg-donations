@@ -26,7 +26,7 @@ export async function generateMetadata({
 
   return {
     description: dictionary.brand.description,
-    title: `Universal | ${dictionary.brand.productName}`,
+    title: dictionary.brand.productName,
   };
 }
 

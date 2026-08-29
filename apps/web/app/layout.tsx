@@ -4,8 +4,12 @@ import type { ReactNode } from 'react';
 import './styles.css';
 
 export const metadata: Metadata = {
-  description: 'Universal Financial Management Platform',
-  title: 'Universal | Financial Management',
+  description: 'Financial Management Platform',
+  icons: {
+    apple: '/program-logo.png',
+    icon: '/program-logo.png',
+  },
+  title: 'Financial Management',
 };
 
 export const viewport: Viewport = {

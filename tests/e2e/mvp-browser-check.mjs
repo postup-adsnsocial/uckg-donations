@@ -16,7 +16,7 @@ const memberName = `Member ${suffix}`;
 const managedChurchName = `UCKG Brooklyn ${suffix}`;
 const managedChurchUpdatedName = `UCKG Brooklyn Center ${suffix}`;
 const envelopeImage = fileURLToPath(
-  new URL('../../apps/web/public/universal-logo.png', import.meta.url),
+  new URL('../../apps/web/public/program-logo.png', import.meta.url),
 );
 const browserName =
   process.env.MVP_BROWSER === 'firefox' ? 'firefox' : 'chromium';

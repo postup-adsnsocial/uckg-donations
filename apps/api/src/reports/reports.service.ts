@@ -204,7 +204,7 @@ export class ReportsService {
     const document = await PDFDocument.create();
     const regular = await document.embedFont(StandardFonts.Helvetica);
     const bold = await document.embedFont(StandardFonts.HelveticaBold);
-    const logo = await this.loadUniversalLogo(document);
+    const logo = await this.loadProgramLogo(document);
     const page = document.addPage([612, 792]);
     page.drawRectangle({
       x: 0,
@@ -213,7 +213,7 @@ export class ReportsService {
       height: 50,
       color: rgb(1, 1, 1),
     });
-    this.drawUniversalLogo(page, logo, 44, 750, 250, 32);
+    this.drawProgramLogo(page, logo, 44, 750, 32, 32);
     page.drawRectangle({
       x: 0,
       y: 682,
@@ -307,7 +307,7 @@ export class ReportsService {
     const document = await PDFDocument.create();
     const regular = await document.embedFont(StandardFonts.Helvetica);
     const bold = await document.embedFont(StandardFonts.HelveticaBold);
-    const logo = await this.loadUniversalLogo(document);
+    const logo = await this.loadProgramLogo(document);
     const total = items.reduce((sum, item) => sum + item.amountCents, 0);
     if (reportType === 'annual_members') {
       return this.createAnnualMembersPdf(
@@ -542,7 +542,7 @@ export class ReportsService {
 
     const addSummaryPage = () => {
       const page = document.addPage([612, 792]);
-      this.drawUniversalLogo(page, logo, 44, 738, 230, 32);
+      this.drawProgramLogo(page, logo, 44, 738, 32, 32);
       page.drawLine({
         start: { x: startX, y: 722 },
         end: { x: startX + tableWidth, y: 722 },
@@ -839,7 +839,7 @@ export class ReportsService {
     totalCents: number,
   ) {
     const page = document.addPage([612, 792]);
-    this.drawUniversalLogo(page, logo, 44, 738, 230, 32);
+    this.drawProgramLogo(page, logo, 44, 738, 32, 32);
 
     const title = `Receipts by Contributor - ${this.formatDate(startDate)} to ${this.formatDate(endDate)}`;
     const titleWidth = bold.widthOfTextAtSize(title, 10);
@@ -944,7 +944,7 @@ export class ReportsService {
         height: 42,
         color: rgb(1, 1, 1),
       });
-      this.drawUniversalLogo(page, logo, 28, 576, 210, 28);
+      this.drawProgramLogo(page, logo, 28, 576, 28, 28);
       page.drawRectangle({
         x: 0,
         y: 520,
@@ -1283,7 +1283,7 @@ export class ReportsService {
       height: 50,
       color: rgb(1, 1, 1),
     });
-    this.drawUniversalLogo(page, logo, 44, 750, 250, 32);
+    this.drawProgramLogo(page, logo, 44, 750, 32, 32);
     page.drawRectangle({
       x: 0,
       y: 682,
@@ -1325,11 +1325,11 @@ export class ReportsService {
     return page;
   }
 
-  private async loadUniversalLogo(document: PDFDocument) {
+  private async loadProgramLogo(document: PDFDocument) {
     try {
       const response = await fetch(
-        process.env.UNIVERSAL_LOGO_URL ??
-          'https://uckg-donations-web.vercel.app/universal-report-logo.png',
+        process.env.PROGRAM_LOGO_URL ??
+          'https://uckg-donations-web.vercel.app/program-logo.png',
         { signal: AbortSignal.timeout(3000) },
       );
       if (!response.ok) return null;
@@ -1339,7 +1339,7 @@ export class ReportsService {
     }
   }
 
-  private drawUniversalLogo(
+  private drawProgramLogo(
     page: PDFPage,
     logo: PDFImage | null,
     x: number,

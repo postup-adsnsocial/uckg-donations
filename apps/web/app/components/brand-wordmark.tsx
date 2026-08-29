@@ -16,15 +16,14 @@ export function BrandWordmark({
       <span className="wordmark__symbol">
         <Image
           alt=""
-          height={490}
+          height={96}
           priority={priority}
-          src="/universal-logo.png"
-          width={625}
+          src="/program-logo.png"
+          width={96}
         />
       </span>
       <span className="wordmark__copy">
-        <strong>Universal</strong>
-        <small>{productName}</small>
+        <strong>{productName}</strong>
       </span>
     </div>
   );
