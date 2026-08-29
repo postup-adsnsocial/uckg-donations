@@ -25,32 +25,33 @@ endobj
 /Font <<
 /F1 5 0 R
 /F1-0 6 0 R
-/Helvetica-1275322832 7 0 R
-/Helvetica-1848524175 7 0 R
-/Helvetica-2708199956 7 0 R
-/Helvetica-6703682664 7 0 R
-/Helvetica-7720966295 7 0 R
-/Helvetica-7888911063 7 0 R
-/Helvetica-8450180107 7 0 R
-/Helvetica-8659871878 7 0 R
-/Helvetica-8784015711 7 0 R
-/Helvetica-9668333493 7 0 R
-/Helvetica-9742682568 7 0 R
-/Helvetica-Bold-2000805986 8 0 R
-/Helvetica-Bold-250812044 8 0 R
-/Helvetica-Bold-4525072762 8 0 R
-/Helvetica-Bold-5824662338 8 0 R
-/Helvetica-Bold-7098480789 8 0 R
-/Helvetica-Bold-735569487 8 0 R
-/Helvetica-Bold-7572533686 8 0 R
-/Helvetica-Bold-9750469207 8 0 R
-/Helvetica-Bold-979344929 8 0 R
+/F1-1 7 0 R
+/Helvetica-1275322832 8 0 R
+/Helvetica-1848524175 8 0 R
+/Helvetica-2708199956 8 0 R
+/Helvetica-6703682664 8 0 R
+/Helvetica-7720966295 8 0 R
+/Helvetica-7888911063 8 0 R
+/Helvetica-8450180107 8 0 R
+/Helvetica-8659871878 8 0 R
+/Helvetica-8784015711 8 0 R
+/Helvetica-9668333493 8 0 R
+/Helvetica-9742682568 8 0 R
+/Helvetica-Bold-2000805986 9 0 R
+/Helvetica-Bold-250812044 9 0 R
+/Helvetica-Bold-4525072762 9 0 R
+/Helvetica-Bold-5824662338 9 0 R
+/Helvetica-Bold-7098480789 9 0 R
+/Helvetica-Bold-735569487 9 0 R
+/Helvetica-Bold-7572533686 9 0 R
+/Helvetica-Bold-9750469207 9 0 R
+/Helvetica-Bold-979344929 9 0 R
 >>
 /ProcSet [ /ImageB /ImageC /ImageI /PDF /Text ]
 >>
 /MediaBox [ 0 0 612 792 ]
 /Annots [ ]
-/Contents 9 0 R
+/Contents 10 0 R
 /Parent 2 0 R
 >>
 endobj
@@ -74,13 +75,22 @@ endobj
 endobj
 7 0 obj
 <<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+8 0 obj
+<<
 /Type /Font
 /Subtype /Type1
 /BaseFont /Helvetica
 /Encoding /WinAnsiEncoding
 >>
 endobj
-8 0 obj
+9 0 obj
 <<
 /Type /Font
 /Subtype /Type1
@@ -88,11 +98,12 @@ endobj
 /Encoding /WinAnsiEncoding
 >>
 endobj
-9 0 obj
+10 0 obj
 <<
-/Length 3041
+/Length 3264
 >>
 stream
+q
 q
 q
 q
@@ -412,26 +423,55 @@ ET
 Q
 
 
+Q
+
+q
+0.0 0.0 612 792 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F1-1 12 Tf
+14.4 TL
+ET
+0.02 0.18 0.29 rg
+n
+0 720 612 72 re
+f*
+1 1 1 rg
+BT
+/F1-1 16 Tf
+19.2 TL
+ET
+BT
+1 0 0 1 44 753 Tm
+(PRESTARE  \174  DONATION TOTALS BY MEMBER) Tj
+T*
+ET
+Q
+
+
 endstream
 endobj
 xref
-0 10
+0 11
 0000000000 65535 f 
 0000000015 00000 n 
 0000000054 00000 n 
 0000000113 00000 n 
 0000000162 00000 n 
-0000000964 00000 n 
-0000001071 00000 n 
-0000001178 00000 n 
-0000001275 00000 n 
-0000001377 00000 n 
+0000000977 00000 n 
+0000001084 00000 n 
+0000001191 00000 n 
+0000001298 00000 n 
+0000001395 00000 n 
+0000001497 00000 n 
 trailer
 <<
-/Size 10
+/Size 11
 /Root 3 0 R
 /Info 1 0 R
 >>
 startxref
-4470
+4814
 %%EOF
