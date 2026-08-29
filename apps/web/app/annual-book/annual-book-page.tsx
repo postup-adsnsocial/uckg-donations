@@ -964,18 +964,30 @@ function DayEditor({
                 {serviceTotals.map(([slot, total]) => (
                   <td key={slot}>{formatMoney(total, locale)}</td>
                 ))}
-                <td colSpan={2} />
+                <td className="annual-book-entry-grid__designated" colSpan={2}>
+                  <label>
+                    <span>{copy.designated}</span>
+                    <span className="annual-book-money-input">
+                      <b>$</b>
+                      <input
+                        aria-label={copy.designated}
+                        disabled={!canWrite}
+                        inputMode="decimal"
+                        min="0"
+                        placeholder="0.00"
+                        step="0.01"
+                        type="number"
+                        value={designated}
+                        onChange={(event) => setDesignated(event.target.value)}
+                      />
+                    </span>
+                  </label>
+                </td>
               </tr>
             </tfoot>
           </table>
         </div>
         <div className="annual-book-day__extras">
-          <MoneyField
-            disabled={!canWrite}
-            label={copy.designated}
-            onChange={setDesignated}
-            value={designated}
-          />
           <MoneyField
             disabled={!canWrite}
             label={copy.ath}
