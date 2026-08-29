@@ -165,7 +165,11 @@ for (const locale of locales) {
     await expect(
       page.getByRole('heading', { level: 2, name: locale.title }),
     ).toBeVisible();
-    await page.locator('.annual-book-day').first().locator('summary').click();
+    const firstWeek = page.locator('.annual-book-week').first();
+    const firstWeekToggle = firstWeek.locator('.annual-book-week__heading');
+    await firstWeekToggle.click();
+    await expect(firstWeekToggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(firstWeek.locator('.annual-book-day').first()).toBeVisible();
 
     const layoutIssues = await page.evaluate(() => {
       const issues: string[] = [];

@@ -51,7 +51,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: pnpm
@@ -85,7 +85,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: pnpm
@@ -114,10 +114,30 @@ jobs:
           echo "DATABASE_URL=postgresql://${runtime_login}:${runtime_password}@localhost:5432/uckg_donations" >> "${GITHUB_ENV}"
       - run: pnpm exec playwright install --with-deps chromium firefox
       - run: pnpm test:e2e
-      - run: pnpm test:visual
       - if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-results
+          path: test-results/
+          retention-days: 14
+
+  visual:
+    name: Visual quality
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:packages
+      - run: pnpm exec playwright install chromium firefox
+      - run: pnpm test:visual
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-visual-results
           path: test-results/
           retention-days: 14
