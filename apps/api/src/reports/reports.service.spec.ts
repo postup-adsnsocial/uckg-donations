@@ -80,6 +80,70 @@ describe('ReportsService detailed PDF', () => {
     expect(donations.getEnvelope).toHaveBeenCalledWith(context, item.id);
   });
 
+  it('generates the contributor summary without envelope images', async () => {
+    const items = [
+      {
+        amountCents: 12500,
+        createdAt: new Date('2026-04-04T12:00:00Z'),
+        envelope: null,
+        id: 'c127ae2f-c693-4052-b40d-9ae0b7b965d0',
+        member: { fullName: 'Member A', id: 'member-a' },
+        notes: null,
+        operatorName: 'Operator A',
+        paymentMethod: 'cash' as const,
+        receivedOn: '2026-04-04',
+      },
+      {
+        amountCents: 5000,
+        createdAt: new Date('2026-04-09T12:00:00Z'),
+        envelope: null,
+        id: '33c23399-1d9a-4c4d-a564-5f41a7c6162c',
+        member: null,
+        notes: null,
+        operatorName: 'Operator A',
+        paymentMethod: 'cash' as const,
+        receivedOn: '2026-04-09',
+      },
+    ];
+    const donations = {
+      getEnvelope: vi.fn(),
+      list: vi.fn().mockResolvedValue(items),
+    } as unknown as DonationsService;
+    const values = vi.fn().mockResolvedValue(undefined);
+    const transaction = { insert: vi.fn(() => ({ values })) };
+    const tenantUnitOfWork = {
+      run: vi.fn(
+        async (
+          _context: TenantContext,
+          work: (received: typeof transaction) => Promise<unknown>,
+        ) => work(transaction),
+      ),
+    } as unknown as TenantUnitOfWork;
+    const storage = {
+      createSignedDownloadUrl: vi.fn().mockResolvedValue(null),
+      upload: vi.fn().mockResolvedValue(undefined),
+    } as unknown as PrivateObjectStorage;
+    const service = new ReportsService(
+      donations,
+      {} as AnnualBookService,
+      tenantUnitOfWork,
+      storage,
+    );
+
+    const report = await service.generate(
+      context,
+      'MAEBO',
+      '2026-04-01',
+      '2026-04-30',
+      'member_totals',
+      false,
+    );
+    const pdf = await PDFDocument.load(report.buffer);
+
+    expect(pdf.getPageCount()).toBe(1);
+    expect(donations.getEnvelope).not.toHaveBeenCalled();
+  });
+
   it('generates the Annual Book PDF from financial summary data', async () => {
     const donations = {
       list: vi.fn(),

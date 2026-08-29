@@ -61,8 +61,13 @@ export class DonationsService {
           envelopeOriginalName: schema.envelopeFiles.originalName,
           envelopeSizeBytes: schema.envelopeFiles.sizeBytes,
           id: schema.donations.id,
+          memberAddressLine1: schema.members.addressLine1,
+          memberAddressLine2: schema.members.addressLine2,
+          memberCity: schema.members.city,
           memberFullName: schema.members.fullName,
           memberId: schema.members.id,
+          memberPostalCode: schema.members.postalCode,
+          memberRegion: schema.members.region,
           notes: schema.donations.notes,
           operatorName: schema.adminUsers.displayName,
           paymentMethod: schema.donations.paymentMethod,
@@ -105,7 +110,15 @@ export class DonationsService {
               : null,
             id: row.id,
             member: row.memberId
-              ? { fullName: row.memberFullName!, id: row.memberId }
+              ? {
+                  addressLine1: row.memberAddressLine1,
+                  addressLine2: row.memberAddressLine2,
+                  city: row.memberCity,
+                  fullName: row.memberFullName!,
+                  id: row.memberId,
+                  postalCode: row.memberPostalCode,
+                  region: row.memberRegion,
+                }
               : null,
             notes: row.notes,
             operatorName: row.operatorName,

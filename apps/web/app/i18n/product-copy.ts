@@ -473,9 +473,9 @@ export const productCopies: Record<Locale, ProductCopy> = {
       intro: 'Monte o relatório escolhendo o conteúdo, as imagens e o período.',
       last30Days: 'Últimos 30 dias',
       lastMonth: 'Mês anterior',
-      memberTotals: 'Total por membro',
+      memberTotals: 'Resumo por contribuinte',
       memberTotalsDescription:
-        'Quantidade de envelopes e valor total doado por cada membro.',
+        'Valor total doado por cada contribuinte no período selecionado.',
       memberFilterDescription:
         'Busque no cadastro ou mantenha todos os membros no relatório.',
       memberFilterLabel: 'Membro do relatório',
@@ -737,9 +737,9 @@ export const productCopies: Record<Locale, ProductCopy> = {
       intro: 'Build a report by choosing its content, images and period.',
       last30Days: 'Last 30 days',
       lastMonth: 'Previous month',
-      memberTotals: 'Total by member',
+      memberTotals: 'Contributor summary',
       memberTotalsDescription:
-        'Envelope count and total donated by each member.',
+        'Total donated by each contributor in the selected period.',
       memberFilterDescription:
         'Search the member registry or keep everyone in the report.',
       memberFilterLabel: 'Report member',
@@ -1010,9 +1010,9 @@ export const productCopies: Record<Locale, ProductCopy> = {
         'Crea el informe eligiendo el contenido, las imágenes y el período.',
       last30Days: 'Últimos 30 días',
       lastMonth: 'Mes anterior',
-      memberTotals: 'Total por miembro',
+      memberTotals: 'Resumen por contribuyente',
       memberTotalsDescription:
-        'Cantidad de sobres y valor total donado por cada miembro.',
+        'Valor total donado por cada contribuyente en el período seleccionado.',
       memberFilterDescription:
         'Busca en el registro o mantén todos los miembros en el informe.',
       memberFilterLabel: 'Miembro del informe',

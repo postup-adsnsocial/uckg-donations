@@ -322,6 +322,34 @@ export class ReportsService {
         total,
       );
     }
+
+    if (reportType === 'detailed' && includeImages) {
+      return this.createContributorReceiptsPdf(
+        document,
+        bold,
+        regular,
+        context,
+        churchName,
+        startDate,
+        endDate,
+        items,
+        logo,
+      );
+    }
+
+    if (reportType === 'member_totals') {
+      return this.createContributorSummaryPdf(
+        document,
+        bold,
+        regular,
+        churchName,
+        startDate,
+        endDate,
+        items,
+        logo,
+      );
+    }
+
     let page = this.addPage(
       document,
       bold,
@@ -423,25 +451,15 @@ export class ReportsService {
         y -= cardHeight + 12;
       }
     } else {
-      const rows =
-        reportType === 'member_totals'
-          ? this.memberTotals(items)
-          : this.paymentTotals(items);
-      page.drawText(
-        reportType === 'member_totals'
-          ? 'DONATION TOTALS BY MEMBER'
-          : 'TOTALS BY PAYMENT METHOD',
-        { x: 48, y, font: bold, size: 12, color: rgb(0.02, 0.28, 0.5) },
-      );
+      const rows = this.paymentTotals(items);
+      page.drawText('TOTALS BY PAYMENT METHOD', {
+        x: 48,
+        y,
+        font: bold,
+        size: 12,
+        color: rgb(0.02, 0.28, 0.5),
+      });
       y -= 30;
-      const isMemberTotals = reportType === 'member_totals';
-      if (isMemberTotals) {
-        page.drawText('MEMBER', { x: 52, y, font: bold, size: 8 });
-        page.drawText('CHURCH', { x: 250, y, font: bold, size: 8 });
-        page.drawText('COUNT', { x: 430, y, font: bold, size: 8 });
-        page.drawText('TOTAL', { x: 485, y, font: bold, size: 8 });
-        y -= 20;
-      }
       for (const row of rows) {
         if (y < 70) {
           page = this.addPage(
@@ -455,41 +473,22 @@ export class ReportsService {
             total,
           );
           y = 625;
-          if (isMemberTotals) {
-            page.drawText('MEMBER', { x: 52, y, font: bold, size: 8 });
-            page.drawText('CHURCH', { x: 250, y, font: bold, size: 8 });
-            page.drawText('COUNT', { x: 430, y, font: bold, size: 8 });
-            page.drawText('TOTAL', { x: 485, y, font: bold, size: 8 });
-            y -= 20;
-          }
         }
-        page.drawText(
-          this.clean(row.label).slice(0, isMemberTotals ? 30 : 55),
-          {
-            x: 52,
-            y,
-            font: regular,
-            size: 10,
-            color: rgb(0.05, 0.12, 0.22),
-          },
-        );
-        if (isMemberTotals) {
-          page.drawText(this.clean(churchName).slice(0, 25), {
-            x: 250,
-            y,
-            font: regular,
-            size: 9,
-            color: rgb(0.05, 0.12, 0.22),
-          });
-        }
+        page.drawText(this.clean(row.label).slice(0, 55), {
+          x: 52,
+          y,
+          font: regular,
+          size: 10,
+          color: rgb(0.05, 0.12, 0.22),
+        });
         page.drawText(String(row.count), {
-          x: isMemberTotals ? 430 : 410,
+          x: 410,
           y,
           font: regular,
           size: 10,
         });
         page.drawText(`USD ${(row.totalCents / 100).toFixed(2)}`, {
-          x: isMemberTotals ? 485 : 470,
+          x: 470,
           y,
           font: bold,
           size: 10,
@@ -520,6 +519,375 @@ export class ReportsService {
     }
 
     return Buffer.from(await document.save());
+  }
+
+  private async createContributorSummaryPdf(
+    document: PDFDocument,
+    bold: PDFFont,
+    regular: PDFFont,
+    churchName: string,
+    startDate: string,
+    endDate: string,
+    items: DonationItem[],
+    logo: PDFImage | null,
+  ) {
+    const rows = this.memberTotals(items);
+    const totalCents = items.reduce((sum, item) => sum + item.amountCents, 0);
+    const startX = 44;
+    const churchColumnWidth = 104;
+    const amountColumnWidth = 142;
+    const contributorColumnWidth = 278;
+    const tableWidth =
+      churchColumnWidth + amountColumnWidth + contributorColumnWidth;
+
+    const addSummaryPage = () => {
+      const page = document.addPage([612, 792]);
+      this.drawUniversalLogo(page, logo, 44, 738, 230, 32);
+      page.drawLine({
+        start: { x: startX, y: 722 },
+        end: { x: startX + tableWidth, y: 722 },
+        thickness: 1.3,
+        color: rgb(0.04, 0.04, 0.04),
+      });
+      const title = 'CONTRIBUTOR SUMMARY';
+      const titleWidth = bold.widthOfTextAtSize(title, 15);
+      page.drawText(title, {
+        x: (612 - titleWidth) / 2,
+        y: 698,
+        font: bold,
+        size: 15,
+        color: rgb(0.04, 0.04, 0.04),
+      });
+      const period = `For Period ${this.formatDate(startDate)} to ${this.formatDate(endDate)}`;
+      const periodWidth = regular.widthOfTextAtSize(period, 10);
+      page.drawText(period, {
+        x: (612 - periodWidth) / 2,
+        y: 666,
+        font: regular,
+        size: 10,
+        color: rgb(0.05, 0.05, 0.05),
+      });
+
+      const headerY = 642;
+      const drawCenteredHeader = (label: string, x: number, width: number) => {
+        const labelWidth = bold.widthOfTextAtSize(label, 10);
+        page.drawText(label, {
+          x: x + (width - labelWidth) / 2,
+          y: headerY,
+          font: bold,
+          size: 10,
+          color: rgb(0.04, 0.04, 0.04),
+        });
+      };
+      drawCenteredHeader('Church', startX, churchColumnWidth);
+      drawCenteredHeader(
+        'Amount',
+        startX + churchColumnWidth,
+        amountColumnWidth,
+      );
+      drawCenteredHeader(
+        'Contributor',
+        startX + churchColumnWidth + amountColumnWidth,
+        contributorColumnWidth,
+      );
+      page.drawLine({
+        start: { x: startX, y: 636 },
+        end: { x: startX + tableWidth, y: 636 },
+        thickness: 1,
+        color: rgb(0.04, 0.04, 0.04),
+      });
+      return page;
+    };
+
+    let page = addSummaryPage();
+    let y = 618;
+
+    for (const row of rows) {
+      if (y < 72) {
+        page = addSummaryPage();
+        y = 618;
+      }
+      page.drawText(this.clean(churchName).slice(0, 16), {
+        x: startX + 8,
+        y,
+        font: regular,
+        size: 9.5,
+        color: rgb(0.05, 0.05, 0.05),
+      });
+      const amount = `USD ${(row.totalCents / 100).toFixed(2)}`;
+      const amountWidth = regular.widthOfTextAtSize(amount, 9.5);
+      page.drawText(amount, {
+        x: startX + churchColumnWidth + amountColumnWidth - amountWidth - 10,
+        y,
+        font: regular,
+        size: 9.5,
+        color: rgb(0.05, 0.05, 0.05),
+      });
+      page.drawText(this.clean(row.label).slice(0, 40), {
+        x: startX + churchColumnWidth + amountColumnWidth + 10,
+        y,
+        font: regular,
+        size: 9.5,
+        color: rgb(0.05, 0.05, 0.05),
+      });
+      y -= 18;
+    }
+
+    page.drawLine({
+      start: { x: startX, y: y + 4 },
+      end: { x: startX + tableWidth, y: y + 4 },
+      thickness: 1,
+      color: rgb(0.04, 0.04, 0.04),
+    });
+    page.drawText('TOTAL', {
+      x: startX + 20,
+      y: y - 16,
+      font: bold,
+      size: 13,
+      color: rgb(0.04, 0.04, 0.04),
+    });
+    const total = `USD ${(totalCents / 100).toFixed(2)}`;
+    const totalWidth = bold.widthOfTextAtSize(total, 11);
+    page.drawText(total, {
+      x: startX + churchColumnWidth + amountColumnWidth - totalWidth - 10,
+      y: y - 15,
+      font: bold,
+      size: 11,
+      color: rgb(0.04, 0.04, 0.04),
+    });
+
+    return Buffer.from(await document.save());
+  }
+
+  private async createContributorReceiptsPdf(
+    document: PDFDocument,
+    bold: PDFFont,
+    regular: PDFFont,
+    context: TenantContext,
+    churchName: string,
+    startDate: string,
+    endDate: string,
+    items: DonationItem[],
+    logo: PDFImage | null,
+  ) {
+    const contributors = new Map<
+      string,
+      { items: DonationItem[]; member: DonationItem['member'] }
+    >();
+
+    for (const item of items) {
+      const key = item.member?.id ?? 'anonymous';
+      const contributor = contributors.get(key) ?? {
+        items: [],
+        member: item.member,
+      };
+      contributor.items.push(item);
+      contributors.set(key, contributor);
+    }
+
+    const contributorEntries = [...contributors.values()].sort((left, right) =>
+      (left.member?.fullName ?? 'Anonymous').localeCompare(
+        right.member?.fullName ?? 'Anonymous',
+      ),
+    );
+
+    if (!contributorEntries.length) {
+      this.addContributorReceiptPage(
+        document,
+        bold,
+        regular,
+        churchName,
+        startDate,
+        endDate,
+        logo,
+        null,
+        0,
+      );
+      return Buffer.from(await document.save());
+    }
+
+    for (const contributor of contributorEntries) {
+      const contributorTotal = contributor.items.reduce(
+        (sum, item) => sum + item.amountCents,
+        0,
+      );
+      let page = this.addContributorReceiptPage(
+        document,
+        bold,
+        regular,
+        churchName,
+        startDate,
+        endDate,
+        logo,
+        contributor.member,
+        contributorTotal,
+      );
+      let y = 590;
+
+      for (const item of contributor.items) {
+        const entryHeight = 202;
+        if (y - entryHeight < 38) {
+          page = this.addContributorReceiptPage(
+            document,
+            bold,
+            regular,
+            churchName,
+            startDate,
+            endDate,
+            logo,
+            contributor.member,
+            contributorTotal,
+          );
+          y = 590;
+        }
+
+        page.drawText('DATE:', {
+          x: 48,
+          y: y - 18,
+          font: regular,
+          size: 9,
+          color: rgb(0.05, 0.12, 0.22),
+        });
+        page.drawText(this.formatDate(item.receivedOn), {
+          x: 88,
+          y: y - 18,
+          font: bold,
+          size: 8.5,
+          color: rgb(0.05, 0.12, 0.22),
+        });
+        page.drawText('AMOUNT:', {
+          x: 48,
+          y: y - 39,
+          font: regular,
+          size: 9,
+          color: rgb(0.05, 0.12, 0.22),
+        });
+        page.drawText(`USD ${(item.amountCents / 100).toFixed(2)}`, {
+          x: 48,
+          y: y - 54,
+          font: bold,
+          size: 8.5,
+          color: rgb(0.05, 0.12, 0.22),
+        });
+        page.drawText('TYPE:', {
+          x: 48,
+          y: y - 77,
+          font: regular,
+          size: 9,
+          color: rgb(0.05, 0.12, 0.22),
+        });
+        page.drawText(this.methodLabel(item.paymentMethod), {
+          x: 48,
+          y: y - 92,
+          font: bold,
+          size: 8.5,
+          color: rgb(0.05, 0.12, 0.22),
+        });
+
+        const messageArea = { height: 174, width: 360, x: 196, y: y - 184 };
+        page.drawRectangle({
+          ...messageArea,
+          color: rgb(1, 1, 1),
+          borderColor: rgb(0.08, 0.12, 0.16),
+          borderWidth: 0.8,
+        });
+
+        if (item.envelope) {
+          try {
+            const file = await this.donations.getEnvelope(context, item.id);
+            const image =
+              file.contentType === 'image/png'
+                ? await document.embedPng(file.buffer)
+                : await document.embedJpg(file.buffer);
+            const dimensions = image.scaleToFit(
+              messageArea.width - 12,
+              messageArea.height - 12,
+            );
+            page.drawImage(image, {
+              x: messageArea.x + (messageArea.width - dimensions.width) / 2,
+              y: messageArea.y + (messageArea.height - dimensions.height) / 2,
+              width: dimensions.width,
+              height: dimensions.height,
+            });
+          } catch {
+            page.drawText('Message image unavailable', {
+              x: messageArea.x + 12,
+              y: messageArea.y + messageArea.height - 20,
+              font: regular,
+              size: 8,
+              color: rgb(0.55, 0.25, 0.25),
+            });
+          }
+        }
+
+        y -= entryHeight;
+      }
+    }
+
+    return Buffer.from(await document.save());
+  }
+
+  private addContributorReceiptPage(
+    document: PDFDocument,
+    bold: PDFFont,
+    regular: PDFFont,
+    churchName: string,
+    startDate: string,
+    endDate: string,
+    logo: PDFImage | null,
+    member: DonationItem['member'],
+    totalCents: number,
+  ) {
+    const page = document.addPage([612, 792]);
+    this.drawUniversalLogo(page, logo, 44, 738, 230, 32);
+
+    const title = `Receipts by Contributor - ${this.formatDate(startDate)} to ${this.formatDate(endDate)}`;
+    const titleWidth = bold.widthOfTextAtSize(title, 10);
+    page.drawText(title, {
+      x: Math.max(44, (612 - titleWidth) / 2),
+      y: 706,
+      font: bold,
+      size: 10,
+      color: rgb(0.05, 0.05, 0.05),
+    });
+
+    const contributorName = this.clean(member?.fullName ?? 'Anonymous');
+    page.drawText('NAME:', {
+      x: 48,
+      y: 672,
+      font: bold,
+      size: 9,
+      color: rgb(0.05, 0.05, 0.05),
+    });
+    page.drawText(contributorName.slice(0, 54), {
+      x: 84,
+      y: 672,
+      font: regular,
+      size: 9,
+      color: rgb(0.05, 0.05, 0.05),
+    });
+    page.drawText(this.receiptAddress(member, churchName).slice(0, 78), {
+      x: 48,
+      y: 652,
+      font: regular,
+      size: 8.5,
+      color: rgb(0.05, 0.05, 0.05),
+    });
+    page.drawText('TOTAL:', {
+      x: 430,
+      y: 672,
+      font: bold,
+      size: 9,
+      color: rgb(0.05, 0.05, 0.05),
+    });
+    page.drawText(`USD ${(totalCents / 100).toFixed(2)}`, {
+      x: 476,
+      y: 672,
+      font: bold,
+      size: 9,
+      color: rgb(0.05, 0.05, 0.05),
+    });
+    return page;
   }
 
   private async createAnnualMembersPdf(
@@ -996,7 +1364,7 @@ export class ReportsService {
   private memberTotals(items: DonationItem[]) {
     const totals = new Map<string, { count: number; totalCents: number }>();
     for (const item of items) {
-      const label = item.member?.fullName ?? 'Anonymous';
+      const label = item.member?.fullName ?? 'UNDESIGNATED FUNDS';
       const current = totals.get(label) ?? { count: 0, totalCents: 0 };
       current.count += 1;
       current.totalCents += item.amountCents;
@@ -1047,6 +1415,20 @@ export class ReportsService {
 
   private methodLabel(method: DonationItem['paymentMethod']) {
     return { card: 'Card', cash: 'Cash', check: 'Check' }[method];
+  }
+
+  private receiptAddress(member: DonationItem['member'], churchName: string) {
+    if (!member) return this.clean(churchName);
+
+    const street = [member.addressLine1, member.addressLine2]
+      .filter(Boolean)
+      .join(', ');
+    const locality = [member.city, member.region, member.postalCode]
+      .filter(Boolean)
+      .join(', ');
+    return this.clean(
+      [street, locality].filter(Boolean).join(' - ') || churchName,
+    );
   }
 
   private clean(value: string) {
