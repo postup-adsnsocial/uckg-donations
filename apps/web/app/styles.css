@@ -4719,7 +4719,6 @@ input[type='week'] {
 }
 
 .annual-book-month-bar label,
-.annual-book-day__extras label,
 .annual-book-comparison-form label {
   display: grid;
   gap: 7px;
@@ -4729,7 +4728,6 @@ input[type='week'] {
 }
 
 .annual-book-month-bar input,
-.annual-book-day__extras input,
 .annual-book-comparison-form input {
   width: 100%;
   min-height: 44px;
@@ -5125,12 +5123,6 @@ td.annual-book-entry-grid__grand-total {
   vertical-align: middle;
 }
 
-.annual-book-day__extras {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 12px;
-}
-
 .annual-book-money-input {
   position: relative;
 }
@@ -5342,10 +5334,6 @@ td.annual-book-entry-grid__online-total {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .annual-book-day__extras {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   .annual-book-expected-deposit {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -5422,7 +5410,6 @@ td.annual-book-entry-grid__online-total {
     font-size: 0.78rem;
   }
 
-  .annual-book-day__extras,
   .annual-book-comparison-form fieldset {
     grid-template-columns: minmax(0, 1fr);
   }

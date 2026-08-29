@@ -828,9 +828,6 @@ function DayEditor({
     inputValue(day.designatedEnvelopeCents),
   );
   const [ath, setAth] = useState(inputValue(day.athMobileCents));
-  const [cardMachine, setCardMachine] = useState(
-    inputValue(day.cardMachineCents),
-  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const serviceTotals = serviceSlots.map(
@@ -875,7 +872,7 @@ function DayEditor({
     const response = await apiRequest(`/annual-book/days/${day.entryDate}`, {
       body: JSON.stringify({
         athMobileCents: toCents(ath),
-        cardMachineCents: cardMachine.trim() ? toCents(cardMachine) : null,
+        cardMachineCents: day.cardMachineCents,
         designatedEnvelopeCents: toCents(designated),
         entries,
         entryDate: day.entryDate,
@@ -1012,14 +1009,6 @@ function DayEditor({
             </tfoot>
           </table>
         </div>
-        <div className="annual-book-day__extras">
-          <MoneyField
-            disabled={!canWrite}
-            label={copy.cardMachine}
-            onChange={setCardMachine}
-            value={cardMachine}
-          />
-        </div>
         {error ? (
           <p className="form-feedback form-feedback--error">{error}</p>
         ) : null}
@@ -1064,37 +1053,6 @@ function DayEditor({
         </aside>
       ))}
     </article>
-  );
-}
-
-function MoneyField({
-  disabled,
-  label,
-  onChange,
-  value,
-}: {
-  disabled: boolean;
-  label: string;
-  onChange: (value: string) => void;
-  value: string;
-}) {
-  return (
-    <label>
-      <span>{label}</span>
-      <span className="annual-book-money-input">
-        <b>$</b>
-        <input
-          disabled={disabled}
-          inputMode="decimal"
-          min="0"
-          placeholder="0.00"
-          step="0.01"
-          type="number"
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-        />
-      </span>
-    </label>
   );
 }
 
