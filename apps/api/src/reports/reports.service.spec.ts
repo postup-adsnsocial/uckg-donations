@@ -158,7 +158,11 @@ describe('ReportsService detailed PDF', () => {
             entryDate: '2026-08-01',
             saved: true,
             entries: [
-              { amountCents: 16_000, paymentMethod: 'cash', serviceSlot: 'first' },
+              {
+                amountCents: 16_000,
+                paymentMethod: 'cash',
+                serviceSlot: 'first',
+              },
             ],
             metrics: {
               athMobileCents: 0,
@@ -176,6 +180,29 @@ describe('ReportsService detailed PDF', () => {
             notes: null,
             weekday: 'saturday',
           },
+          ...Array.from({ length: 9 }, (_, index) => ({
+            athMobileCents: 0,
+            cardMachineCents: null,
+            designatedEnvelopeCents: 0,
+            entryDate: `2026-08-${String(index + 2).padStart(2, '0')}`,
+            saved: false,
+            entries: [],
+            metrics: {
+              athMobileCents: 0,
+              cardCents: 0,
+              cardDifferenceCents: null,
+              cardMachineCents: 0,
+              cashCents: 0,
+              checkCents: 0,
+              designatedEnvelopeCents: 0,
+              expectedDepositCents: 0,
+              totalWithAthCents: 0,
+              totalWithoutAthCents: 0,
+              undesignatedCents: 0,
+            },
+            notes: null,
+            weekday: 'weekday',
+          })),
         ],
         expectedDeposits: [],
         month: '2026-08',
@@ -245,7 +272,7 @@ describe('ReportsService detailed PDF', () => {
     );
     const pdf = await PDFDocument.load(report.buffer);
 
-    expect(pdf.getPageCount()).toBe(1);
+    expect(pdf.getPageCount()).toBe(3);
     expect(annualBook.month).toHaveBeenCalledWith(context, '2026-08');
     expect(annualBook.summary).toHaveBeenCalledWith(context, {
       endDate: '2025-08-31',

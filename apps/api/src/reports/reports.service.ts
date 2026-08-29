@@ -129,10 +129,7 @@ export class ReportsService {
     let buffer: Buffer;
 
     if (reportType === 'annual_book') {
-      const month = await this.annualBook.month(
-        context,
-        startDate.slice(0, 7),
-      );
+      const month = await this.annualBook.month(context, startDate.slice(0, 7));
       const [year, monthNumber] = month.month.split('-').map(Number);
       const priorStartDate = `${year! - 1}-${String(monthNumber).padStart(2, '0')}-01`;
       const priorEndDate = new Date(Date.UTC(year! - 1, monthNumber!, 0))
@@ -311,7 +308,6 @@ export class ReportsService {
     const document = await PDFDocument.create();
     const regular = await document.embedFont(StandardFonts.Helvetica);
     const bold = await document.embedFont(StandardFonts.HelveticaBold);
-    const logo = await this.loadProgramLogo(document);
     const slots = [
       { key: 'first', label: '1ª REUNIÃO' },
       { key: 'second', label: '2ª REUNIÃO' },
@@ -369,8 +365,7 @@ export class ReportsService {
       method: string,
     ) =>
       day.entries.find(
-        (entry) =>
-          entry.serviceSlot === slot && entry.paymentMethod === method,
+        (entry) => entry.serviceSlot === slot && entry.paymentMethod === method,
       )?.amountCents ?? 0;
     const sumDays = (
       days: typeof month.days,
@@ -394,16 +389,13 @@ export class ReportsService {
         height: 65,
         color: navy,
       });
-      page.drawText(
-        monthTitle.charAt(0).toUpperCase() + monthTitle.slice(1),
-        {
-          x: startX + 10,
-          y: 1141,
-          font: bold,
-          size: 22,
-          color: rgb(1, 1, 1),
-        },
-      );
+      page.drawText(monthTitle.charAt(0).toUpperCase() + monthTitle.slice(1), {
+        x: startX + 10,
+        y: 1141,
+        font: bold,
+        size: 22,
+        color: rgb(1, 1, 1),
+      });
       page.drawText(this.clean(churchName), {
         x: startX + 10,
         y: 1118,
@@ -625,27 +617,19 @@ export class ReportsService {
     let { page, top } = addPage();
     let weekStartIndex = 0;
     let weekNumber = 0;
-    const weekNames = ['PRIMEIRA', 'SEGUNDA', 'TERCEIRA', 'QUARTA', 'QUINTA', 'SEXTA'];
+    const weekNames = [
+      'PRIMEIRA',
+      'SEGUNDA',
+      'TERCEIRA',
+      'QUARTA',
+      'QUINTA',
+      'SEXTA',
+    ];
     for (const [dayIndex, day] of month.days.entries()) {
       const currentWeekday = new Date(`${day.entryDate}T12:00:00Z`).getUTCDay();
       if (dayIndex === 0 || currentWeekday === 1) {
         weekStartIndex = dayIndex;
-        let daysInWeek = 0;
-        for (let index = dayIndex; index < month.days.length; index += 1) {
-          daysInWeek += 1;
-          const candidate = month.days[index];
-          if (
-            !candidate ||
-            new Date(`${candidate.entryDate}T12:00:00Z`).getUTCDay() === 0
-          )
-            break;
-        }
-        const requiredHeight =
-          daysInWeek * (dayBlockHeight + totalRowHeight + 10) + 62;
-        if (top - requiredHeight < 64) ({ page, top } = addPage());
-      }
-      if (top - dayBlockHeight - totalRowHeight < 64) {
-        ({ page, top } = addPage());
+        if (dayIndex > 0) ({ page, top } = addPage());
       }
       const blockTop = top;
       const subtotalX =
@@ -676,7 +660,7 @@ export class ReportsService {
         borderColor: rgb(0.02, 0.42, 0.72),
         borderWidth: 0.5,
       });
-      const dayTotal = money(day.metrics.totalWithoutAthCents);
+      const dayTotal = money(day.metrics.totalWithAthCents);
       const dayTotalWidth = bold.widthOfTextAtSize(dayTotal, 11);
       page.drawText(dayTotal, {
         x: dailyTotalX + (dailyTotalWidth - dayTotalWidth) / 2,
@@ -747,16 +731,20 @@ export class ReportsService {
           color: rgb(0.42, 0.62, 0.78),
         });
       }
-      [startX, startX + dayWidth, subtotalX, dailyTotalX, startX + tableWidth].forEach(
-        (x) => {
-          page.drawLine({
-            start: { x, y: blockTop - dayBlockHeight },
-            end: { x, y: blockTop },
-            thickness: 0.4,
-            color: rgb(0.02, 0.42, 0.72),
-          });
-        },
-      );
+      [
+        startX,
+        startX + dayWidth,
+        subtotalX,
+        dailyTotalX,
+        startX + tableWidth,
+      ].forEach((x) => {
+        page.drawLine({
+          start: { x, y: blockTop - dayBlockHeight },
+          end: { x, y: blockTop },
+          thickness: 0.4,
+          color: rgb(0.02, 0.42, 0.72),
+        });
+      });
       page.drawLine({
         start: { x: startX + dayWidth, y: blockTop - dayBlockHeight },
         end: { x: startX + tableWidth, y: blockTop - dayBlockHeight },
@@ -830,21 +818,6 @@ export class ReportsService {
       if (isWeekEnd) {
         weekNumber += 1;
         const weekDays = month.days.slice(weekStartIndex, dayIndex + 1);
-        const weekStart = weekDays[0]?.entryDate ?? day.entryDate;
-        const weekEnd = weekDays.at(-1)?.entryDate ?? day.entryDate;
-        const depositsForWeek = month.expectedDeposits.filter((deposit) =>
-          deposit.sourceDates.some(
-            (sourceDate) => sourceDate >= weekStart && sourceDate <= weekEnd,
-          ),
-        );
-        const depositByWeekday = (weekdayNumber: number) =>
-          depositsForWeek
-            .filter(
-              (deposit) =>
-                new Date(`${deposit.depositDate}T12:00:00Z`).getUTCDay() ===
-                weekdayNumber,
-            )
-            .reduce((sum, deposit) => sum + deposit.totalCents, 0);
         const summaryHeight = 54;
         page.drawRectangle({
           x: startX,
@@ -853,22 +826,24 @@ export class ReportsService {
           height: summaryHeight,
           color: rgb(0.01, 0.12, 0.38),
         });
-        page.drawText(`${weekNames[weekNumber - 1] ?? weekNumber + 'ª'} SEMANA`, {
-          x: startX + 22,
-          y: top - 32,
-          font: bold,
-          size: 12,
-          color: rgb(1, 1, 1),
-        });
+        page.drawText(
+          `${weekNames[weekNumber - 1] ?? weekNumber + 'ª'} SEMANA`,
+          {
+            x: startX + 22,
+            y: top - 32,
+            font: bold,
+            size: 12,
+            color: rgb(1, 1, 1),
+          },
+        );
         const weeklyCells = [
-          ['DEPÓSITO QUARTA', depositByWeekday(3)],
-          ['DEPÓSITO SEXTA', depositByWeekday(5)],
-          ['DEPÓSITO SEGUNDA', depositByWeekday(1)],
-          ['TOTAL CARTÕES', sumDays(weekDays, 'cardCents')],
-          ['NÃO DESIGNADO', sumDays(weekDays, 'undesignatedCents')],
+          ['DINHEIRO', sumDays(weekDays, 'cashCents')],
+          ['CARTÃO', sumDays(weekDays, 'cardCents')],
+          ['CHEQUE', sumDays(weekDays, 'checkCents')],
+          ['ONLINE', sumDays(weekDays, 'athMobileCents')],
         ] as const;
         weeklyCells.forEach(([label, value], index) => {
-          const x = startX + 178 + index * 78;
+          const x = startX + 168 + index * 82;
           page.drawText(label, {
             x,
             y: top - 18,
@@ -879,7 +854,7 @@ export class ReportsService {
           const valueText = money(value);
           const valueWidth = bold.widthOfTextAtSize(valueText, 8);
           page.drawText(valueText, {
-            x: x + (70 - valueWidth) / 2,
+            x: x + (74 - valueWidth) / 2,
             y: top - 39,
             font: bold,
             size: 8,
@@ -888,6 +863,13 @@ export class ReportsService {
         });
         const weekTotal = money(sumDays(weekDays, 'totalWithAthCents'));
         const weekTotalWidth = bold.widthOfTextAtSize(weekTotal, 14);
+        page.drawText('TOTAL SEMANA', {
+          x: startX + tableWidth - 86,
+          y: top - 18,
+          font: regular,
+          size: 5.5,
+          color: rgb(0.82, 0.89, 0.95),
+        });
         page.drawText(weekTotal, {
           x: startX + tableWidth - weekTotalWidth - 12,
           y: top - 36,
@@ -1063,54 +1045,54 @@ export class ReportsService {
     let y = 625;
 
     const rows = this.paymentTotals(items);
-      page.drawText('TOTALS BY PAYMENT METHOD', {
-        x: 48,
+    page.drawText('TOTALS BY PAYMENT METHOD', {
+      x: 48,
+      y,
+      font: bold,
+      size: 12,
+      color: rgb(0.02, 0.28, 0.5),
+    });
+    y -= 30;
+    for (const row of rows) {
+      if (y < 70) {
+        page = this.addPage(
+          document,
+          bold,
+          regular,
+          churchName,
+          startDate,
+          endDate,
+          logo,
+          total,
+        );
+        y = 625;
+      }
+      page.drawText(this.clean(row.label).slice(0, 55), {
+        x: 52,
+        y,
+        font: regular,
+        size: 10,
+        color: rgb(0.05, 0.12, 0.22),
+      });
+      page.drawText(String(row.count), {
+        x: 410,
+        y,
+        font: regular,
+        size: 10,
+      });
+      page.drawText(`USD ${(row.totalCents / 100).toFixed(2)}`, {
+        x: 470,
         y,
         font: bold,
-        size: 12,
-        color: rgb(0.02, 0.28, 0.5),
+        size: 10,
       });
-      y -= 30;
-      for (const row of rows) {
-        if (y < 70) {
-          page = this.addPage(
-            document,
-            bold,
-            regular,
-            churchName,
-            startDate,
-            endDate,
-            logo,
-            total,
-          );
-          y = 625;
-        }
-        page.drawText(this.clean(row.label).slice(0, 55), {
-          x: 52,
-          y,
-          font: regular,
-          size: 10,
-          color: rgb(0.05, 0.12, 0.22),
-        });
-        page.drawText(String(row.count), {
-          x: 410,
-          y,
-          font: regular,
-          size: 10,
-        });
-        page.drawText(`USD ${(row.totalCents / 100).toFixed(2)}`, {
-          x: 470,
-          y,
-          font: bold,
-          size: 10,
-        });
-        page.drawLine({
-          start: { x: 48, y: y - 8 },
-          end: { x: 565, y: y - 8 },
-          thickness: 0.5,
-          color: rgb(0.88, 0.9, 0.93),
-        });
-        y -= 28;
+      page.drawLine({
+        start: { x: 48, y: y - 8 },
+        end: { x: 565, y: y - 8 },
+        thickness: 0.5,
+        color: rgb(0.88, 0.9, 0.93),
+      });
+      y -= 28;
     }
 
     if (includeImages) {
