@@ -147,6 +147,7 @@ const copies = {
     title: 'Livro Anual',
     total: 'Total + Online',
     totalByCategory: 'Total',
+    totalOverall: 'Total geral',
     totalByService: 'Total por reunião',
     totalWithoutAth: 'Total sem Online',
     undesignated: 'Undesignated',
@@ -200,6 +201,7 @@ const copies = {
     title: 'Annual Book',
     total: 'Total + Online',
     totalByCategory: 'Total',
+    totalOverall: 'Grand total',
     totalByService: 'Total by service',
     totalWithoutAth: 'Total without Online',
     undesignated: 'Undesignated',
@@ -254,6 +256,7 @@ const copies = {
     title: 'Libro Anual',
     total: 'Total + Online',
     totalByCategory: 'Total',
+    totalOverall: 'Total general',
     totalByService: 'Total por reunión',
     totalWithoutAth: 'Total sin Online',
     undesignated: 'Undesignated',
@@ -839,6 +842,20 @@ function DayEditor({
         ),
       ] as const,
   );
+  const categoryTotals = paymentMethods.map(
+    (method) =>
+      [
+        method,
+        serviceSlots.reduce(
+          (total, slot) => total + toCents(amounts[`${slot}:${method}`] ?? ''),
+          0,
+        ),
+      ] as const,
+  );
+  const dailyEntriesTotal = categoryTotals.reduce(
+    (total, [, categoryTotal]) => total + categoryTotal,
+    0,
+  );
 
   async function save() {
     setSaving(true);
@@ -897,10 +914,13 @@ function DayEditor({
                 <th className="annual-book-entry-grid__total">
                   {copy.totalByCategory}
                 </th>
+                <th className="annual-book-entry-grid__grand-total">
+                  {copy.totalOverall}
+                </th>
               </tr>
             </thead>
             <tbody>
-              {paymentMethods.map((method) => (
+              {categoryTotals.map(([method, categoryTotal], methodIndex) => (
                 <tr key={method}>
                   <th>{copy[method]}</th>
                   {serviceSlots.map((slot) => (
@@ -925,15 +945,16 @@ function DayEditor({
                     </td>
                   ))}
                   <td className="annual-book-entry-grid__total">
-                    {formatMoney(
-                      serviceSlots.reduce(
-                        (total, slot) =>
-                          total + toCents(amounts[`${slot}:${method}`] ?? ''),
-                        0,
-                      ),
-                      locale,
-                    )}
+                    {formatMoney(categoryTotal, locale)}
                   </td>
+                  {methodIndex === 0 ? (
+                    <td
+                      className="annual-book-entry-grid__grand-total"
+                      rowSpan={paymentMethods.length}
+                    >
+                      {formatMoney(dailyEntriesTotal, locale)}
+                    </td>
+                  ) : null}
                 </tr>
               ))}
             </tbody>

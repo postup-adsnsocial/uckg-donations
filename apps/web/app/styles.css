@@ -5113,6 +5113,32 @@ td.annual-book-entry-grid__total {
   vertical-align: middle;
 }
 
+.annual-book-entry-grid__grand-total {
+  min-width: 172px !important;
+  border-radius: 7px;
+  background: #eef3f6;
+  color: #4d5860 !important;
+  font-weight: 900;
+  text-align: right !important;
+}
+
+th.annual-book-entry-grid__grand-total {
+  padding: 8px 12px;
+  background: var(--blue-950);
+  color: #ffffff !important;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-align: center !important;
+  text-transform: uppercase;
+}
+
+td.annual-book-entry-grid__grand-total {
+  padding: 0 14px;
+  font-size: 1.3rem;
+  letter-spacing: 0.02em;
+  vertical-align: middle;
+}
+
 .annual-book-day__extras {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(180px, 1.4fr);
