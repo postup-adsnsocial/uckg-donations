@@ -2834,9 +2834,18 @@ input[type='week'] {
   color: var(--blue-800);
 }
 
-.overview-card__icon svg {
+.overview-card__icon svg,
+.overview-card__icon .product-icon--image {
   width: 27px;
   height: 27px;
+}
+
+.overview-card__icon .product-icon--image {
+  display: block;
+  object-fit: contain;
+}
+
+.overview-card__icon svg {
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
