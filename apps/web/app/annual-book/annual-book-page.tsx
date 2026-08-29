@@ -106,6 +106,7 @@ const copies = {
     card: 'Cartão',
     cardDifference: 'Diferença do cartão',
     cardMachine: 'Maquininha',
+    cashAndCheck: 'Dinheiro + cheque',
     cash: 'Dinheiro',
     check: 'Cheque',
     compare: 'Comparar períodos',
@@ -161,6 +162,7 @@ const copies = {
     card: 'Card',
     cardDifference: 'Card difference',
     cardMachine: 'Card machine',
+    cashAndCheck: 'Cash + checks',
     cash: 'Cash',
     check: 'Check',
     compare: 'Compare periods',
@@ -215,6 +217,7 @@ const copies = {
     card: 'Tarjeta',
     cardDifference: 'Diferencia de tarjeta',
     cardMachine: 'Máquina de tarjeta',
+    cashAndCheck: 'Efectivo + cheques',
     cash: 'Efectivo',
     check: 'Cheque',
     compare: 'Comparar períodos',
@@ -1026,15 +1029,7 @@ function DayEditor({
           </div>
           <dl>
             <div>
-              <dt>{copy.cash}</dt>
-              <dd>{formatMoney(deposit.cashCents, locale)}</dd>
-            </div>
-            <div>
-              <dt>{copy.check}</dt>
-              <dd>{formatMoney(deposit.checkCents, locale)}</dd>
-            </div>
-            <div>
-              <dt>{copy.totalWithoutAth}</dt>
+              <dt>{copy.cashAndCheck}</dt>
               <dd>{formatMoney(deposit.totalCents, locale)}</dd>
             </div>
           </dl>
