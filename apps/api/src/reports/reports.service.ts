@@ -350,7 +350,6 @@ export class ReportsService {
     }).format(new Date(`${month.month}-01T12:00:00Z`));
     const weekday = (date: string) =>
       new Intl.DateTimeFormat('pt-BR', {
-        day: '2-digit',
         timeZone: 'UTC',
         weekday: 'short',
       })
@@ -691,7 +690,7 @@ export class ReportsService {
         page.drawRectangle({
           x: startX + dayWidth,
           y: rowTop - dayRowHeight,
-          width: tableWidth - dayWidth,
+          width: dailyTotalX - (startX + dayWidth),
           height: dayRowHeight,
           color: dayIndex % 2 === 0 ? rgb(0.97, 0.98, 0.99) : rgb(1, 1, 1),
         });
@@ -734,7 +733,7 @@ export class ReportsService {
         });
         page.drawLine({
           start: { x: startX + dayWidth, y: rowTop - dayRowHeight },
-          end: { x: startX + tableWidth, y: rowTop - dayRowHeight },
+          end: { x: dailyTotalX, y: rowTop - dayRowHeight },
           thickness: 0.35,
           color: rgb(0.42, 0.62, 0.78),
         });

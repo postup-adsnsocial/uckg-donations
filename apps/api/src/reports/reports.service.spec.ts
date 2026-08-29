@@ -152,11 +152,29 @@ describe('ReportsService detailed PDF', () => {
       month: vi.fn().mockResolvedValue({
         days: [
           {
+            athMobileCents: 0,
+            cardMachineCents: null,
+            designatedEnvelopeCents: 0,
             entryDate: '2026-08-01',
             saved: true,
             entries: [
               { amountCents: 16_000, paymentMethod: 'cash', serviceSlot: 'first' },
             ],
+            metrics: {
+              athMobileCents: 0,
+              cardCents: 0,
+              cardDifferenceCents: null,
+              cardMachineCents: 0,
+              cashCents: 16_000,
+              checkCents: 0,
+              designatedEnvelopeCents: 0,
+              expectedDepositCents: 16_000,
+              totalWithAthCents: 16_000,
+              totalWithoutAthCents: 16_000,
+              undesignatedCents: 16_000,
+            },
+            notes: null,
+            weekday: 'saturday',
           },
         ],
         expectedDeposits: [],
@@ -176,6 +194,24 @@ describe('ReportsService detailed PDF', () => {
         },
         startDate: '2026-08-01',
         endDate: '2026-08-31',
+      }),
+      summary: vi.fn().mockResolvedValue({
+        dayCount: 0,
+        endDate: '2025-08-31',
+        metrics: {
+          athMobileCents: 0,
+          cardCents: 0,
+          cardDifferenceCents: 0,
+          cardMachineCents: 0,
+          cashCents: 0,
+          checkCents: 0,
+          designatedEnvelopeCents: 0,
+          expectedDepositCents: 0,
+          totalWithAthCents: 0,
+          totalWithoutAthCents: 0,
+          undesignatedCents: 0,
+        },
+        startDate: '2025-08-01',
       }),
     } as unknown as AnnualBookService;
     const values = vi.fn().mockResolvedValue(undefined);
@@ -211,6 +247,10 @@ describe('ReportsService detailed PDF', () => {
 
     expect(pdf.getPageCount()).toBe(1);
     expect(annualBook.month).toHaveBeenCalledWith(context, '2026-08');
+    expect(annualBook.summary).toHaveBeenCalledWith(context, {
+      endDate: '2025-08-31',
+      startDate: '2025-08-01',
+    });
     expect(donations.list).not.toHaveBeenCalled();
     expect(values).toHaveBeenCalledWith(
       expect.objectContaining({
