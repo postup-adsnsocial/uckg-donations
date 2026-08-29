@@ -148,6 +148,7 @@ const copies = {
     title: 'Livro Anual',
     total: 'Total + Online',
     totalByCategory: 'Total',
+    totalDeposit: 'Total de depósito',
     totalOverall: 'Total geral',
     totalByService: 'Total por reunião',
     totalWithoutAth: 'Total sem Online',
@@ -203,6 +204,7 @@ const copies = {
     title: 'Annual Book',
     total: 'Total + Online',
     totalByCategory: 'Total',
+    totalDeposit: 'Total deposit',
     totalOverall: 'Grand total',
     totalByService: 'Total by service',
     totalWithoutAth: 'Total without Online',
@@ -259,6 +261,7 @@ const copies = {
     title: 'Libro Anual',
     total: 'Total + Online',
     totalByCategory: 'Total',
+    totalDeposit: 'Total de depósito',
     totalOverall: 'Total general',
     totalByService: 'Total por reunión',
     totalWithoutAth: 'Total sin Online',
@@ -734,8 +737,7 @@ function WeeklyClosing({
   week: AnnualBookWeek;
 }) {
   const closingMetrics: Array<[string, number]> = [
-    [copy.cash, week.metrics.cashCents],
-    [copy.check, week.metrics.checkCents],
+    [copy.totalDeposit, week.metrics.cashCents + week.metrics.checkCents],
     [copy.card, week.metrics.cardCents],
     [copy.ath, week.metrics.athMobileCents],
     [copy.designated, week.metrics.designatedEnvelopeCents],
