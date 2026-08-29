@@ -5167,48 +5167,23 @@ td.annual-book-entry-grid__grand-total {
   justify-self: end;
 }
 
-.annual-book-service-totals {
-  display: grid;
-  grid-template-columns: minmax(150px, 0.7fr) minmax(0, 2fr);
-  gap: 14px 22px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 16px 22px;
+.annual-book-entry-grid__service-totals > * {
+  padding: 11px 8px;
   background: var(--blue-800);
-}
-
-.annual-book-service-totals > span {
-  align-self: center;
   color: #ffffff;
-  font-size: 0.72rem;
   font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
 }
 
-.annual-book-service-totals dl {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 8px;
-  margin: 0;
-}
-
-.annual-book-service-totals dl > div {
-  display: grid;
-  gap: 4px;
-}
-
-.annual-book-service-totals dt {
-  color: #cfe6f8;
-  font-size: 0.64rem;
-  font-weight: 750;
-  text-transform: uppercase;
-}
-
-.annual-book-service-totals dd {
-  margin: 0;
+.annual-book-entry-grid__service-totals th {
   color: #ffffff;
-  font-size: 0.82rem;
-  font-weight: 800;
+  font-size: 0.68rem;
+  text-align: left;
+}
+
+.annual-book-entry-grid__service-totals td {
+  color: #ffffff;
+  font-size: 0.88rem;
+  text-align: right;
 }
 
 .annual-book-expected-deposit {
@@ -5323,10 +5298,6 @@ td.annual-book-entry-grid__grand-total {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .annual-book-service-totals {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   .annual-book-week__metrics {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -5406,14 +5377,6 @@ td.annual-book-entry-grid__grand-total {
 
   .annual-book-expected-deposit {
     padding: 14px;
-  }
-
-  .annual-book-service-totals {
-    padding: 14px;
-  }
-
-  .annual-book-service-totals dl {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .annual-book-expected-deposit dl {

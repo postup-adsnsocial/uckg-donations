@@ -958,6 +958,15 @@ function DayEditor({
                 </tr>
               ))}
             </tbody>
+            <tfoot>
+              <tr className="annual-book-entry-grid__service-totals">
+                <th>{copy.totalByService}</th>
+                {serviceTotals.map(([slot, total]) => (
+                  <td key={slot}>{formatMoney(total, locale)}</td>
+                ))}
+                <td colSpan={2} />
+              </tr>
+            </tfoot>
           </table>
         </div>
         <div className="annual-book-day__extras">
@@ -1003,17 +1012,6 @@ function DayEditor({
           </button>
         ) : null}
       </div>
-      <aside className="annual-book-service-totals">
-        <span>{copy.totalByService}</span>
-        <dl>
-          {serviceTotals.map(([slot, total]) => (
-            <div key={slot}>
-              <dt>{copy[slot]}</dt>
-              <dd>{formatMoney(total, locale)}</dd>
-            </div>
-          ))}
-        </dl>
-      </aside>
       {expectedDeposits.map((deposit) => (
         <aside
           aria-label={`${copy.expectedDeposit}: ${dateLabel(
