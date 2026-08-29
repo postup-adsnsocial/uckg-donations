@@ -16,7 +16,7 @@ Este documento registra o funcionamento observado na planilha antes de qualquer 
 
 A planilha é um livro financeiro operacional anual, organizado por mês. Ela combina quatro funções:
 
-1. registrar o recebido em cada dia, culto/reunião e meio de pagamento;
+1. registrar o recebido em cada dia, reunião e meio de pagamento;
 2. calcular fechamentos diários e semanais;
 3. informar o valor esperado para depósito em dinheiro e cheque e o total semanal de cartões;
 4. consolidar o mês e o ano, inclusive ATH Móvil e comparação com o ano anterior.
@@ -47,7 +47,7 @@ Foram identificadas 3.712 fórmulas, das quais 3.686 estão nas abas mensais. N�
 
 ### Valores recebidos por dia
 
-Cada data contém cinco possíveis cultos/reuniões:
+Cada data contém cinco possíveis reuniões:
 
 - 1ª reunião;
 - 2ª reunião;
@@ -55,13 +55,13 @@ Cada data contém cinco possíveis cultos/reuniões:
 - 4ª reunião;
 - extra.
 
-Para cada culto/reunião são lançados valores em três meios de pagamento:
+Para cada reunião são lançados valores em três meios de pagamento:
 
 - `CASH` — dinheiro;
 - `CARDS` — cartões;
 - `CHECKS` — cheques.
 
-Portanto, um dia comporta até 15 valores de entrada: 5 cultos/reuniões × 3 meios de pagamento.
+Portanto, um dia comporta até 15 valores de entrada: 5 reuniões × 3 meios de pagamento.
 
 ### Total de envelopes
 
@@ -153,8 +153,8 @@ Como `D5:D16` referencia o total mensal `CON ATH MÓVIL` e `D34` soma novamente 
 
 ## O que a planilha permite hoje
 
-- lançar valores diariamente por culto/reunião e meio de pagamento;
-- visualizar subtotais por meio de pagamento e por culto/reunião;
+- lançar valores diariamente por reunião e meio de pagamento;
+- visualizar subtotais por meio de pagamento e por reunião;
 - obter total diário, semanal, mensal e anual;
 - calcular o valor esperado de depósitos três vezes por semana;
 - obter o total semanal de cartões para conferência externa com a maquininha;
@@ -191,10 +191,10 @@ Como `D5:D16` referencia o total mensal `CON ATH MÓVIL` e `D34` soma novamente 
 ### Visão de lançamentos
 
 - Calendário gerado automaticamente para qualquer ano, com data e dia da semana corretos.
-- Grade diária por culto/reunião e meio de pagamento.
-- Cultos/reuniões padrão: 1º, 2º, 3º, 4º e extra; o desenho dos dados deve permitir configuração futura.
+- Grade diária por reunião e meio de pagamento.
+- Reuniões padrão: 1º, 2º, 3º, 4º e extra; o desenho dos dados deve permitir configuração futura.
 - Meios de pagamento iniciais: dinheiro, cartão e cheque.
-- Totais diários e por culto/reunião calculados no servidor.
+- Totais diários e por reunião calculados no servidor.
 - Entrada do valor total de envelopes identificados.
 - Entradas de ATH Móvil com data e valor.
 
@@ -233,7 +233,7 @@ Como `D5:D16` referencia o total mensal `CON ATH MÓVIL` e `D34` soma novamente 
 
 O sistema já possui doações individuais com data e meio de pagamento, além de permissões financeiras. Entretanto, o modelo atual não registra:
 
-- culto/reunião;
+- reunião;
 - total monetário de envelopes por dia;
 - ATH Móvil como fluxo separado;
 - valor da maquininha e divergência;
@@ -246,7 +246,7 @@ Nesta primeira versão, os lançamentos do Livro Anual são agregados e manuais.
 ## Critérios de aceitação da implementação
 
 1. Para qualquer ano selecionado, todas as datas e dias da semana são gerados corretamente.
-2. Os subtotais por meio de pagamento, culto/reunião e dia reconciliam com o total diário.
+2. Os subtotais por meio de pagamento, reunião e dia reconciliam com o total diário.
 3. Existe uma linha de depósito esperado para cada dia útil; dinheiro e cheque são atribuídos ao próximo dia útil, com sexta, sábado e domingo consolidados na segunda-feira.
 4. O total de cartões semanal reconcilia com os lançamentos e mostra a diferença em relação à maquininha.
 5. `Não designado = total recebido − total identificado em envelopes`.
@@ -259,7 +259,7 @@ Nesta primeira versão, os lançamentos do Livro Anual são agregados e manuais.
 ## Decisões que permanecem abertas
 
 - moeda utilizada por cada igreja;
-- nomes e quantidade de cultos/reuniões configuráveis;
+- nomes e quantidade de reuniões configuráveis;
 - se ATH Móvil deve ser tratado como meio de pagamento, canal ou fonte separada;
 - documentos obrigatórios para confirmar depósito e fechamento;
 - política de reabertura e aprovação de períodos fechados.

@@ -108,7 +108,7 @@ const donations = donationSeed.map(
       fullName: members[memberIndex].fullName,
       id: members[memberIndex].id,
     },
-    notes: index === 1 ? 'Culto de domingo' : null,
+    notes: index === 1 ? 'Reunião de domingo' : null,
     operatorName: 'Administração UCKG',
     paymentMethod,
     receivedOn,
