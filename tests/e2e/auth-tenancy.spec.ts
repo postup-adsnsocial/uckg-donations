@@ -543,14 +543,8 @@ test.describe('administrative authentication and tenant isolation', () => {
         .filter({ hasText: 'Undesignated' }),
     ).toContainText('5,25');
     await expect(
-      page.getByRole('heading', {
-        level: 3,
-        name: 'Depósitos esperados — segunda a sexta',
-      }),
-    ).toBeVisible();
-    await expect(
       page
-        .locator('.annual-book-deposits tbody tr')
+        .locator('.annual-book-expected-deposit')
         .filter({ hasText: '10,25' }),
     ).toHaveCount(1);
 

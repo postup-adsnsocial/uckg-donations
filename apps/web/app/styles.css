@@ -5105,6 +5105,62 @@ input[type='week'] {
   justify-self: end;
 }
 
+.annual-book-expected-deposit {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(0, 1.4fr);
+  gap: 14px 22px;
+  border-top: 2px solid #8ec1df;
+  padding: 16px 22px;
+  background: #eef7fc;
+}
+
+.annual-book-expected-deposit > div {
+  display: grid;
+  align-content: center;
+  gap: 4px;
+}
+
+.annual-book-expected-deposit > div span,
+.annual-book-expected-deposit dt {
+  color: var(--blue-800);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.annual-book-expected-deposit > div strong {
+  color: var(--ink-950);
+  font-size: 0.86rem;
+  text-transform: capitalize;
+}
+
+.annual-book-expected-deposit dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.annual-book-expected-deposit dl > div {
+  display: grid;
+  gap: 4px;
+}
+
+.annual-book-expected-deposit dd {
+  margin: 0;
+  color: var(--ink-950);
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.annual-book-expected-deposit > p {
+  grid-column: 1 / -1;
+  margin: -3px 0 0;
+  color: var(--ink-500);
+  font-size: 0.74rem;
+}
+
 .annual-book-deposits {
   min-width: 840px;
 }
@@ -5155,6 +5211,10 @@ input[type='week'] {
 
   .annual-book-day__extras {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .annual-book-expected-deposit {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .annual-book-week__metrics {
@@ -5231,6 +5291,14 @@ input[type='week'] {
 
   .annual-book-day__extras,
   .annual-book-comparison-form fieldset {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .annual-book-expected-deposit {
+    padding: 14px;
+  }
+
+  .annual-book-expected-deposit dl {
     grid-template-columns: minmax(0, 1fr);
   }
 

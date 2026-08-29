@@ -77,7 +77,6 @@ interface AnnualBookComparison {
 
 interface AnnualBookWeek {
   days: AnnualBookDay[];
-  deposits: ExpectedDeposit[];
   endDate: string;
   metrics: Pick<
     AnnualBookMetrics,
@@ -152,7 +151,6 @@ const copies = {
     viewOnly: 'Seu acesso permite consulta, mas não alteração.',
     weeklyCollapse: 'Recolher semana',
     weeklyClosing: 'Fechamento semanal',
-    weeklyDeposits: 'Depósitos esperados na semana',
     weeklyExpand: 'Expandir semana',
   },
   en: {
@@ -204,7 +202,6 @@ const copies = {
     viewOnly: 'Your access allows viewing, but not editing.',
     weeklyCollapse: 'Collapse week',
     weeklyClosing: 'Weekly closing',
-    weeklyDeposits: 'Expected deposits for the week',
     weeklyExpand: 'Expand week',
   },
   es: {
@@ -257,7 +254,6 @@ const copies = {
     viewOnly: 'Tu acceso permite consultar, pero no modificar.',
     weeklyCollapse: 'Contraer semana',
     weeklyClosing: 'Cierre semanal',
-    weeklyDeposits: 'Depósitos esperados de la semana',
     weeklyExpand: 'Expandir semana',
   },
 } as const;
@@ -301,13 +297,18 @@ function monthBoundedWeekStart(entryDate: string, monthStart: string) {
   return weekStart < monthStart ? monthStart : weekStart;
 }
 
+function previousCalendarDay(entryDate: string) {
+  const date = new Date(`${entryDate}T12:00:00Z`);
+  date.setUTCDate(date.getUTCDate() - 1);
+  return date.toISOString().slice(0, 10);
+}
+
 function groupWeeks(data: AnnualBookMonth): AnnualBookWeek[] {
   const weeks = new Map<string, AnnualBookWeek>();
   for (const day of data.days) {
     const startDate = monthBoundedWeekStart(day.entryDate, data.startDate);
     const week = weeks.get(startDate) ?? {
       days: [],
-      deposits: [],
       endDate: day.entryDate,
       metrics: {
         athMobileCents: 0,
@@ -329,15 +330,24 @@ function groupWeeks(data: AnnualBookMonth): AnnualBookWeek[] {
     }
     weeks.set(startDate, week);
   }
-  for (const deposit of data.expectedDeposits) {
-    const startDate = monthBoundedWeekStart(
-      deposit.depositDate,
-      data.startDate,
-    );
-    const week = weeks.get(startDate);
-    if (week) week.deposits.push(deposit);
-  }
   return [...weeks.values()];
+}
+
+function depositsBySourceDay(data: AnnualBookMonth) {
+  const availableDates = new Set(data.days.map((day) => day.entryDate));
+  const deposits = new Map<string, ExpectedDeposit[]>();
+  for (const deposit of data.expectedDeposits) {
+    const sourceDate =
+      deposit.sourceDates
+        .filter((date) => availableDates.has(date))
+        .sort()
+        .at(-1) ?? previousCalendarDay(deposit.depositDate);
+    if (!availableDates.has(sourceDate)) continue;
+    const current = deposits.get(sourceDate) ?? [];
+    current.push(deposit);
+    deposits.set(sourceDate, current);
+  }
+  return deposits;
 }
 
 function comparisonDates(month: string) {
@@ -478,6 +488,7 @@ function AnnualBook({
       ]
     : [];
   const weeks = data ? groupWeeks(data) : [];
+  const depositsByDay = data ? depositsBySourceDay(data) : new Map();
 
   return (
     <>
@@ -601,6 +612,9 @@ function AnnualBook({
                             churchId={church.id}
                             copy={copy}
                             day={day}
+                            expectedDeposits={
+                              depositsByDay.get(day.entryDate) ?? []
+                            }
                             key={`${day.entryDate}-${day.saved}-${day.entries.length}`}
                             locale={locale}
                             onSaved={async () => {
@@ -726,44 +740,6 @@ function WeeklyClosing({
           </div>
         ))}
       </div>
-      <div className="annual-book-week__deposits">
-        <strong>{copy.weeklyDeposits}</strong>
-        <p>{copy.expectedIntro}</p>
-        <div className="product-table-wrap">
-          <table className="product-table annual-book-deposits">
-            <thead>
-              <tr>
-                <th>{copy.expectedDeposit}</th>
-                <th>{copy.sourceDates}</th>
-                <th>{copy.cash}</th>
-                <th>{copy.check}</th>
-                <th>{copy.totalWithoutAth}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {week.deposits.map((deposit) => (
-                <tr key={deposit.depositDate}>
-                  <td>
-                    <strong>{dateLabel(deposit.depositDate, locale)}</strong>
-                  </td>
-                  <td>
-                    {deposit.sourceDates.length
-                      ? deposit.sourceDates
-                          .map((date) => dateLabel(date, locale, false))
-                          .join(', ')
-                      : copy.noSources}
-                  </td>
-                  <td>{formatMoney(deposit.cashCents, locale)}</td>
-                  <td>{formatMoney(deposit.checkCents, locale)}</td>
-                  <td>
-                    <strong>{formatMoney(deposit.totalCents, locale)}</strong>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
     </footer>
   );
 }
@@ -811,6 +787,7 @@ function DayEditor({
   churchId,
   copy,
   day,
+  expectedDeposits,
   locale,
   onSaved,
 }: {
@@ -818,6 +795,7 @@ function DayEditor({
   churchId: string;
   copy: (typeof copies)[Locale];
   day: AnnualBookDay;
+  expectedDeposits: ExpectedDeposit[];
   locale: Locale;
   onSaved: () => Promise<void>;
 }) {
@@ -974,6 +952,43 @@ function DayEditor({
           </button>
         ) : null}
       </div>
+      {expectedDeposits.map((deposit) => (
+        <aside
+          aria-label={`${copy.expectedDeposit}: ${dateLabel(
+            deposit.depositDate,
+            locale,
+          )}`}
+          className="annual-book-expected-deposit"
+          key={deposit.depositDate}
+        >
+          <div>
+            <span>{copy.expectedDeposit}</span>
+            <strong>{dateLabel(deposit.depositDate, locale)}</strong>
+          </div>
+          <dl>
+            <div>
+              <dt>{copy.cash}</dt>
+              <dd>{formatMoney(deposit.cashCents, locale)}</dd>
+            </div>
+            <div>
+              <dt>{copy.check}</dt>
+              <dd>{formatMoney(deposit.checkCents, locale)}</dd>
+            </div>
+            <div>
+              <dt>{copy.totalWithoutAth}</dt>
+              <dd>{formatMoney(deposit.totalCents, locale)}</dd>
+            </div>
+          </dl>
+          {deposit.sourceDates.length > 1 ? (
+            <p>
+              {copy.sourceDates}:{' '}
+              {deposit.sourceDates
+                .map((date) => dateLabel(date, locale, false))
+                .join(', ')}
+            </p>
+          ) : null}
+        </aside>
+      ))}
     </article>
   );
 }

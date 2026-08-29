@@ -38,11 +38,7 @@ export class AnnualBookService {
       Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + 1, 1),
     );
     const endDate = addUtcDays(nextMonth.toISOString().slice(0, 10), -1);
-    const storedDays = await this.loadDays(
-      context,
-      addUtcDays(startDate, -3),
-      endDate,
-    );
+    const storedDays = await this.loadDays(context, startDate, endDate);
     const byDate = new Map(storedDays.map((day) => [day.entryDate, day]));
     const days: AnnualBookDayValue[] = [];
 
@@ -55,10 +51,9 @@ export class AnnualBookService {
       string,
       { cashCents: number; checkCents: number; sourceDates: string[] }
     >();
-    for (const day of storedDays) {
+    for (const day of days) {
       const metrics = summarizeAnnualBookDays([day]);
       const depositDate = nextBusinessDay(day.entryDate);
-      if (depositDate < startDate || depositDate > endDate) continue;
       const deposit = depositsByDate.get(depositDate) ?? {
         cashCents: 0,
         checkCents: 0,
@@ -66,28 +61,29 @@ export class AnnualBookService {
       };
       deposit.cashCents += metrics.cashCents;
       deposit.checkCents += metrics.checkCents;
-      if (metrics.expectedDepositCents > 0)
-        deposit.sourceDates.push(day.entryDate);
+      deposit.sourceDates.push(day.entryDate);
       depositsByDate.set(depositDate, deposit);
     }
 
-    const expectedDeposits = days
-      .filter(
-        (day) => !['saturday', 'sunday'].includes(weekdayKey(day.entryDate)),
-      )
-      .map((day) => {
-        const deposit = depositsByDate.get(day.entryDate) ?? {
-          cashCents: 0,
-          checkCents: 0,
-          sourceDates: [],
-        };
-        return {
-          ...deposit,
-          depositDate: day.entryDate,
-          totalCents: deposit.cashCents + deposit.checkCents,
-          weekday: weekdayKey(day.entryDate),
-        };
+    const expectedDeposits = [];
+    for (
+      let depositDate = startDate;
+      depositDate <= nextBusinessDay(endDate);
+      depositDate = addUtcDays(depositDate, 1)
+    ) {
+      if (['saturday', 'sunday'].includes(weekdayKey(depositDate))) continue;
+      const deposit = depositsByDate.get(depositDate) ?? {
+        cashCents: 0,
+        checkCents: 0,
+        sourceDates: [],
+      };
+      expectedDeposits.push({
+        ...deposit,
+        depositDate,
+        totalCents: deposit.cashCents + deposit.checkCents,
+        weekday: weekdayKey(depositDate),
       });
+    }
 
     return {
       days: days.map((day) => this.presentDay(day)),
