@@ -4856,16 +4856,26 @@ input[type='week'] {
 
 .annual-book-days {
   display: grid;
-  gap: 0;
+  gap: 14px;
+  padding: 14px;
+  background: #edf3f7;
 }
 
 .annual-book-day {
-  border-bottom: 1px solid #e8edf1;
+  overflow: hidden;
+  border: 1px solid #dbe6ed;
+  border-radius: 11px;
   background: #ffffff;
+  box-shadow: 0 3px 10px rgba(0, 42, 77, 0.035);
 }
 
-.annual-book-day:last-child {
-  border-bottom: 0;
+.annual-book-day:nth-child(even) {
+  border-color: #cadfea;
+  background: #f8fcff;
+}
+
+.annual-book-day:nth-child(even) .annual-book-day__heading {
+  background: #f0f8fd;
 }
 
 .annual-book-week__closing {
