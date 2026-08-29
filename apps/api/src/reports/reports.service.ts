@@ -393,10 +393,10 @@ export class ReportsService {
     >();
     const availableDates = new Set(month.days.map((day) => day.entryDate));
     month.expectedDeposits.forEach((deposit) => {
-      const sourceDate = deposit.sourceDates
+      const sourceDates = deposit.sourceDates
         .filter((date) => availableDates.has(date))
-        .sort()
-        .at(-1);
+        .sort();
+      const sourceDate = sourceDates[sourceDates.length - 1];
       if (!sourceDate) return;
       const current = expectedDepositsBySourceDate.get(sourceDate) ?? [];
       current.push(deposit);
