@@ -384,6 +384,7 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
       undesignatedCents: number;
     };
   } | null>(null);
+  const [undesignatedCents, setUndesignatedCents] = useState(0);
   const [hasGenerated, setHasGenerated] = useState(false);
   const [archive, setArchive] = useState<ReportRecord[]>([]);
   const [loading, setLoading] = useState(false);
@@ -418,6 +419,7 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
   useEffect(() => {
     setItems([]);
     setAnnualBookSummary(null);
+    setUndesignatedCents(0);
     setHasGenerated(false);
   }, [church.id, endDate, selectedMember, startDate]);
 
@@ -430,10 +432,17 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
       reportType === 'annual_book'
         ? `/annual-book/summary?${params}`
         : `/donations?${params}`;
-    const response = await apiRequest(path, {
-      headers: { 'x-church-id': church.id },
-    });
-    if (response.ok) {
+    const includesUndesignated =
+      reportType === 'detailed' || reportType === 'member_totals';
+    const [response, undesignatedResponse] = await Promise.all([
+      apiRequest(path, { headers: { 'x-church-id': church.id } }),
+      includesUndesignated
+        ? apiRequest(`/annual-book/summary?${params}`, {
+            headers: { 'x-church-id': church.id },
+          })
+        : Promise.resolve(null),
+    ]);
+    if (response.ok && (!undesignatedResponse || undesignatedResponse.ok)) {
       if (reportType === 'annual_book') {
         setAnnualBookSummary(
           (await response.json()) as NonNullable<typeof annualBookSummary>,
@@ -442,6 +451,14 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
       } else {
         setItems((await response.json()) as EnvelopeRecord[]);
         setAnnualBookSummary(null);
+        if (undesignatedResponse) {
+          const summary = (await undesignatedResponse.json()) as {
+            metrics: { undesignatedCents: number };
+          };
+          setUndesignatedCents(summary.metrics.undesignatedCents);
+        } else {
+          setUndesignatedCents(0);
+        }
       }
       setHasGenerated(true);
     }
@@ -595,19 +612,45 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
     }
   }
 
-  const total = items.reduce((sum, item) => sum + item.amountCents, 0);
-  const memberTotals = [
-    ...items
-      .reduce((map, item) => {
-        const name = item.member?.fullName ?? copy.common.anonymous;
-        const current = map.get(name) ?? { count: 0, totalCents: 0 };
-        current.count += 1;
-        current.totalCents += item.amountCents;
-        map.set(name, current);
-        return map;
-      }, new Map<string, { count: number; totalCents: number }>())
-      .entries(),
-  ].sort((a, b) => b[1].totalCents - a[1].totalCents);
+  const reportUndesignatedCents =
+    reportType === 'detailed' || reportType === 'member_totals'
+      ? undesignatedCents
+      : 0;
+  const total =
+    items.reduce((sum, item) => sum + item.amountCents, 0) +
+    reportUndesignatedCents;
+  const memberTotals: Array<
+    [string, { count: number; isUndesignated: boolean; totalCents: number }]
+  > = [
+    [
+      copy.reports.undesignated,
+      {
+        count: 0,
+        isUndesignated: true,
+        totalCents: reportUndesignatedCents,
+      },
+    ],
+    ...[
+      ...items
+        .reduce((map, item) => {
+          const name = item.member?.fullName ?? copy.common.anonymous;
+          const current = map.get(name) ?? { count: 0, totalCents: 0 };
+          current.count += 1;
+          current.totalCents += item.amountCents;
+          map.set(name, current);
+          return map;
+        }, new Map<string, { count: number; totalCents: number }>())
+        .entries(),
+    ]
+      .sort((a, b) => b[1].totalCents - a[1].totalCents)
+      .map(
+        ([name, value]) =>
+          [name, { ...value, isUndesignated: false }] as [
+            string,
+            { count: number; isUndesignated: boolean; totalCents: number },
+          ],
+      ),
+  ];
   const paymentTotals = (['cash', 'card', 'check'] as const).map((method) => ({
     method,
     items: items.filter((item) => item.paymentMethod === method),
@@ -1095,7 +1138,10 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
             </div>
           </section>
         </>
-      ) : hasGenerated && items.length ? (
+      ) : hasGenerated &&
+        (items.length ||
+          reportType === 'detailed' ||
+          reportType === 'member_totals') ? (
         <>
           <div className="summary-grid summary-grid--compact report-summary">
             <article>
@@ -1187,7 +1233,7 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
                         <td>
                           <strong>{name}</strong>
                         </td>
-                        <td>{value.count}</td>
+                        <td>{value.isUndesignated ? '—' : value.count}</td>
                         <td>{formatMoney(value.totalCents, locale)}</td>
                       </tr>
                     ))}
@@ -1234,6 +1280,15 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
                     </tr>
                   </thead>
                   <tbody>
+                    <tr className="report-undesignated-row">
+                      <td>—</td>
+                      <td>
+                        <strong>{copy.reports.undesignated}</strong>
+                      </td>
+                      <td>{formatMoney(reportUndesignatedCents, locale)}</td>
+                      <td>—</td>
+                      <td>—</td>
+                    </tr>
                     {items.map((item) => (
                       <tr key={item.id}>
                         <td>{item.receivedOn}</td>

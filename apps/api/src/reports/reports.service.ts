@@ -1144,9 +1144,12 @@ export class ReportsService {
     const totalCents =
       items.reduce((sum, item) => sum + item.amountCents, 0) +
       undesignatedCents;
-    const rows = [
+    const rows: Array<
+      | { amountCents: number; isUndesignated: true }
+      | { isUndesignated: false; item: DonationItem }
+    > = [
       { amountCents: undesignatedCents, isUndesignated: true },
-      ...items.map((item) => ({ isUndesignated: false, item })),
+      ...items.map((item) => ({ isUndesignated: false as const, item })),
     ];
     const startX = 34;
     const columns = [
