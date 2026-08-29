@@ -756,14 +756,28 @@ select:focus-visible {
   text-decoration: none;
 }
 
-.sidebar-link svg {
+.sidebar-link svg,
+.sidebar-link .product-icon--image {
   width: 23px;
   height: 23px;
+}
+
+.sidebar-link svg {
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 2;
+}
+
+.sidebar-link .product-icon--image {
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.72;
+}
+
+.sidebar-link--active .product-icon--image {
+  opacity: 1;
 }
 
 .sidebar-link--active {
@@ -4133,10 +4147,14 @@ input[type='week'] {
     text-decoration: none;
   }
 
-  .mobile-product-nav a svg {
+  .mobile-product-nav a svg,
+  .mobile-product-nav a .product-icon--image {
     width: 21px;
     height: 21px;
     flex: 0 0 auto;
+  }
+
+  .mobile-product-nav a svg {
     fill: none;
     stroke: currentColor;
     stroke-linecap: round;

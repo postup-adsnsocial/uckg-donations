@@ -15,7 +15,30 @@ interface ProductIconProps {
   name: ProductIconName;
 }
 
+const navigationIconSources: Partial<Record<ProductIconName, string>> = {
+  'annual-book': '/navigation-icons/annual-book.png',
+  churches: '/navigation-icons/churches.png',
+  envelopes: '/navigation-icons/envelopes.png',
+  launch: '/navigation-icons/launch.png',
+  members: '/navigation-icons/members.png',
+  overview: '/navigation-icons/overview.png',
+  reports: '/navigation-icons/reports.png',
+  users: '/navigation-icons/users.png',
+};
+
 export function ProductIcon({ className = '', name }: ProductIconProps) {
+  const imageSource = navigationIconSources[name];
+  if (imageSource) {
+    return (
+      <img
+        alt=""
+        aria-hidden="true"
+        className={`product-icon--image ${className}`}
+        src={imageSource}
+      />
+    );
+  }
+
   const sharedProps = {
     'aria-hidden': true,
     className,
