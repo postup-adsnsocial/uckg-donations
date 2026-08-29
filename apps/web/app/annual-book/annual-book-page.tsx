@@ -149,8 +149,10 @@ const copies = {
     totalWithoutAth: 'Total sem ATH Móvil',
     undesignated: 'Undesignated',
     viewOnly: 'Seu acesso permite consulta, mas não alteração.',
+    weeklyCollapse: 'Recolher semana',
     weeklyClosing: 'Fechamento semanal',
     weeklyDeposits: 'Depósitos esperados na semana',
+    weeklyExpand: 'Expandir semana',
   },
   en: {
     ath: 'ATH Móvil',
@@ -198,8 +200,10 @@ const copies = {
     totalWithoutAth: 'Total without ATH Móvil',
     undesignated: 'Undesignated',
     viewOnly: 'Your access allows viewing, but not editing.',
+    weeklyCollapse: 'Collapse week',
     weeklyClosing: 'Weekly closing',
     weeklyDeposits: 'Expected deposits for the week',
+    weeklyExpand: 'Expand week',
   },
   es: {
     ath: 'ATH Móvil',
@@ -248,8 +252,10 @@ const copies = {
     totalWithoutAth: 'Total sin ATH Móvil',
     undesignated: 'Undesignated',
     viewOnly: 'Tu acceso permite consultar, pero no modificar.',
+    weeklyCollapse: 'Contraer semana',
     weeklyClosing: 'Cierre semanal',
     weeklyDeposits: 'Depósitos esperados de la semana',
+    weeklyExpand: 'Expandir semana',
   },
 } as const;
 
@@ -380,6 +386,10 @@ function AnnualBook({
   const initialComparison = useMemo(() => comparisonDates(month), [month]);
   const [periods, setPeriods] = useState(initialComparison);
   const [comparing, setComparing] = useState(false);
+  const today = new Date().toISOString().slice(0, 10);
+  const [expandedWeeks, setExpandedWeeks] = useState<Set<string>>(
+    () => new Set([isoWeekStart(today)]),
+  );
 
   const loadMonth = useCallback(async () => {
     setLoading(true);
@@ -400,6 +410,12 @@ function AnnualBook({
     setPeriods(initialComparison);
     setComparison(null);
   }, [initialComparison]);
+
+  useEffect(() => {
+    setExpandedWeeks(
+      month === today.slice(0, 7) ? new Set([isoWeekStart(today)]) : new Set(),
+    );
+  }, [month, today]);
 
   async function compare(event: React.FormEvent) {
     event.preventDefault();
@@ -530,7 +546,25 @@ function AnnualBook({
             <div className="annual-book-weeks">
               {weeks.map((week) => (
                 <section className="annual-book-week" key={week.startDate}>
-                  <header className="annual-book-week__heading">
+                  <button
+                    aria-expanded={expandedWeeks.has(week.startDate)}
+                    aria-label={
+                      expandedWeeks.has(week.startDate)
+                        ? copy.weeklyCollapse
+                        : copy.weeklyExpand
+                    }
+                    className="annual-book-week__heading"
+                    type="button"
+                    onClick={() =>
+                      setExpandedWeeks((current) => {
+                        const next = new Set(current);
+                        if (next.has(week.startDate))
+                          next.delete(week.startDate);
+                        else next.add(week.startDate);
+                        return next;
+                      })
+                    }
+                  >
                     <div>
                       <span>{copy.weeklyClosing}</span>
                       <strong>
@@ -541,24 +575,34 @@ function AnnualBook({
                     <strong>
                       {formatMoney(week.metrics.totalWithAthCents, locale)}
                     </strong>
-                  </header>
-                  <div className="annual-book-days">
-                    {week.days.map((day) => (
-                      <DayEditor
-                        canWrite={canWrite}
-                        churchId={church.id}
-                        copy={copy}
-                        day={day}
-                        key={`${day.entryDate}-${day.saved}-${day.entries.length}`}
-                        locale={locale}
-                        onSaved={async () => {
-                          setSuccessDate(day.entryDate);
-                          await loadMonth();
-                        }}
-                      />
-                    ))}
-                  </div>
-                  <WeeklyClosing copy={copy} locale={locale} week={week} />
+                    <span
+                      aria-hidden="true"
+                      className="annual-book-week__toggle"
+                    >
+                      {expandedWeeks.has(week.startDate) ? '−' : '+'}
+                    </span>
+                  </button>
+                  {expandedWeeks.has(week.startDate) ? (
+                    <>
+                      <div className="annual-book-days">
+                        {week.days.map((day) => (
+                          <DayEditor
+                            canWrite={canWrite}
+                            churchId={church.id}
+                            copy={copy}
+                            day={day}
+                            key={`${day.entryDate}-${day.saved}-${day.entries.length}`}
+                            locale={locale}
+                            onSaved={async () => {
+                              setSuccessDate(day.entryDate);
+                              await loadMonth();
+                            }}
+                          />
+                        ))}
+                      </div>
+                      <WeeklyClosing copy={copy} locale={locale} week={week} />
+                    </>
+                  ) : null}
                 </section>
               ))}
             </div>
