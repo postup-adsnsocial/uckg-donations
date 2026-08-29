@@ -4915,6 +4915,68 @@ input[type='week'] {
   font-size: 0.76rem;
 }
 
+.annual-book-month-closing {
+  overflow: hidden;
+  border: 2px solid var(--blue-800);
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.annual-book-month-closing > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 15px 18px;
+  background: var(--blue-800);
+  color: #ffffff;
+}
+
+.annual-book-month-closing > div:first-child span {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.annual-book-month-closing > div:first-child strong {
+  font-size: 1rem;
+}
+
+.annual-book-month-closing__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.annual-book-month-closing__metrics > div {
+  display: grid;
+  gap: 5px;
+  padding: 14px;
+  border-right: 1px solid #d9e6ef;
+  border-bottom: 1px solid #d9e6ef;
+}
+
+.annual-book-month-closing__metrics > div:nth-child(4n) {
+  border-right: 0;
+}
+
+.annual-book-month-closing__metrics > div:nth-last-child(-n + 4) {
+  border-bottom: 0;
+}
+
+.annual-book-month-closing__metrics span {
+  color: var(--blue-800);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.annual-book-month-closing__metrics strong {
+  color: var(--ink-950);
+  font-size: 0.84rem;
+}
+
 .annual-book-day__heading {
   display: flex;
   min-height: 62px;
@@ -5097,6 +5159,26 @@ input[type='week'] {
 
   .annual-book-week__metrics {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .annual-book-month-closing__metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .annual-book-month-closing__metrics > div:nth-child(4n) {
+    border-right: 1px solid #d9e6ef;
+  }
+
+  .annual-book-month-closing__metrics > div:nth-child(even) {
+    border-right: 0;
+  }
+
+  .annual-book-month-closing__metrics > div:nth-last-child(-n + 4) {
+    border-bottom: 1px solid #d9e6ef;
+  }
+
+  .annual-book-month-closing__metrics > div:nth-last-child(-n + 2) {
+    border-bottom: 0;
   }
 
   .annual-book-week__metrics > div:nth-child(3) {

@@ -132,6 +132,7 @@ const copies = {
     fourth: '4º culto',
     loading: 'Carregando o Livro Anual…',
     monthSummary: 'Resumo do mês',
+    monthlyClosing: 'Fechamento do mês',
     nextMonth: 'Próximo mês',
     noSources: 'Sem valores anteriores',
     notes: 'Observações',
@@ -183,6 +184,7 @@ const copies = {
     fourth: '4th service',
     loading: 'Loading the Annual Book…',
     monthSummary: 'Monthly summary',
+    monthlyClosing: 'Monthly closing',
     nextMonth: 'Next month',
     noSources: 'No prior amounts',
     notes: 'Notes',
@@ -235,6 +237,7 @@ const copies = {
     fourth: '4.º servicio',
     loading: 'Cargando el Libro Anual…',
     monthSummary: 'Resumen del mes',
+    monthlyClosing: 'Cierre del mes',
     nextMonth: 'Mes siguiente',
     noSources: 'Sin valores anteriores',
     notes: 'Observaciones',
@@ -293,20 +296,19 @@ function isoWeekStart(entryDate: string) {
   return date.toISOString().slice(0, 10);
 }
 
-function addDays(entryDate: string, days: number) {
-  const date = new Date(`${entryDate}T12:00:00Z`);
-  date.setUTCDate(date.getUTCDate() + days);
-  return date.toISOString().slice(0, 10);
+function monthBoundedWeekStart(entryDate: string, monthStart: string) {
+  const weekStart = isoWeekStart(entryDate);
+  return weekStart < monthStart ? monthStart : weekStart;
 }
 
 function groupWeeks(data: AnnualBookMonth): AnnualBookWeek[] {
   const weeks = new Map<string, AnnualBookWeek>();
   for (const day of data.days) {
-    const startDate = isoWeekStart(day.entryDate);
+    const startDate = monthBoundedWeekStart(day.entryDate, data.startDate);
     const week = weeks.get(startDate) ?? {
       days: [],
       deposits: [],
-      endDate: addDays(startDate, 6),
+      endDate: day.entryDate,
       metrics: {
         athMobileCents: 0,
         cardCents: 0,
@@ -319,6 +321,7 @@ function groupWeeks(data: AnnualBookMonth): AnnualBookWeek[] {
       startDate,
     };
     week.days.push(day);
+    if (day.entryDate > week.endDate) week.endDate = day.entryDate;
     for (const key of Object.keys(week.metrics) as Array<
       keyof typeof week.metrics
     >) {
@@ -327,7 +330,11 @@ function groupWeeks(data: AnnualBookMonth): AnnualBookWeek[] {
     weeks.set(startDate, week);
   }
   for (const deposit of data.expectedDeposits) {
-    const week = weeks.get(isoWeekStart(deposit.depositDate));
+    const startDate = monthBoundedWeekStart(
+      deposit.depositDate,
+      data.startDate,
+    );
+    const week = weeks.get(startDate);
     if (week) week.deposits.push(deposit);
   }
   return [...weeks.values()];
@@ -387,8 +394,9 @@ function AnnualBook({
   const [periods, setPeriods] = useState(initialComparison);
   const [comparing, setComparing] = useState(false);
   const today = new Date().toISOString().slice(0, 10);
+  const currentMonthStart = `${today.slice(0, 7)}-01`;
   const [expandedWeeks, setExpandedWeeks] = useState<Set<string>>(
-    () => new Set([isoWeekStart(today)]),
+    () => new Set([monthBoundedWeekStart(today, currentMonthStart)]),
   );
 
   const loadMonth = useCallback(async () => {
@@ -413,9 +421,11 @@ function AnnualBook({
 
   useEffect(() => {
     setExpandedWeeks(
-      month === today.slice(0, 7) ? new Set([isoWeekStart(today)]) : new Set(),
+      month === today.slice(0, 7)
+        ? new Set([monthBoundedWeekStart(today, currentMonthStart)])
+        : new Set(),
     );
-  }, [month, today]);
+  }, [currentMonthStart, month, today]);
 
   async function compare(event: React.FormEvent) {
     event.preventDefault();
@@ -605,6 +615,11 @@ function AnnualBook({
                   ) : null}
                 </section>
               ))}
+              <MonthlyClosing
+                copy={copy}
+                locale={locale}
+                summary={data.summary}
+              />
             </div>
             {successDate ? (
               <p className="form-feedback" role="status">
@@ -748,6 +763,44 @@ function WeeklyClosing({
             </tbody>
           </table>
         </div>
+      </div>
+    </footer>
+  );
+}
+
+function MonthlyClosing({
+  copy,
+  locale,
+  summary,
+}: {
+  copy: (typeof copies)[Locale];
+  locale: Locale;
+  summary: AnnualBookMetrics;
+}) {
+  const closingMetrics: Array<[string, number]> = [
+    [copy.total, summary.totalWithAthCents],
+    [copy.cash, summary.cashCents],
+    [copy.check, summary.checkCents],
+    [copy.card, summary.cardCents],
+    [copy.ath, summary.athMobileCents],
+    [copy.designated, summary.designatedEnvelopeCents],
+    [copy.undesignated, summary.undesignatedCents],
+    [copy.expectedDeposit, summary.expectedDepositCents],
+  ];
+
+  return (
+    <footer className="annual-book-month-closing">
+      <div>
+        <span>{copy.monthlyClosing}</span>
+        <strong>{formatMoney(summary.totalWithAthCents, locale)}</strong>
+      </div>
+      <div className="annual-book-month-closing__metrics">
+        {closingMetrics.map(([label, value]) => (
+          <div key={label}>
+            <span>{label}</span>
+            <strong>{formatMoney(value, locale)}</strong>
+          </div>
+        ))}
       </div>
     </footer>
   );
