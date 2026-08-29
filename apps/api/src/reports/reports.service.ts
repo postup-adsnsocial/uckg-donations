@@ -152,8 +152,19 @@ export class ReportsService {
         memberId,
         startDate,
       });
+      const undesignatedCents =
+        reportType === 'detailed' || reportType === 'member_totals'
+          ? (
+              await this.annualBook.summary(context, {
+                endDate,
+                startDate,
+              })
+            ).metrics.undesignatedCents
+          : 0;
       envelopeCount = items.length;
-      totalCents = items.reduce((sum, item) => sum + item.amountCents, 0);
+      totalCents =
+        items.reduce((sum, item) => sum + item.amountCents, 0) +
+        undesignatedCents;
       buffer = await this.createPdf(
         context,
         churchName,
@@ -162,6 +173,7 @@ export class ReportsService {
         reportType,
         effectiveIncludeImages,
         items,
+        undesignatedCents,
       );
     }
     const imageLabel = effectiveIncludeImages
@@ -972,12 +984,15 @@ export class ReportsService {
     reportType: ReportType,
     includeImages: boolean,
     items: DonationItem[],
+    undesignatedCents = 0,
   ) {
     const document = await PDFDocument.create();
     const regular = await document.embedFont(StandardFonts.Helvetica);
     const bold = await document.embedFont(StandardFonts.HelveticaBold);
     const logo = await this.loadProgramLogo(document);
-    const total = items.reduce((sum, item) => sum + item.amountCents, 0);
+    const total =
+      items.reduce((sum, item) => sum + item.amountCents, 0) +
+      undesignatedCents;
     if (reportType === 'annual_members') {
       return this.createAnnualMembersPdf(
         document,
@@ -1016,6 +1031,7 @@ export class ReportsService {
         endDate,
         items,
         logo,
+        undesignatedCents,
       );
     }
 
@@ -1029,6 +1045,7 @@ export class ReportsService {
         endDate,
         items,
         logo,
+        undesignatedCents,
       );
     }
 
@@ -1122,8 +1139,15 @@ export class ReportsService {
     endDate: string,
     items: DonationItem[],
     logo: PDFImage | null,
+    undesignatedCents: number,
   ) {
-    const totalCents = items.reduce((sum, item) => sum + item.amountCents, 0);
+    const totalCents =
+      items.reduce((sum, item) => sum + item.amountCents, 0) +
+      undesignatedCents;
+    const rows = [
+      { amountCents: undesignatedCents, isUndesignated: true },
+      ...items.map((item) => ({ isUndesignated: false, item })),
+    ];
     const startX = 34;
     const columns = [
       { label: 'DATE', width: 82 },
@@ -1179,7 +1203,7 @@ export class ReportsService {
     };
 
     let { page, top } = addTablePage();
-    items.forEach((item, index) => {
+    rows.forEach((row, index) => {
       if (top - rowHeight < 80) {
         ({ page, top } = addTablePage());
       }
@@ -1193,13 +1217,21 @@ export class ReportsService {
           color: rgb(0.96, 0.98, 0.99),
         });
       }
-      const values = [
-        this.formatDate(item.receivedOn),
-        item.member?.fullName ?? 'Anonymous',
-        `USD ${(item.amountCents / 100).toFixed(2)}`,
-        this.methodLabel(item.paymentMethod),
-        item.envelope ? 'YES' : '-',
-      ];
+      const values = row.isUndesignated
+        ? [
+            '-',
+            'UNDESIGNATED',
+            `USD ${(row.amountCents / 100).toFixed(2)}`,
+            '-',
+            '-',
+          ]
+        : [
+            this.formatDate(row.item.receivedOn),
+            row.item.member?.fullName ?? 'Anonymous',
+            `USD ${(row.item.amountCents / 100).toFixed(2)}`,
+            this.methodLabel(row.item.paymentMethod),
+            row.item.envelope ? 'YES' : '-',
+          ];
       values.forEach((value, columnIndex) => {
         const column = columns[columnIndex];
         if (!column) return;
@@ -1271,9 +1303,15 @@ export class ReportsService {
     endDate: string,
     items: DonationItem[],
     logo: PDFImage | null,
+    undesignatedCents: number,
   ) {
-    const rows = this.memberTotals(items);
-    const totalCents = items.reduce((sum, item) => sum + item.amountCents, 0);
+    const rows = [
+      { count: 0, label: 'UNDESIGNATED', totalCents: undesignatedCents },
+      ...this.memberTotals(items),
+    ];
+    const totalCents =
+      items.reduce((sum, item) => sum + item.amountCents, 0) +
+      undesignatedCents;
     const startX = 44;
     const churchColumnWidth = 104;
     const amountColumnWidth = 142;
