@@ -445,7 +445,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       allMembers: 'Todos os membros',
       annualBook: 'Livro Anual',
       annualBookDescription:
-        'Dinheiro, cheque, cartão, ATH Móvil, Designated e Undesignated do período.',
+        'Dinheiro, cheque, cartão, Online, Designated e Undesignated do período.',
       annualBookFilterHint:
         'Este relatório utiliza os lançamentos diários do Livro Anual.',
       annualBookDays: 'Dias lançados',
@@ -503,9 +503,9 @@ export const productCopies: Record<Locale, ProductCopy> = {
       title: 'Relatórios',
       customPeriodHint: 'Defina duas datas',
       useEntireYear: 'Usar o ano inteiro',
-      athMobile: 'ATH Móvil',
+      athMobile: 'Online',
       designated: 'Designated',
-      totalWithoutAth: 'Total sem ATH Móvil',
+      totalWithoutAth: 'Total sem Online',
       undesignated: 'Undesignated',
       withImages: 'Com imagens',
       withoutImages: 'Sem imagens',
@@ -709,7 +709,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       allMembers: 'All members',
       annualBook: 'Annual Book',
       annualBookDescription:
-        'Cash, checks, cards, ATH Móvil, Designated and Undesignated for the period.',
+        'Cash, checks, cards, Online, Designated and Undesignated for the period.',
       annualBookFilterHint:
         'This report uses the daily entries from the Annual Book.',
       annualBookDays: 'Recorded days',
@@ -766,9 +766,9 @@ export const productCopies: Record<Locale, ProductCopy> = {
       title: 'Reports',
       customPeriodHint: 'Set two dates',
       useEntireYear: 'Use the entire year',
-      athMobile: 'ATH Móvil',
+      athMobile: 'Online',
       designated: 'Designated',
-      totalWithoutAth: 'Total without ATH Móvil',
+      totalWithoutAth: 'Total without Online',
       undesignated: 'Undesignated',
       withImages: 'With images',
       withoutImages: 'Without images',
@@ -981,7 +981,7 @@ export const productCopies: Record<Locale, ProductCopy> = {
       allMembers: 'Todos los miembros',
       annualBook: 'Libro Anual',
       annualBookDescription:
-        'Efectivo, cheques, tarjetas, ATH Móvil, Designated y Undesignated del período.',
+        'Efectivo, cheques, tarjetas, Online, Designated y Undesignated del período.',
       annualBookFilterHint:
         'Este informe utiliza los registros diarios del Libro Anual.',
       annualBookDays: 'Días registrados',
@@ -1041,9 +1041,9 @@ export const productCopies: Record<Locale, ProductCopy> = {
       title: 'Informes',
       customPeriodHint: 'Define dos fechas',
       useEntireYear: 'Usar el año completo',
-      athMobile: 'ATH Móvil',
+      athMobile: 'Online',
       designated: 'Designated',
-      totalWithoutAth: 'Total sin ATH Móvil',
+      totalWithoutAth: 'Total sin Online',
       undesignated: 'Undesignated',
       withImages: 'Con imágenes',
       withoutImages: 'Sin imágenes',

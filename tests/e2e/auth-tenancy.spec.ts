@@ -533,7 +533,7 @@ test.describe('administrative authentication and tenant isolation', () => {
     await expect(todayEditor).toHaveCount(1);
     await todayEditor.getByLabel('Dinheiro — 1º culto').fill('10.25');
     await todayEditor.getByLabel('Designated (envelopes)').fill('5.00');
-    await todayEditor.getByLabel('ATH Móvil').fill('2.00');
+    await todayEditor.getByLabel('Online').fill('2.00');
     await todayEditor.getByRole('button', { name: 'Salvar este dia' }).click();
 
     await expect(page.getByText(/Dia salvo com sucesso/)).toBeVisible();
