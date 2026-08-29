@@ -129,18 +129,13 @@ export class ReportsService {
     let buffer: Buffer;
 
     if (reportType === 'annual_book') {
-      const summary = await this.annualBook.summary(context, {
-        endDate,
-        startDate,
-      });
-      envelopeCount = summary.dayCount;
-      totalCents = summary.metrics.totalWithAthCents;
-      buffer = await this.createAnnualBookPdf(
-        churchName,
-        startDate,
-        endDate,
-        summary.metrics,
+      const month = await this.annualBook.month(
+        context,
+        startDate.slice(0, 7),
       );
+      envelopeCount = month.days.filter((day) => day.saved).length;
+      totalCents = month.summary.totalWithAthCents;
+      buffer = await this.createAnnualBookMonthPdf(churchName, month);
     } else {
       const items = await this.donations.list(context, {
         endDate,
@@ -292,6 +287,328 @@ export class ReportsService {
       );
       y -= 32;
     });
+    return Buffer.from(await document.save());
+  }
+
+  private async createAnnualBookMonthPdf(
+    churchName: string,
+    month: Awaited<ReturnType<AnnualBookService['month']>>,
+  ) {
+    const document = await PDFDocument.create();
+    const regular = await document.embedFont(StandardFonts.Helvetica);
+    const bold = await document.embedFont(StandardFonts.HelveticaBold);
+    const logo = await this.loadProgramLogo(document);
+    const slots = [
+      { key: 'first', label: '1ª REUNIÃO' },
+      { key: 'second', label: '2ª REUNIÃO' },
+      { key: 'third', label: '3ª REUNIÃO' },
+      { key: 'fourth', label: '4ª REUNIÃO' },
+      { key: 'extra', label: 'EXTRA' },
+    ] as const;
+    const methods = [
+      { key: 'cash', label: 'DINHEIRO' },
+      { key: 'card', label: 'CARTÃO' },
+      { key: 'check', label: 'CHEQUE' },
+    ] as const;
+    const startX = 32;
+    const dayWidth = 82;
+    const methodWidth = 68;
+    const slotWidth = 84;
+    const tableWidth = dayWidth + methodWidth + slotWidth * slots.length;
+    const dayRowHeight = 20;
+    const dayBlockHeight = dayRowHeight * methods.length;
+    const totalRowHeight = 24;
+    const monthTitle = new Intl.DateTimeFormat('pt-BR', {
+      month: 'long',
+      timeZone: 'UTC',
+      year: 'numeric',
+    }).format(new Date(`${month.month}-01T12:00:00Z`));
+    const weekday = (date: string) =>
+      new Intl.DateTimeFormat('pt-BR', {
+        day: '2-digit',
+        timeZone: 'UTC',
+        weekday: 'short',
+      })
+        .format(new Date(`${date}T12:00:00Z`))
+        .replace('.', '')
+        .toUpperCase();
+    const money = (amountCents: number) =>
+      amountCents ? `USD ${(amountCents / 100).toFixed(2)}` : '-';
+    const dayValue = (day: (typeof month.days)[number], slot: string, method: string) =>
+      day.entries.find(
+        (entry) => entry.serviceSlot === slot && entry.paymentMethod === method,
+      )?.amountCents ?? 0;
+
+    const addPage = () => {
+      const page = document.addPage([612, 792]);
+      page.drawRectangle({
+        x: 0,
+        y: 742,
+        width: 612,
+        height: 50,
+        color: rgb(1, 1, 1),
+      });
+      this.drawProgramLogo(page, logo, 32, 750, 32, 32);
+      page.drawText('PRESTARE', {
+        x: 74,
+        y: 761,
+        font: bold,
+        size: 14,
+        color: rgb(0.02, 0.28, 0.5),
+      });
+      page.drawText(this.clean(churchName), {
+        x: 74,
+        y: 748,
+        font: regular,
+        size: 8,
+        color: rgb(0.38, 0.44, 0.53),
+      });
+      page.drawRectangle({
+        x: 0,
+        y: 682,
+        width: 612,
+        height: 60,
+        color: rgb(0.01, 0.19, 0.32),
+      });
+      page.drawText(monthTitle.charAt(0).toUpperCase() + monthTitle.slice(1), {
+        x: 32,
+        y: 707,
+        font: bold,
+        size: 20,
+        color: rgb(1, 1, 1),
+      });
+      page.drawText('GESTÃO FINANCEIRA MENSAL', {
+        x: 32,
+        y: 690,
+        font: regular,
+        size: 8,
+        color: rgb(0.78, 0.88, 0.94),
+      });
+      const headerTop = 660;
+      const headers = [
+        { label: 'DIA', x: startX, width: dayWidth },
+        { label: 'MÉTODO', x: startX + dayWidth, width: methodWidth },
+        ...slots.map((slot, index) => ({
+          label: slot.label,
+          x: startX + dayWidth + methodWidth + index * slotWidth,
+          width: slotWidth,
+        })),
+      ];
+      headers.forEach((header) => {
+        page.drawRectangle({
+          x: header.x,
+          y: headerTop - 24,
+          width: header.width,
+          height: 24,
+          color: rgb(0.02, 0.42, 0.72),
+        });
+        const labelWidth = bold.widthOfTextAtSize(header.label, 7);
+        page.drawText(header.label, {
+          x: header.x + (header.width - labelWidth) / 2,
+          y: headerTop - 16,
+          font: bold,
+          size: 7,
+          color: rgb(1, 1, 1),
+        });
+      });
+      return { page, top: headerTop - 24 };
+    };
+
+    let { page, top } = addPage();
+    for (const [dayIndex, day] of month.days.entries()) {
+      if (top - dayBlockHeight - totalRowHeight < 64) {
+        ({ page, top } = addPage());
+      }
+      const blockTop = top;
+      page.drawRectangle({
+        x: startX,
+        y: blockTop - dayBlockHeight,
+        width: dayWidth,
+        height: dayBlockHeight,
+        color: dayIndex % 2 === 0 ? rgb(0.94, 0.97, 0.99) : rgb(0.98, 0.99, 1),
+      });
+      const dayText = `${day.entryDate.slice(8, 10)} ${weekday(day.entryDate)}`;
+      const dayWidthText = bold.widthOfTextAtSize(dayText, 10);
+      page.drawText(dayText, {
+        x: startX + (dayWidth - dayWidthText) / 2,
+        y: blockTop - 38,
+        font: bold,
+        size: 10,
+        color: rgb(0.27, 0.31, 0.35),
+      });
+      methods.forEach((method, methodIndex) => {
+        const rowTop = blockTop - methodIndex * dayRowHeight;
+        page.drawRectangle({
+          x: startX + dayWidth,
+          y: rowTop - dayRowHeight,
+          width: tableWidth - dayWidth,
+          height: dayRowHeight,
+          color: dayIndex % 2 === 0 ? rgb(0.97, 0.98, 0.99) : rgb(1, 1, 1),
+        });
+        page.drawText(method.label, {
+          x: startX + dayWidth + 8,
+          y: rowTop - 14,
+          font: regular,
+          size: 7,
+          color: rgb(0.32, 0.36, 0.4),
+        });
+        slots.forEach((slot, slotIndex) => {
+          const amount = dayValue(day, slot.key, method.key);
+          const text = money(amount);
+          const textWidth = regular.widthOfTextAtSize(text, 7.5);
+          page.drawText(text, {
+            x:
+              startX +
+              dayWidth +
+              methodWidth +
+              slotIndex * slotWidth +
+              (slotWidth - textWidth) / 2,
+            y: rowTop - 14,
+            font: regular,
+            size: 7.5,
+            color: rgb(0.18, 0.22, 0.27),
+          });
+        });
+        page.drawLine({
+          start: { x: startX + dayWidth, y: rowTop - dayRowHeight },
+          end: { x: startX + tableWidth, y: rowTop - dayRowHeight },
+          thickness: 0.35,
+          color: rgb(0.42, 0.62, 0.78),
+        });
+      });
+      for (let boundary = 0; boundary <= slots.length; boundary += 1) {
+        const x = startX + dayWidth + methodWidth + boundary * slotWidth;
+        page.drawLine({
+          start: { x, y: blockTop - dayBlockHeight },
+          end: { x, y: blockTop },
+          thickness: 0.35,
+          color: rgb(0.42, 0.62, 0.78),
+        });
+      }
+      page.drawLine({
+        start: { x: startX + dayWidth, y: blockTop - dayBlockHeight },
+        end: { x: startX + tableWidth, y: blockTop - dayBlockHeight },
+        thickness: 0.35,
+        color: rgb(0.42, 0.62, 0.78),
+      });
+      const totalsTop = blockTop - dayBlockHeight;
+      page.drawRectangle({
+        x: startX,
+        y: totalsTop - totalRowHeight,
+        width: tableWidth,
+        height: totalRowHeight,
+        color: rgb(0.01, 0.12, 0.38),
+      });
+      page.drawText('Totais por Reunião', {
+        x: startX + 8,
+        y: totalsTop - 16,
+        font: regular,
+        size: 9,
+        color: rgb(1, 1, 1),
+      });
+      slots.forEach((slot, slotIndex) => {
+        const total = methods.reduce(
+          (sum, method) => sum + dayValue(day, slot.key, method.key),
+          0,
+        );
+        const text = money(total);
+        const textWidth = regular.widthOfTextAtSize(text, 8);
+        page.drawText(text, {
+          x:
+            startX +
+            dayWidth +
+            methodWidth +
+            slotIndex * slotWidth +
+            (slotWidth - textWidth) / 2,
+          y: totalsTop - 16,
+          font: bold,
+          size: 8,
+          color: rgb(1, 1, 1),
+        });
+      });
+      top = totalsTop - totalRowHeight - 10;
+    }
+
+    if (top - 170 < 64) ({ page, top } = addPage());
+    page.drawText('Fechamento do mês', {
+      x: startX,
+      y: top - 18,
+      font: bold,
+      size: 12,
+      color: rgb(0.02, 0.28, 0.5),
+    });
+    const closingRows: Array<[string, number]> = [
+      ['Dinheiro', month.summary.cashCents],
+      ['Cartão', month.summary.cardCents],
+      ['Cheque', month.summary.checkCents],
+      ['Online', month.summary.athMobileCents],
+      ['Designado (envelopes)', month.summary.designatedEnvelopeCents],
+      ['Não designado', month.summary.undesignatedCents],
+      ['Depósito esperado', month.summary.expectedDepositCents],
+      ['Total geral', month.summary.totalWithAthCents],
+    ];
+    let closingY = top - 40;
+    closingRows.forEach(([label, amount], index) => {
+      if (index % 2 === 0)
+        page.drawRectangle({
+          x: startX,
+          y: closingY - 8,
+          width: tableWidth,
+          height: 22,
+          color: rgb(0.94, 0.97, 0.99),
+        });
+      page.drawText(label, {
+        x: startX + 8,
+        y: closingY,
+        font: index === closingRows.length - 1 ? bold : regular,
+        size: 9,
+        color: rgb(0.05, 0.12, 0.22),
+      });
+      const text = money(amount);
+      const textWidth = bold.widthOfTextAtSize(text, 9);
+      page.drawText(text, {
+        x: startX + tableWidth - textWidth - 8,
+        y: closingY,
+        font: bold,
+        size: 9,
+        color: rgb(0.02, 0.28, 0.5),
+      });
+      closingY -= 22;
+    });
+    if (month.expectedDeposits.length) {
+      page.drawText('Depósitos esperados', {
+        x: startX,
+        y: closingY - 12,
+        font: bold,
+        size: 10,
+        color: rgb(0.02, 0.28, 0.5),
+      });
+      closingY -= 32;
+      month.expectedDeposits.forEach((deposit) => {
+        if (closingY < 38) {
+          ({ page, top } = addPage());
+          page.drawText('Depósitos esperados', {
+            x: startX,
+            y: top - 18,
+            font: bold,
+            size: 10,
+            color: rgb(0.02, 0.28, 0.5),
+          });
+          closingY = top - 40;
+        }
+        page.drawText(
+          `${deposit.depositDate}  |  USD ${(deposit.totalCents / 100).toFixed(2)}`,
+          {
+            x: startX + 8,
+            y: closingY,
+            font: regular,
+            size: 8,
+            color: rgb(0.18, 0.22, 0.27),
+          },
+        );
+        closingY -= 18;
+      });
+    }
     return Buffer.from(await document.save());
   }
 

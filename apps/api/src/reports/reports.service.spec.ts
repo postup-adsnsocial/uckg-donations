@@ -149,10 +149,19 @@ describe('ReportsService detailed PDF', () => {
       list: vi.fn(),
     } as unknown as DonationsService;
     const annualBook = {
-      summary: vi.fn().mockResolvedValue({
-        dayCount: 2,
-        endDate: '2026-08-31',
-        metrics: {
+      month: vi.fn().mockResolvedValue({
+        days: [
+          {
+            entryDate: '2026-08-01',
+            saved: true,
+            entries: [
+              { amountCents: 16_000, paymentMethod: 'cash', serviceSlot: 'first' },
+            ],
+          },
+        ],
+        expectedDeposits: [],
+        month: '2026-08',
+        summary: {
           athMobileCents: 2_000,
           cardCents: 3_000,
           cardDifferenceCents: 0,
@@ -166,6 +175,7 @@ describe('ReportsService detailed PDF', () => {
           undesignatedCents: 9_000,
         },
         startDate: '2026-08-01',
+        endDate: '2026-08-31',
       }),
     } as unknown as AnnualBookService;
     const values = vi.fn().mockResolvedValue(undefined);
@@ -200,14 +210,11 @@ describe('ReportsService detailed PDF', () => {
     const pdf = await PDFDocument.load(report.buffer);
 
     expect(pdf.getPageCount()).toBe(1);
-    expect(annualBook.summary).toHaveBeenCalledWith(context, {
-      endDate: '2026-08-31',
-      startDate: '2026-08-01',
-    });
+    expect(annualBook.month).toHaveBeenCalledWith(context, '2026-08');
     expect(donations.list).not.toHaveBeenCalled();
     expect(values).toHaveBeenCalledWith(
       expect.objectContaining({
-        envelopeCount: 2,
+        envelopeCount: 1,
         reportType: 'annual_book',
         totalCents: 16_000,
       }),
