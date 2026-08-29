@@ -120,8 +120,8 @@ export const dictionaries: Record<Locale, Dictionary> = {
         },
       ],
       featuresLabel: 'Características da plataforma',
-      footer: 'Sistema de Gestão Financeira',
-      productName: 'Gestão Financeira',
+      footer: 'Gestão financeira.',
+      productName: 'PRESTARE',
       title: 'Clareza para cuidar. Segurança para servir.',
     },
     dashboard: {
@@ -238,8 +238,8 @@ export const dictionaries: Record<Locale, Dictionary> = {
         { description: 'Role-based permissions', title: 'Protected access' },
       ],
       featuresLabel: 'Platform features',
-      footer: 'Financial Management System',
-      productName: 'Financial Management',
+      footer: 'Financial management.',
+      productName: 'PRESTARE',
       title: 'Clarity to care. Security to serve.',
     },
     dashboard: {
@@ -357,8 +357,8 @@ export const dictionaries: Record<Locale, Dictionary> = {
         },
       ],
       featuresLabel: 'Características de la plataforma',
-      footer: 'Sistema de Gestión Financiera',
-      productName: 'Gestión Financiera',
+      footer: 'Gestión financiera.',
+      productName: 'PRESTARE',
       title: 'Claridad para cuidar. Seguridad para servir.',
     },
     dashboard: {

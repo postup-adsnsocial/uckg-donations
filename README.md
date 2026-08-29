@@ -1,4 +1,6 @@
-# UCKG Donations
+# PRESTARE
+
+Gestão financeira.
 
 MVP web multi-igreja para cadastro de membros, lançamento de envelopes e relatórios.
 

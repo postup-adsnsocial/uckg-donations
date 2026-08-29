@@ -11,7 +11,7 @@ from docx.shared import Inches, Pt, RGBColor
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "dossier" / "Dossie_UCKG_Donations_Cliente.docx"
-LOGO = ROOT / "apps" / "web" / "public" / "universal-logo.png"
+LOGO = ROOT / "apps" / "web" / "public" / "program-logo.png"
 
 NAVY = "003B66"
 BLUE = "005A9C"
@@ -157,7 +157,7 @@ def configure(doc):
     header = section.header.paragraphs[0]
     header.clear()
     header.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    run = header.add_run("UCKG DONATIONS  |  Dossiê de Produto")
+    run = header.add_run("PRESTARE  |  Dossiê de Produto")
     set_run_font(run, 8.5, MUTED, bold=True)
     footer = section.footer.paragraphs[0]
     footer.clear()
@@ -331,11 +331,11 @@ def build():
     if LOGO.exists():
         p.add_run().add_picture(str(LOGO), width=Inches(0.68))
     add_kicker(doc, "Plataforma corporativa de gestão de contribuições")
-    add_title(doc, "UCKG Donations", "Dossiê funcional e técnico para apresentação ao cliente")
+    add_title(doc, "PRESTARE", "Gestão financeira. | Dossiê funcional e técnico para apresentação ao cliente")
     add_body(doc, "Uma plataforma web multi-igreja para registrar, proteger, organizar e acompanhar contribuições, membros e relatórios financeiros em uma operação centralizada.")
     add_callout(doc, "Proposta de valor", "A plataforma oferece visibilidade e padronização para a operação financeira de múltiplas igrejas, preservando o isolamento de dados de cada igreja e a rastreabilidade de cada lançamento.")
     add_metadata(doc, [
-        ("Produto", "UCKG Donations - Gestão Financeira Multi-Igreja"),
+        ("Produto", "PRESTARE - Gestão financeira multi-igreja"),
         ("Público", "Administração central, administradores de igreja, operadores financeiros e auditores"),
         ("Mercado-alvo", "Rede de igrejas nos Estados Unidos, com capacidade planejada para até 150 unidades"),
         ("Idiomas", "Português do Brasil, inglês e espanhol"),
@@ -351,7 +351,7 @@ def build():
     page_break(doc)
     add_kicker(doc, "01 | Visão executiva")
     doc.add_heading("Resumo da solução", level=1)
-    add_body(doc, "O UCKG Donations centraliza o registro e a consulta de contribuições recebidas pelas igrejas, com identificação opcional do membro, imagem privada do envelope, histórico financeiro e relatórios em PDF. A solução foi desenhada para uma administração em rede, onde cada unidade opera em seu próprio ambiente lógico, sem acesso aos dados das demais.")
+    add_body(doc, "O PRESTARE centraliza o registro e a consulta de contribuições recebidas pelas igrejas, com identificação opcional do membro, imagem privada do envelope, histórico financeiro e relatórios em PDF. A solução foi desenhada para uma administração em rede, onde cada unidade opera em seu próprio ambiente lógico, sem acesso aos dados das demais.")
     add_body(doc, "A experiência operacional é web, responsiva e localizada para três idiomas. O objetivo é substituir processos dispersos de planilhas, e-mails e arquivos locais por um fluxo único, verificável e acessível a usuários autorizados.")
     doc.add_heading("Resultados esperados", level=2)
     add_bullets(doc, [
@@ -597,18 +597,18 @@ def build():
         ("Suporte", "Quais horários, canais, tempos de resposta e responsáveis devem constar no acordo operacional?"),
     ], [2500, 6860])
     doc.add_heading("Conclusão", level=1)
-    add_body(doc, "O UCKG Donations foi concebido como uma base segura e profissional para padronizar a gestão de contribuições em uma rede de igrejas. A solução combina operação local por igreja, governança central, controle de acesso, documentação de envelopes e relatórios privados, com uma arquitetura preparada para evolução progressiva.")
+    add_body(doc, "O PRESTARE foi concebido como uma base segura e profissional para padronizar a gestão de contribuições em uma rede de igrejas. A solução combina operação local por igreja, governança central, controle de acesso, documentação de envelopes e relatórios privados, com uma arquitetura preparada para evolução progressiva.")
     add_body(doc, "A fase de implantação deve confirmar os processos internos, validar a operação piloto e consolidar os requisitos de governança antes do rollout para toda a rede.")
     p = doc.add_paragraph()
     p.paragraph_format.space_before = Pt(28)
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r = p.add_run("UCKG Donations | Clareza para cuidar. Segurança para servir.")
+    r = p.add_run("PRESTARE | Gestão financeira.")
     set_run_font(r, 10.5, NAVY, bold=True)
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     doc.core_properties.author = ""
     doc.core_properties.last_modified_by = ""
-    doc.core_properties.title = "UCKG Donations - Dossiê funcional e técnico"
+    doc.core_properties.title = "PRESTARE - Dossiê funcional e técnico"
     doc.core_properties.subject = "Apresentação de produto e especificações"
     doc.save(OUT)
     print(OUT)

@@ -2,7 +2,7 @@
   "name": "uckg-donations",
   "version": "0.0.0",
   "private": true,
-  "description": "Plataforma multi-tenant de gestão de doações da UCKG",
+  "description": "PRESTARE — Gestão financeira.",
   "packageManager": "pnpm@11.9.0",
   "engines": {
     "node": ">=22.13.0",

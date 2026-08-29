@@ -5,17 +5,17 @@ const source = await readFile(sourcePath, 'utf8');
 
 const rows = [
   [
-    'Proposta Comercial · Universal Gestão Financeira',
-    'Commercial Proposal · Universal Financial Management',
-    'Propuesta Comercial · Universal Gestión Financiera',
+    'Proposta Comercial · PRESTARE — Gestão financeira.',
+    'Commercial Proposal · PRESTARE — Financial management.',
+    'Propuesta Comercial · PRESTARE — Gestión financiera.',
   ],
   [
-    'Proposta comercial da plataforma Universal Gestão Financeira, com licenciamento individual por igreja.',
-    'Commercial proposal for the Universal Financial Management platform, licensed individually per church.',
-    'Propuesta comercial de la plataforma Universal Gestión Financiera, con licencia individual por iglesia.',
+    'Proposta comercial da plataforma PRESTARE — Gestão financeira, com licenciamento individual por igreja.',
+    'Commercial proposal for the PRESTARE — Financial management platform, licensed individually per church.',
+    'Propuesta comercial de la plataforma PRESTARE — Gestión financiera, con licencia individual por iglesia.',
   ],
   ['Voltar ao início', 'Back to top', 'Volver al inicio'],
-  ['Gestão Financeira', 'Financial Management', 'Gestión Financiera'],
+  ['Gestão financeira.', 'Financial management.', 'Gestión financiera.'],
   ['A solução', 'Solution', 'La solución'],
   ['Segurança', 'Security', 'Seguridad'],
   ['Investimento', 'Investment', 'Inversión'],
@@ -822,9 +822,9 @@ const rows = [
     '☐ Adquisición del código &nbsp; ☐ Mensualidad',
   ],
   [
-    'Universal · Sistema de Gestão Financeira',
-    'Universal · Financial Management System',
-    'Universal · Sistema de Gestión Financiera',
+    'PRESTARE · Gestão financeira.',
+    'PRESTARE · Financial management.',
+    'PRESTARE · Gestión financiera.',
   ],
   [
     'Proposta PC-2026-0806 · Valores individuais por igreja',

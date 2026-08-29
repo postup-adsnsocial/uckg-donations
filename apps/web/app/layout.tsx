@@ -4,12 +4,12 @@ import type { ReactNode } from 'react';
 import './styles.css';
 
 export const metadata: Metadata = {
-  description: 'Financial Management Platform',
+  description: 'PRESTARE — Gestão financeira.',
   icons: {
     apple: '/program-logo.png',
     icon: '/program-logo.png',
   },
-  title: 'Financial Management',
+  title: 'PRESTARE — Gestão financeira.',
 };
 
 export const viewport: Viewport = {
