@@ -337,6 +337,19 @@ export class ReportsService {
       );
     }
 
+    if (reportType === 'detailed') {
+      return this.createDetailedTablePdf(
+        document,
+        bold,
+        regular,
+        churchName,
+        startDate,
+        endDate,
+        items,
+        logo,
+      );
+    }
+
     if (reportType === 'member_totals') {
       return this.createContributorSummaryPdf(
         document,
@@ -362,96 +375,7 @@ export class ReportsService {
     );
     let y = 625;
 
-    if (reportType === 'detailed') {
-      for (const item of items) {
-        const cardHeight = includeImages ? (item.envelope ? 280 : 128) : 110;
-        if (y - cardHeight < 70) {
-          page = this.addPage(
-            document,
-            bold,
-            regular,
-            churchName,
-            startDate,
-            endDate,
-            logo,
-            total,
-          );
-          y = 625;
-        }
-        page.drawRectangle({
-          x: 42,
-          y: y - cardHeight + 10,
-          width: 528,
-          height: cardHeight,
-          color: rgb(0.97, 0.98, 0.99),
-          borderColor: rgb(0.87, 0.9, 0.93),
-          borderWidth: 1,
-        });
-        page.drawText(this.clean(item.member?.fullName ?? 'Anonymous'), {
-          x: 56,
-          y: y - 12,
-          font: bold,
-          size: 11,
-          color: rgb(0.05, 0.12, 0.22),
-        });
-        page.drawText(
-          `${this.formatDate(item.receivedOn)}  |  ${this.methodLabel(item.paymentMethod)}  |  USD ${(item.amountCents / 100).toFixed(2)}`,
-          {
-            x: 56,
-            y: y - 31,
-            font: regular,
-            size: 9,
-            color: rgb(0.24, 0.31, 0.42),
-          },
-        );
-        page.drawText(`Church: ${this.clean(churchName)}`, {
-          x: 56,
-          y: y - 49,
-          font: regular,
-          size: 8,
-          color: rgb(0.38, 0.44, 0.53),
-        });
-        page.drawText(`Operator: ${this.clean(item.operatorName)}`, {
-          x: 56,
-          y: y - 67,
-          font: regular,
-          size: 8,
-          color: rgb(0.38, 0.44, 0.53),
-        });
-        if (item.notes)
-          page.drawText(this.clean(item.notes).slice(0, 62), {
-            x: 56,
-            y: y - 85,
-            font: regular,
-            size: 8,
-            color: rgb(0.38, 0.44, 0.53),
-          });
-
-        if (includeImages) {
-          if (item.envelope) {
-            await this.drawEnvelopeImage(
-              document,
-              page,
-              regular,
-              context,
-              item,
-              y,
-            );
-          } else {
-            page.drawText('No envelope image', {
-              x: 56,
-              y: y - 88,
-              font: regular,
-              size: 8,
-              color: rgb(0.5, 0.55, 0.62),
-            });
-          }
-        }
-
-        y -= cardHeight + 12;
-      }
-    } else {
-      const rows = this.paymentTotals(items);
+    const rows = this.paymentTotals(items);
       page.drawText('TOTALS BY PAYMENT METHOD', {
         x: 48,
         y,
@@ -500,10 +424,9 @@ export class ReportsService {
           color: rgb(0.88, 0.9, 0.93),
         });
         y -= 28;
-      }
     }
 
-    if (includeImages && reportType !== 'detailed') {
+    if (includeImages) {
       await this.appendEnvelopeImages(
         document,
         bold,
@@ -518,6 +441,155 @@ export class ReportsService {
       );
     }
 
+    return Buffer.from(await document.save());
+  }
+
+  private async createDetailedTablePdf(
+    document: PDFDocument,
+    bold: PDFFont,
+    regular: PDFFont,
+    churchName: string,
+    startDate: string,
+    endDate: string,
+    items: DonationItem[],
+    logo: PDFImage | null,
+  ) {
+    const totalCents = items.reduce((sum, item) => sum + item.amountCents, 0);
+    const startX = 34;
+    const columns = [
+      { label: 'DATE', width: 82 },
+      { label: 'MEMBER', width: 190 },
+      { label: 'AMOUNT', width: 92 },
+      { label: 'PAYMENT METHOD', width: 112 },
+      { label: 'IMAGE', width: 69 },
+    ];
+    const tableWidth = columns.reduce((sum, column) => sum + column.width, 0);
+    const rowHeight = 25;
+    const headerHeight = 27;
+    const rowTextY = (top: number) => top - 17;
+    const boundaries = [
+      startX,
+      ...columns.map((column, index) =>
+        columns
+          .slice(0, index + 1)
+          .reduce((sum, current) => sum + current.width, startX),
+      ),
+    ];
+
+    const addTablePage = () => {
+      const page = this.addPage(
+        document,
+        bold,
+        regular,
+        churchName,
+        startDate,
+        endDate,
+        logo,
+        totalCents,
+      );
+      const headerTop = 640;
+      page.drawRectangle({
+        x: startX,
+        y: headerTop - headerHeight,
+        width: tableWidth,
+        height: headerHeight,
+        color: rgb(0.02, 0.28, 0.5),
+      });
+      columns.forEach((column, index) => {
+        const labelWidth = bold.widthOfTextAtSize(column.label, 7);
+        const boundary = boundaries[index]!;
+        page.drawText(column.label, {
+          x: boundary + (column.width - labelWidth) / 2,
+          y: headerTop - 18,
+          font: bold,
+          size: 7,
+          color: rgb(1, 1, 1),
+        });
+      });
+      return { page, top: headerTop - headerHeight };
+    };
+
+    let { page, top } = addTablePage();
+    items.forEach((item, index) => {
+      if (top - rowHeight < 80) {
+        ({ page, top } = addTablePage());
+      }
+      const rowTop = top;
+      if (index % 2 === 0) {
+        page.drawRectangle({
+          x: startX,
+          y: rowTop - rowHeight,
+          width: tableWidth,
+          height: rowHeight,
+          color: rgb(0.96, 0.98, 0.99),
+        });
+      }
+      const values = [
+        this.formatDate(item.receivedOn),
+        item.member?.fullName ?? 'Anonymous',
+        `USD ${(item.amountCents / 100).toFixed(2)}`,
+        this.methodLabel(item.paymentMethod),
+        item.envelope ? 'YES' : '-',
+      ];
+      values.forEach((value, columnIndex) => {
+        const column = columns[columnIndex];
+        if (!column) return;
+        const text = this.clean(value).slice(0, columnIndex === 1 ? 30 : 20);
+        const textWidth = regular.widthOfTextAtSize(text, 8.5);
+        const centered = columnIndex === 0 || columnIndex >= 2;
+        const boundary = boundaries[columnIndex]!;
+        page.drawText(text, {
+          x: centered
+            ? boundary + (column.width - textWidth) / 2
+            : boundary + 8,
+          y: rowTextY(rowTop),
+          font: columnIndex === 2 ? bold : regular,
+          size: 8.5,
+          color: rgb(0.05, 0.12, 0.22),
+        });
+      });
+      boundaries.forEach((x) => {
+        page.drawLine({
+          start: { x, y: rowTop - rowHeight },
+          end: { x, y: rowTop },
+          thickness: 0.35,
+          color: rgb(0.82, 0.88, 0.92),
+        });
+      });
+      page.drawLine({
+        start: { x: startX, y: rowTop - rowHeight },
+        end: { x: startX + tableWidth, y: rowTop - rowHeight },
+        thickness: 0.35,
+        color: rgb(0.82, 0.88, 0.92),
+      });
+      top -= rowHeight;
+    });
+
+    if (top - 34 < 80) ({ page, top } = addTablePage());
+    page.drawRectangle({
+      x: startX,
+      y: top - 30,
+      width: tableWidth,
+      height: 30,
+      color: rgb(0.88, 0.94, 0.97),
+    });
+    page.drawText('TOTAL', {
+      x: boundaries[0]! + 8,
+      y: top - 20,
+      font: bold,
+      size: 9,
+      color: rgb(0.02, 0.28, 0.5),
+    });
+    const totalText = `USD ${(totalCents / 100).toFixed(2)}`;
+    const totalWidth = bold.widthOfTextAtSize(totalText, 9);
+    const amountColumn = columns[2]!;
+    page.drawText(totalText, {
+      x: boundaries[2]! + amountColumn.width - totalWidth - 8,
+      y: top - 20,
+      font: bold,
+      size: 9,
+      color: rgb(0.02, 0.28, 0.5),
+    });
     return Buffer.from(await document.save());
   }
 
