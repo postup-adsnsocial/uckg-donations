@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 
+import { NumberInputWheelGuard } from './components/number-input-wheel-guard';
 import './styles.css';
 
 export const metadata: Metadata = {
@@ -23,7 +24,10 @@ export default function RootLayout({
 }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="pt-BR">
-      <body>{children}</body>
+      <body>
+        <NumberInputWheelGuard />
+        {children}
+      </body>
     </html>
   );
 }
