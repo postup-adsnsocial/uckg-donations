@@ -828,7 +828,6 @@ function DayEditor({
   const [cardMachine, setCardMachine] = useState(
     inputValue(day.cardMachineCents),
   );
-  const [notes, setNotes] = useState(day.notes ?? '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const serviceTotals = serviceSlots.map(
@@ -877,7 +876,7 @@ function DayEditor({
         designatedEnvelopeCents: toCents(designated),
         entries,
         entryDate: day.entryDate,
-        notes: notes.trim() || undefined,
+        notes: day.notes ?? undefined,
       }),
       headers: { 'x-church-id': churchId },
       method: 'PUT',
@@ -898,9 +897,6 @@ function DayEditor({
             {dateLabel(day.entryDate, locale)}
           </span>
         </div>
-        <span className={day.saved ? 'is-saved' : undefined}>
-          {formatMoney(day.metrics.totalWithAthCents, locale)}
-        </span>
       </header>
       <div className="annual-book-day__body">
         <div className="annual-book-entry-grid-wrap">
@@ -1000,15 +996,6 @@ function DayEditor({
             onChange={setCardMachine}
             value={cardMachine}
           />
-          <label className="annual-book-notes">
-            <span>{copy.notes}</span>
-            <input
-              disabled={!canWrite}
-              maxLength={500}
-              value={notes}
-              onChange={(event) => setNotes(event.target.value)}
-            />
-          </label>
         </div>
         {error ? (
           <p className="form-feedback form-feedback--error">{error}</p>

@@ -5023,20 +5023,6 @@ input[type='week'] {
   text-transform: capitalize;
 }
 
-.annual-book-day__heading > span:last-child {
-  border-radius: 999px;
-  padding: 7px 10px;
-  background: #f3f5f7;
-  color: var(--ink-600);
-  font-size: 0.76rem;
-  font-weight: 720;
-}
-
-.annual-book-day__heading > span.is-saved {
-  background: #e9f7ef;
-  color: #067647;
-}
-
 .annual-book-day__body {
   display: grid;
   gap: 18px;
