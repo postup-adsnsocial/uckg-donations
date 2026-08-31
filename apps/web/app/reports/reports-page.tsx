@@ -1100,11 +1100,11 @@ function Reports({ church, locale }: { church: AppChurch; locale: Locale }) {
                 <tbody>
                   {[
                     [copy.envelopes.cash, annualBookSummary.metrics.cashCents],
+                    [copy.envelopes.card, annualBookSummary.metrics.cardCents],
                     [
                       copy.envelopes.check,
                       annualBookSummary.metrics.checkCents,
                     ],
-                    [copy.envelopes.card, annualBookSummary.metrics.cardCents],
                     [
                       copy.reports.athMobile,
                       annualBookSummary.metrics.athMobileCents,

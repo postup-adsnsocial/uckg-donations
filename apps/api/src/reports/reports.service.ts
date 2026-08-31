@@ -265,8 +265,8 @@ export class ReportsService {
 
     const rows = [
       ['Cash', metrics.cashCents],
-      ['Checks', metrics.checkCents],
       ['Cards recorded', metrics.cardCents],
+      ['Checks', metrics.checkCents],
       ['Card machine', metrics.cardMachineCents],
       ['Card difference', metrics.cardDifferenceCents],
       ['ATH Movil', metrics.athMobileCents],
