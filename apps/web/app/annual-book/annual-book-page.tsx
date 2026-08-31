@@ -98,7 +98,7 @@ const serviceSlots: ServiceSlot[] = [
   'fourth',
   'extra',
 ];
-const paymentMethods: PaymentMethod[] = ['cash', 'check', 'card'];
+const paymentMethods: PaymentMethod[] = ['cash', 'card', 'check'];
 
 const copies = {
   'pt-BR': {
@@ -768,8 +768,8 @@ function MonthlyClosing({
   const closingMetrics: Array<[string, number]> = [
     [copy.total, summary.totalWithAthCents],
     [copy.cash, summary.cashCents],
-    [copy.check, summary.checkCents],
     [copy.card, summary.cardCents],
+    [copy.check, summary.checkCents],
     [copy.ath, summary.athMobileCents],
     [copy.designated, summary.designatedEnvelopeCents],
     [copy.undesignated, summary.undesignatedCents],
@@ -1069,8 +1069,8 @@ function ComparisonTable({
     ['totalWithAthCents', copy.total],
     ['totalWithoutAthCents', copy.totalWithoutAth],
     ['cashCents', copy.cash],
-    ['checkCents', copy.check],
     ['cardCents', copy.card],
+    ['checkCents', copy.check],
     ['athMobileCents', copy.ath],
     ['designatedEnvelopeCents', copy.designated],
     ['undesignatedCents', copy.undesignated],
