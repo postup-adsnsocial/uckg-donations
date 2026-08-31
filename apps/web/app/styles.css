@@ -75,9 +75,14 @@ button {
 }
 
 .auth-shell {
-  display: grid;
   min-height: 100dvh;
-  grid-template-columns: minmax(420px, 1.05fr) minmax(440px, 0.95fr);
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(0, 75, 135, 0.055),
+      transparent 38%
+    ),
+    var(--surface);
 }
 
 .brand-panel {
@@ -291,13 +296,7 @@ button {
   flex-direction: column;
   justify-content: center;
   padding: clamp(28px, 6vw, 88px);
-  background:
-    radial-gradient(
-      circle at 100% 0%,
-      rgba(0, 75, 135, 0.055),
-      transparent 30%
-    ),
-    var(--surface);
+  background: transparent;
 }
 
 .auth-form-panel__language {
@@ -5356,6 +5355,79 @@ td.annual-book-entry-grid__online-total {
   color: var(--blue-800);
 }
 
+.annual-book-total-comparison {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.annual-book-comparison-heading__copy {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.annual-book-comparison-heading__icon {
+  width: 58px;
+  height: 58px;
+  flex: 0 0 auto;
+  border-radius: 14px;
+  padding: 12px;
+  background: var(--blue-50);
+  object-fit: contain;
+}
+
+.annual-book-total-comparison article {
+  display: grid;
+  gap: 7px;
+  border: 1px solid #dce7ef;
+  border-radius: 13px;
+  padding: 20px;
+  background: #ffffff;
+}
+
+.annual-book-total-comparison span,
+.annual-book-total-comparison small {
+  color: var(--ink-500);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.annual-book-total-comparison strong {
+  color: var(--ink-950);
+  font-size: clamp(1.35rem, 2.2vw, 1.85rem);
+  letter-spacing: -0.035em;
+}
+
+.annual-book-total-comparison__difference {
+  border-color: #c9e2f3 !important;
+  background: var(--blue-50) !important;
+}
+
+.annual-book-total-comparison__difference strong {
+  color: var(--blue-800);
+}
+
+.annual-book-comparison-details {
+  margin-top: 18px;
+  border: 1px solid #e1e8ee;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.annual-book-comparison-details summary {
+  padding: 16px 18px;
+  color: var(--blue-800);
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.annual-book-comparison-details[open] summary {
+  border-bottom: 1px solid #e8edf1;
+}
+
 @media (max-width: 1100px) {
   .annual-book-summary {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -5394,6 +5466,10 @@ td.annual-book-entry-grid__online-total {
   }
 
   .annual-book-comparison-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .annual-book-total-comparison {
     grid-template-columns: minmax(0, 1fr);
   }
 

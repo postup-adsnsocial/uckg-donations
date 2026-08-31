@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { useCallback, useEffect, useState } from 'react';
 
 import { AppShell, type AppChurch } from '../components/app-shell';
 import { formatMoney } from '../envelopes/types';
@@ -9,8 +10,6 @@ import { apiRequest } from '../lib/api';
 
 type ServiceSlot = 'first' | 'second' | 'third' | 'fourth' | 'extra';
 type PaymentMethod = 'cash' | 'check' | 'card';
-type MetricKey = keyof AnnualBookMetrics;
-
 interface AnnualBookMetrics {
   athMobileCents: number;
   cardCents: number;
@@ -57,22 +56,6 @@ interface AnnualBookMonth {
   month: string;
   startDate: string;
   summary: AnnualBookMetrics;
-}
-
-interface PeriodSummary {
-  dayCount: number;
-  endDate: string;
-  metrics: AnnualBookMetrics;
-  startDate: string;
-}
-
-interface AnnualBookComparison {
-  differences: Record<
-    MetricKey,
-    { amountCents: number | null; percentage: number | null }
-  >;
-  periodA: PeriodSummary;
-  periodB: PeriodSummary;
 }
 
 interface AnnualBookWeek {
@@ -365,22 +348,6 @@ function depositsBySourceDay(data: AnnualBookMonth) {
   return deposits;
 }
 
-function comparisonDates(month: string) {
-  const [year, monthNumber] = month.split('-').map(Number);
-  const end = new Date(Date.UTC(year!, monthNumber!, 0))
-    .toISOString()
-    .slice(0, 10);
-  const priorEnd = new Date(Date.UTC(year! - 1, monthNumber!, 0))
-    .toISOString()
-    .slice(0, 10);
-  return {
-    endA: end,
-    endB: priorEnd,
-    startA: `${month}-01`,
-    startB: `${year! - 1}-${String(monthNumber).padStart(2, '0')}-01`,
-  };
-}
-
 export function AnnualBookPage({ locale }: { locale: Locale }) {
   return (
     <AppShell active="annual-book" locale={locale}>
@@ -412,12 +379,6 @@ function AnnualBook({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [successDate, setSuccessDate] = useState('');
-  const [comparison, setComparison] = useState<AnnualBookComparison | null>(
-    null,
-  );
-  const initialComparison = useMemo(() => comparisonDates(month), [month]);
-  const [periods, setPeriods] = useState(initialComparison);
-  const [comparing, setComparing] = useState(false);
   const today = new Date().toISOString().slice(0, 10);
   const currentMonthStart = `${today.slice(0, 7)}-01`;
   const [expandedWeeks, setExpandedWeeks] = useState<Set<string>>(
@@ -440,31 +401,12 @@ function AnnualBook({
   }, [loadMonth]);
 
   useEffect(() => {
-    setPeriods(initialComparison);
-    setComparison(null);
-  }, [initialComparison]);
-
-  useEffect(() => {
     setExpandedWeeks(
       month === today.slice(0, 7)
         ? new Set([monthBoundedWeekStart(today, currentMonthStart)])
         : new Set(),
     );
   }, [currentMonthStart, month, today]);
-
-  async function compare(event: React.FormEvent) {
-    event.preventDefault();
-    setComparing(true);
-    setError('');
-    const params = new URLSearchParams(periods);
-    const response = await apiRequest(`/annual-book/comparison?${params}`, {
-      headers: { 'x-church-id': church.id },
-    });
-    if (response.ok)
-      setComparison((await response.json()) as AnnualBookComparison);
-    else setError(copy.error);
-    setComparing(false);
-  }
 
   async function downloadReport() {
     if (!data) return;
@@ -511,14 +453,22 @@ function AnnualBook({
           <h2>{copy.title}</h2>
           <p>{copy.dailyIntro}</p>
         </div>
-        <button
-          className="product-primary-link"
-          disabled={!data}
-          type="button"
-          onClick={() => void downloadReport()}
-        >
-          ↓ {copy.download}
-        </button>
+        <div className="heading-actions">
+          <Link
+            className="product-secondary-link"
+            href={`/${locale}/annual-book/comparison`}
+          >
+            {copy.compare}
+          </Link>
+          <button
+            className="product-primary-link"
+            disabled={!data}
+            type="button"
+            onClick={() => void downloadReport()}
+          >
+            ↓ {copy.download}
+          </button>
+        </div>
       </header>
 
       <section className="annual-book-month-bar" aria-label={copy.monthSummary}>
@@ -652,71 +602,6 @@ function AnnualBook({
               <p className="form-feedback" role="status">
                 {dateLabel(successDate, locale)} — {copy.daySaved}
               </p>
-            ) : null}
-          </section>
-
-          <section className="product-panel annual-book-section">
-            <div className="panel-heading">
-              <div>
-                <h3>{copy.comparison}</h3>
-                <p>{copy.comparisonIntro}</p>
-              </div>
-            </div>
-            <form
-              className="annual-book-comparison-form"
-              onSubmit={(event) => void compare(event)}
-            >
-              {(['A', 'B'] as const).map((period) => (
-                <fieldset key={period}>
-                  <legend>
-                    {period === 'A' ? copy.currentPeriod : copy.referencePeriod}
-                  </legend>
-                  <label>
-                    <span>{copy.start}</span>
-                    <input
-                      required
-                      type="date"
-                      value={period === 'A' ? periods.startA : periods.startB}
-                      onChange={(event) =>
-                        setPeriods((current) => ({
-                          ...current,
-                          [period === 'A' ? 'startA' : 'startB']:
-                            event.target.value,
-                        }))
-                      }
-                    />
-                  </label>
-                  <label>
-                    <span>{copy.end}</span>
-                    <input
-                      required
-                      type="date"
-                      value={period === 'A' ? periods.endA : periods.endB}
-                      onChange={(event) =>
-                        setPeriods((current) => ({
-                          ...current,
-                          [period === 'A' ? 'endA' : 'endB']:
-                            event.target.value,
-                        }))
-                      }
-                    />
-                  </label>
-                </fieldset>
-              ))}
-              <button
-                className="product-primary-link"
-                disabled={comparing}
-                type="submit"
-              >
-                {comparing ? copy.loading : copy.compare}
-              </button>
-            </form>
-            {comparison ? (
-              <ComparisonTable
-                comparison={comparison}
-                copy={copy}
-                locale={locale}
-              />
             ) : null}
           </section>
         </>
@@ -1053,74 +938,5 @@ function DayEditor({
         </aside>
       ))}
     </article>
-  );
-}
-
-function ComparisonTable({
-  comparison,
-  copy,
-  locale,
-}: {
-  comparison: AnnualBookComparison;
-  copy: (typeof copies)[Locale];
-  locale: Locale;
-}) {
-  const metrics: Array<[MetricKey, string]> = [
-    ['totalWithAthCents', copy.total],
-    ['totalWithoutAthCents', copy.totalWithoutAth],
-    ['cashCents', copy.cash],
-    ['cardCents', copy.card],
-    ['checkCents', copy.check],
-    ['athMobileCents', copy.ath],
-    ['designatedEnvelopeCents', copy.designated],
-    ['undesignatedCents', copy.undesignated],
-    ['expectedDepositCents', copy.expectedDeposit],
-    ['cardDifferenceCents', copy.cardDifference],
-  ];
-  return (
-    <div className="product-table-wrap annual-book-comparison-table">
-      <table className="product-table">
-        <thead>
-          <tr>
-            <th>{copy.comparison}</th>
-            <th>{copy.currentPeriod}</th>
-            <th>{copy.referencePeriod}</th>
-            <th>{copy.difference}</th>
-            <th>{copy.percentage}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {metrics.map(([key, label]) => {
-            const a = comparison.periodA.metrics[key];
-            const b = comparison.periodB.metrics[key];
-            const difference = comparison.differences[key];
-            return (
-              <tr
-                className={
-                  key === 'undesignatedCents' ? 'is-undesignated' : undefined
-                }
-                key={key}
-              >
-                <td>
-                  <strong>{label}</strong>
-                </td>
-                <td>{a === null ? '—' : formatMoney(a, locale)}</td>
-                <td>{b === null ? '—' : formatMoney(b, locale)}</td>
-                <td>
-                  {difference.amountCents === null
-                    ? '—'
-                    : formatMoney(difference.amountCents, locale)}
-                </td>
-                <td>
-                  {difference.percentage === null
-                    ? '—'
-                    : `${difference.percentage.toFixed(1)}%`}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
   );
 }

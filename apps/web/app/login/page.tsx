@@ -2,8 +2,6 @@
 
 import { useParams } from 'next/navigation';
 
-import { BrandPanel } from '../components/brand-panel';
-import { BrandWordmark } from '../components/brand-wordmark';
 import { LocaleSwitcher } from '../components/locale-switcher';
 import { localeFromRoute } from '../i18n/config';
 import { getDictionary } from '../i18n/dictionaries';
@@ -16,16 +14,8 @@ export default function LoginPage() {
 
   return (
     <main className="auth-shell">
-      <BrandPanel copy={dictionary.brand} />
-
       <section className="auth-form-panel">
         <div className="auth-form-panel__inner">
-          <BrandWordmark
-            className="mobile-wordmark"
-            priority
-            productName={dictionary.brand.productName}
-          />
-
           <header className="auth-header">
             <p className="section-label">{dictionary.login.secureAccess}</p>
             <h2>{dictionary.login.title}</h2>
