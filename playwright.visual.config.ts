@@ -57,7 +57,7 @@ export default defineConfig({
   webServer: externalBaseUrl
     ? undefined
     : {
-        command: 'pnpm --filter @uckg/web dev',
+        command: 'pnpm --filter @uckg/web dev --webpack',
         port: 3000,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,

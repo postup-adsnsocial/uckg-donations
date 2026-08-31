@@ -30,11 +30,13 @@ export function ProductIcon({ className = '', name }: ProductIconProps) {
   const imageSource = navigationIconSources[name];
   if (imageSource) {
     return (
-      <img
+      <Image
         alt=""
         aria-hidden="true"
         className={`product-icon--image ${className}`}
+        height={23}
         src={imageSource}
+        width={23}
       />
     );
   }
@@ -139,3 +141,4 @@ export function ProductIcon({ className = '', name }: ProductIconProps) {
     </svg>
   );
 }
+import Image from 'next/image';
